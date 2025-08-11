@@ -1,4 +1,6 @@
 {
     "not_required_columns": ["Frequency (GHz)", "Anharmonicity (GHz)", "Operational", "Readout assignment error"],
-    "multi_data_columns": ["2q_gate_time", "ecr_gate_error"]
+    "multi_data_columns": ["2q_gate_time", "ecr_gate_error"],
+    "single_qubit_gates": ["id_gate_error", "x_gate_error", "sx_gate_error"],
+    "two_qubit_gates": ["ecr_gate_error"]
 }

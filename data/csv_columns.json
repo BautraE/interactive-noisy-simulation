@@ -41,26 +41,31 @@
     }, 
     "id_gate_error": {
         "name": "ID gate error",
+        "code_name": "id",
         "csv_name": "ID error",
         "description": "Measure of the depolarizing error that affects the state of a qubit when an ID gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit."
     }, 
     "x_gate_error": {
         "name": "X gate error",
+        "code_name": "x",
         "csv_name": "Pauli-X error",
         "description": "Measure of the depolarizing error that affects the state of a qubit when an X gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit."
     }, 
     "sx_gate_error": {
         "name": "SX gate error",
+        "code_name": "sx",
         "csv_name": "√x (sx) error",
         "description": "Measure of the depolarizing error that affects the state of a qubit when an SX gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit."
     }, 
     "ecr_gate_error": {
         "name": "ECR gate error",
+        "code_name": "ecr",
         "csv_name": "ECR error",
         "description": "Measure of the depolarizing error that affects the state of a two-qubit pair when an ECR gate is applied on them. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit pair."
     }, 
     "rz_gate_error": {
         "name": "RZ gate error",
+        "code_name": "rz",
         "csv_name": "Z-axis rotation (rz) error",
         "description": "Measure of the depolarizing error that affects the state of a qubit when an RZ gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit."
     }

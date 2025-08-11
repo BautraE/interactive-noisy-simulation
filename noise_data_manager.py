@@ -17,6 +17,10 @@ class NoiseDataManager:
             f"Continue by importing the QPU calibration data CSV file: \033[32mobject.import_csv_data('path/to/file.csv')\033[0m\n"
         )
 
+    @property
+    def noise_data(self) -> pandas.DataFrame:
+        return self.__dataframe
+
     # For importing calibration data from IBM Quantum QPU's
     def import_csv_data(self, file_path: str):
         print(f"----- Importing data from the selected CSV file -----")
