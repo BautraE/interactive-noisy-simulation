@@ -1,4 +1,9 @@
 {
+    "neighboring_qubits": {
+        "name": "Directionally connected qubits",
+        "csv_name": "Neighboring qubits (directional to)",
+        "description": "Other neighboring to a certain qubit that are connected with a directional link - two qubit gates and instructions can only be applied in the available directions, because in IBM Qiskit, qubit coupling maps are considered as oriented graphs. This information is used to create a coupling map."
+    },
     "t1_time": {
         "name": "T1 relaxation time (microseconds)",
         "csv_name": "T1 (us)",
@@ -68,5 +73,23 @@
         "code_name": "rz",
         "csv_name": "Z-axis rotation (rz) error",
         "description": "Measure of the depolarizing error that affects the state of a qubit when an RZ gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit."
+    },
+    "rx_gate_error": {
+        "name": "RX gate error",
+        "code_name": "rx",
+        "csv_name": "RX error",
+        "description": "Measure of the depolarizing error that affects the state of a qubit when an RX gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit."
+    },
+    "cz_gate_error": {
+        "name": "CZ gate error",
+        "code_name": "cz",
+        "csv_name": "CZ error",
+        "description": "Measure of the depolarizing error that affects the state of a two-qubit pair when an CZ gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit pair."
+    },
+    "rzz_gate_error": {
+        "name": "RZZ gate error",
+        "code_name": "rzz",
+        "csv_name": "RZZ error",
+        "description": "Measure of the depolarizing error that affects the state of a two-qubit pair when an RZZ gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit pair."
     }
 }
