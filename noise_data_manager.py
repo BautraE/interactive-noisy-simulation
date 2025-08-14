@@ -1,10 +1,13 @@
+# Used for functionality purposes:
 import pandas, json, numpy
 from typing import Union
 
 with open("data/csv_columns.json", "r") as file:
     CSV_COLUMNS = json.load(file)
+
 with open("data/noise_data_manager_descriptions.json", "r") as file:
     NOISEDATAMANAGER_METHODS = json.load(file)
+    
 with open("data/config.json", "r") as file:
     CONFIG = json.load(file)
 
@@ -34,7 +37,7 @@ class NoiseDataManager:
         # Initializing new column
         column_neighboring_qubits = CSV_COLUMNS["neighboring_qubits"]["csv_name"]
         self.__dataframe[column_neighboring_qubits] = numpy.nan
-        self.__dataframe[column_neighboring_qubits].astype(object)
+        self.__dataframe[column_neighboring_qubits] = self.__dataframe[column_neighboring_qubits].astype(object)
 
         for qubit in range(len(self.__dataframe)):
             neighboring_qubits = []
