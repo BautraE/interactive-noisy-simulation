@@ -1,0 +1,35 @@
+{
+    "created_new_object": "{class_name} class object has been created successfully!",
+
+    "created_noise_model": "Noise model has been created successfully!",
+
+    "created_simulator": "Simulator has been created successfully!",
+
+    "creating_new_object": "----- Creating {class_name} class object -----",
+
+    "creating_noise_model": "----- Creating noise model from available data -----",
+
+    "creating_simulator": "----- Creating simulator from noise model and coupling map -----",
+
+    "csv_information": "----- Information on all currently relevant CSV calibration data columns -----",
+
+    "error_negative_qubit_number": "Qubit numbers cannot be lower than 0! The number {qubit} goes against this!",
+
+    "error_not_linked": "There is no linked {class_name} object! Please use the method {method_name}(object: {class_name}) before executing this method!",
+
+    "execute_simulator": "----- Executing circuit with simulator -----",
+
+    "execution_complete": "Circuit execution completed successfully! Result job has been returned!",
+
+    "import_csv": "Continue by importing the QPU calibration data CSV file: object.import_csv_data('path/to/file.csv')",
+
+    "importing_csv": "----- Importing data from the selected CSV file -----",
+
+    "linking_object": "----- Linking class {linked_class} object to {this_class} -----",
+
+    "linking_success": "Linking completed successfully!",
+
+    "retrieving_qubits": "----- Retrieving information about qubits {qubits} -----",
+
+    "successful_csv_import": "Data from CSV file has been imported successfully!"
+}

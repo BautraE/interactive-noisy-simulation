@@ -7,12 +7,12 @@
     "t1_time": {
         "name": "T1 relaxation time (microseconds)",
         "csv_name": "T1 (us)",
-        "description": "...WILL ADD THIS DESCRIPTION LATER..."
+        "description": "The T1 time represents the average duration a qubit remains in its excited state ∣1⟩ before decaying to its ground state ∣0⟩ due to energy relaxation. This parameter is used to characterize the qubit's energy relaxation behavior, and is expressed in microseconds."
     },
     "t2_time": {
         "name": "T2 relaxation time (microseconds)",
         "csv_name": "T2 (us)",
-        "description": "...WILL ADD THIS DESCRIPTION LATER..."
+        "description": "The T2 time denotes the timescale over which a qubit maintains phase coherence of a superposition between the ∣0⟩ and ∣1⟩ states. It accounts for both energy relaxation and pure dephasing processes, providing insight into the qubit's coherence properties. It is expressed in microseconds."
     }, 
     "1q_gate_time": {
         "name": "Single-qubit gate time (nanoseconds)",
