@@ -1,13 +1,18 @@
-# Used for functionality purposes:
+# Standard library imports:
 import json, warnings
+from importlib import resources
+
+#Third party imports:
 from qiskit import transpile
 from qiskit_aer import AerSimulator
-# Used for referencing types:
-from noise_creator import NoiseCreator
 from qiskit_aer.jobs.aerjob import AerJob
 
+# Local project imports:
+from . import data
+from .noise_creator import NoiseCreator
 
-with open("data/messages.json", "r") as file:
+
+with (resources.files(data) / "messages.json").open("r") as file:
     MESSAGES = json.load(file)
 
 
@@ -22,14 +27,8 @@ class SimulatorManager:
             f"{MESSAGES["created_new_object"].format(class_name=self.__class__.__name__)}\n"
         )
 
-    
-    def link_noise_creator(self, noise_creator: NoiseCreator) -> None:
-        """Links a NoiseCreator class object to gain access to created noise models """
-        print(f"{MESSAGES["linking_object"].format(linked_class=NoiseCreator.__name__,
-                                                   this_class=self.__class__.__name__)}")
-        self.__noise_model = noise_creator.noise_model
-        print(f"{MESSAGES["linking_success"]}\n")
 
+    # Public class methods
 
     def create_simulator(self) -> None:
         """Creates a AerSimulator object from available data """
@@ -44,6 +43,14 @@ class SimulatorManager:
                                         noise_model=self.__noise_model["noise_model"])
         
         print(f"{MESSAGES["created_simulator"]}\n")
+
+
+    def link_noise_creator(self, noise_creator: NoiseCreator) -> None:
+        """Links a NoiseCreator class object to gain access to created noise models """
+        print(f"{MESSAGES["linking_object"].format(linked_class=NoiseCreator.__name__,
+                                                   this_class=self.__class__.__name__)}")
+        self.__noise_model = noise_creator.noise_model
+        print(f"{MESSAGES["linking_success"]}\n")
 
 
     def run_simulator(self, circuit, optimization, shots) -> AerJob:
@@ -62,6 +69,8 @@ class SimulatorManager:
                 extract the result counts and other data associated with the
                 completed job.
         """
+        self.__check_simulator()
+
         print(f"{MESSAGES["execute_simulator"]}")
 
         # While doing everything correctly, there seems to be an error message
@@ -82,3 +91,11 @@ class SimulatorManager:
 
         print(f"{MESSAGES["execution_complete"]}\n")
         return result_job
+
+
+    # Private class methods
+
+    def __check_simulator(self) -> None:
+        """Checks if a simulator exists in the current object of SimulatorManager """
+        if self.__simulator is None:
+            raise RuntimeError(f"{MESSAGES["error_no_simulator"]}")

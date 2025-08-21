@@ -1,16 +1,24 @@
-# Used for functionality purposes:
-import json, numpy, pandas
+# Standard library imports:
+import json
+from importlib import resources
 from typing import Union
 
+#Third party imports:
+import numpy, pandas
 
-with open("data/config.json", "r") as file:
+# Local project imports:
+from . import data
+
+
+with (resources.files(data) / "config.json").open("r") as file:
     CONFIG = json.load(file)
 
-with open("data/csv_columns.json", "r") as file:
+with (resources.files(data) / "csv_columns.json").open("r") as file:
     CSV_COLUMNS = json.load(file)
-
-with open("data/messages.json", "r") as file:
+    
+with (resources.files(data) / "messages.json").open("r") as file:
     MESSAGES = json.load(file)
+
 
 class NoiseDataManager:
 
@@ -24,12 +32,59 @@ class NoiseDataManager:
         )
 
     
+    # Class properties
+
     @property    
     def noise_data(self) -> pandas.DataFrame:
         """Returns a read-only copy of the current dataframe that contains noise data"""
+        self.__chack_dataframe()
         return self.__dataframe
 
     
+    # Public class methods
+
+    def get_qubit_noise_information(self, qubits: Union[int, list[int]]) -> None:
+        """Prints out noise data for certain qubits
+        
+        Retrieves and prints out all noise data from dataframe for the 
+        selected qubits by the user.
+
+        Args:
+            qubits: either a single qubit number or a list of qubit numbers,
+            for which the noise data will be retrieved and printed out for the
+            user to see.
+        """
+        
+        self.__chack_dataframe()
+
+        dataframe = self.__dataframe
+        if isinstance(qubits, int):
+            qubits = [qubits]
+        
+        # Check for negative numbers and out of bounds indexes
+        self.__check_qubit_input(dataframe, qubits)
+
+        print(f"{MESSAGES["retrieving_qubits"].format(qubits=qubits)}")
+        for qubit in qubits:
+            print(f"Qubit number: {qubit}")
+            for column in CSV_COLUMNS.keys():
+                if CSV_COLUMNS[column]["csv_name"] in dataframe.columns:
+                    name = CSV_COLUMNS[column]["name"]
+                    value = dataframe.loc[qubit, CSV_COLUMNS[column]["csv_name"]]
+                    print(f"{name}: \033[32m{value}\033[0m")
+            print(f"\n")
+
+
+    def help_csv_columns(self) -> None:
+        """Prints out information about all dataframe columns """
+        print(f"{MESSAGES["csv_information"]}")
+        for column in CSV_COLUMNS.keys():
+            name = CSV_COLUMNS[column]["name"]
+            description = CSV_COLUMNS[column]["description"]
+            print(f"\033[32m{name}:\033[0m {description}")
+        print(f"\n")
+
+
     def import_csv_data(self, file_path: str) -> None:
         """Imports and modifies data from a given calibration data file 
         
@@ -52,25 +107,9 @@ class NoiseDataManager:
         print(
             f"{MESSAGES["successful_csv_import"]}\n"
         )
-
     
-    def __remove_unnecessary_collumns(self, dataframe) -> None:
-        """Removes data columns that are not used to simulate noise
 
-        Helper methods for class method "import_csv_data":
-
-        Not all columns in the provided CSV files are used in the creation of
-        errors for a noise model, therefore they are removed. A list of all 
-        removable columns is available in the configuration file "config.json"
-        as "not_required_columns".
-
-        Args:
-            dataframe: dataframe from which the columns will be removed
-        """
-        for column in CONFIG["not_required_columns"]:
-            if column in dataframe.columns:
-                dataframe.pop(column)
-    
+    # Private class methods
 
     def __add_additional_columns(self, dataframe) -> None:
         """Adds additional columns for noise data storage
@@ -102,6 +141,32 @@ class NoiseDataManager:
             f"CSV files currently do not contain Reset operation times. "
             f"A default value of \033[32m1300 ns\033[0m has been set."
         )
+
+
+    def __chack_dataframe(self) -> None:
+        """Checks if a dataframe exists in the current object of NoiseDataManager """
+        if self.__dataframe is None:
+            raise RuntimeError(f"{MESSAGES["error_no_dataframe"]}")
+
+
+    def __check_qubit_input(self, dataframe: pandas.DataFrame, qubits: list[int]) -> None:
+        """Validates input qubit numbers for method "get_qubit_noise_information()"
+
+        Helper method checks if the passed qubit numbers are above 0 and below
+        the max index of qubits based on the dataframe.
+
+        Args:
+            datafrane: The dataframe, from which the information will be extracted
+                from.
+            qubits: Numbers of qubits that got passed as arguments.
+        """
+        qubit_count = len(dataframe)
+        for qubit in qubits:
+            if qubit < 0:
+                raise ValueError(f"{MESSAGES["error_negative_qubit_number"].format(qubit=qubit)}")
+            if qubit >= qubit_count:
+                raise ValueError(f"{MESSAGES["error_large_qubit_number"].format(qubit=qubit,
+                                                                                max_qubits=qubit_count - 1)}")
 
 
     def __modify_dataframe_data(self, dataframe) -> None:
@@ -149,42 +214,19 @@ class NoiseDataManager:
                         are_neighbors_found = True
 
 
-    def get_qubit_noise_information(self, qubits: Union[int, list[int]]) -> None:
-        """Prints out noise data for certain qubits
-        
-        Retrieves and prints out all noise data from dataframe for the 
-        selected qubits by the user.
+    def __remove_unnecessary_collumns(self, dataframe) -> None:
+        """Removes data columns that are not used to simulate noise
+
+        Helper methods for class method "import_csv_data":
+
+        Not all columns in the provided CSV files are used in the creation of
+        errors for a noise model, therefore they are removed. A list of all 
+        removable columns is available in the configuration file "config.json"
+        as "not_required_columns".
 
         Args:
-            qubits: either a single qubit number or a list of qubit numbers,
-            for which the noise data will be retrieved and printed out for the
-            user to see.
+            dataframe: dataframe from which the columns will be removed
         """
-        dataframe = self.__dataframe
-        
-        if isinstance(qubits, int):
-            qubits = [qubits]
-        # Check for negative numbers
-        for qubit in qubits:
-            if qubit < 0:
-                raise ValueError(f"{MESSAGES["error_negative_qubit_number"].format(qubit=qubit)}")
-
-        print(f"{MESSAGES["retrieving_qubits"].format(qubits=qubits)}")
-        for qubit in qubits:
-            print(f"Qubit number: {qubit}")
-            for column in CSV_COLUMNS.keys():
-                if CSV_COLUMNS[column]["csv_name"] in dataframe.columns:
-                    name = CSV_COLUMNS[column]["name"]
-                    value = dataframe.loc[qubit, CSV_COLUMNS[column]["csv_name"]]
-                    print(f"{name}: \033[32m{value}\033[0m")
-            print(f"\n")
-
-
-    def help_csv_columns(self) -> None:
-        """Prints out information about all dataframe columns """
-        print(f"{MESSAGES["csv_information"]}")
-        for column in CSV_COLUMNS.keys():
-            name = CSV_COLUMNS[column]["name"]
-            description = CSV_COLUMNS[column]["description"]
-            print(f"\033[32m{name}:\033[0m {description}")
-        print(f"\n")
+        for column in CONFIG["not_required_columns"]:
+            if column in dataframe.columns:
+                dataframe.pop(column)

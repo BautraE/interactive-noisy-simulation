@@ -1,5 +1,9 @@
-# Used for functionality purposes:
-import json, pandas
+# Standard library imports:
+import json
+from importlib import resources
+
+#Third party imports:
+import pandas
 from qiskit.transpiler import CouplingMap
 from qiskit_aer.noise import (
     NoiseModel,
@@ -7,17 +11,19 @@ from qiskit_aer.noise import (
     depolarizing_error,
     thermal_relaxation_error
 )
-# Used for referencing types:
-from noise_data_manager import NoiseDataManager
+
+# Local project imports:
+from . import data
+from .noise_data_manager import NoiseDataManager
 
 
-with open("data/config.json", "r") as file:
+with (resources.files(data) / "config.json").open("r") as file:
     CONFIG = json.load(file)
 
-with open("data/csv_columns.json", "r") as file:
+with (resources.files(data) / "csv_columns.json").open("r") as file:
     CSV_COLUMNS = json.load(file)
-
-with open("data/messages.json", "r") as file:
+    
+with (resources.files(data) / "messages.json").open("r") as file:
     MESSAGES = json.load(file)
 
 
@@ -33,19 +39,16 @@ class NoiseCreator:
         )
 
 
+    # Class properties
+
     @property
     def noise_model(self) -> NoiseModel:
         """Returns a read-only copy of the current noise model (dictionary with NoiseModel and CouplingMap object) """
+        self.__check_noise_model()
         return self.__noise_model
-    
 
-    def link_noise_data_manager(self, noise_data_manager: NoiseDataManager) -> None:
-        """Links a NoiseDataManager object to gain access to noise data """
-        print(f"{MESSAGES["linking_object"].format(linked_class=NoiseDataManager.__name__,
-                                                   this_class=self.__class__.__name__)}")
-        self.__noise_data = noise_data_manager.noise_data
-        print(f"{MESSAGES["linking_success"]}\n")
 
+    # Public class methods
 
     def create_noise_model(self) -> None:
         """Creates a new noise model
@@ -71,36 +74,15 @@ class NoiseCreator:
         print(f"{MESSAGES["created_noise_model"]}\n")
 
 
-    # Helper methods for class method "create_noise_model":
-   
+    def link_noise_data_manager(self, noise_data_manager: NoiseDataManager) -> None:
+        """Links a NoiseDataManager object to gain access to noise data """
+        print(f"{MESSAGES["linking_object"].format(linked_class=NoiseDataManager.__name__,
+                                                   this_class=self.__class__.__name__)}")
+        self.__noise_data = noise_data_manager.noise_data
+        print(f"{MESSAGES["linking_success"]}\n")
 
-    def __add_readout_error(self, qubit, columns) -> None:
-        """Helps create and add readout error to noise model
 
-        Helper method for the class method "create_noise_model".
-
-        By using available noise data, method creates readout errors for
-        every qubit and adds them to a class NoiseModel object. This code 
-        was written based on givenexamples by IBM on how to create such 
-        errors (a link to the web page is available further on).
-
-        Link to IBM documentation on the mention topic:
-        https://qiskit.github.io/qiskit-aer/tutorials/3_building_noise_models.html
-
-        Args:
-            qubit: The number of the current qubit.
-            columns: Table data for the current qubit. Basically a row, however,
-                to access a certain attribute, you must do as follows:
-                column["attribute_name"], where "attribute_name" is the column
-                name in the dataframe.
-        """
-        noise_model = self.__noise_model["noise_model"]
-
-        m0p1 = columns[CSV_COLUMNS["m0p1"]["csv_name"]]
-        m1p0 = columns[CSV_COLUMNS["m1p0"]["csv_name"]]
-        readout_error = ReadoutError([[1-m0p1, m0p1], [m1p0, 1-m1p0]])
-        noise_model.add_readout_error(readout_error, [qubit])
-
+    # Private class methods
 
     def __add_depolarizing_error(self, qubit, columns) -> None:
         """Helps create and add depolarizing error to noise model
@@ -147,6 +129,34 @@ class NoiseCreator:
                         noise_model.add_quantum_error(error=error, instructions=CSV_COLUMNS[gate]["code_name"], 
                                                       qubits=[qubit, target_qubit], warnings=False)
     
+
+    def __add_readout_error(self, qubit, columns) -> None:
+        """Helps create and add readout error to noise model
+
+        Helper method for the class method "create_noise_model".
+
+        By using available noise data, method creates readout errors for
+        every qubit and adds them to a class NoiseModel object. This code 
+        was written based on givenexamples by IBM on how to create such 
+        errors (a link to the web page is available further on).
+
+        Link to IBM documentation on the mention topic:
+        https://qiskit.github.io/qiskit-aer/tutorials/3_building_noise_models.html
+
+        Args:
+            qubit: The number of the current qubit.
+            columns: Table data for the current qubit. Basically a row, however,
+                to access a certain attribute, you must do as follows:
+                column["attribute_name"], where "attribute_name" is the column
+                name in the dataframe.
+        """
+        noise_model = self.__noise_model["noise_model"]
+
+        m0p1 = columns[CSV_COLUMNS["m0p1"]["csv_name"]]
+        m1p0 = columns[CSV_COLUMNS["m1p0"]["csv_name"]]
+        readout_error = ReadoutError([[1-m0p1, m0p1], [m1p0, 1-m1p0]])
+        noise_model.add_readout_error(readout_error, [qubit])
+
 
     def __add_thermal_error(self, qubit, columns) -> None:
         """Helps create and add thermal relaxation error to noise model
@@ -219,6 +229,13 @@ class NoiseCreator:
         thermal_error_rz = thermal_relaxation_error(t1_time, t2_time, 0)
         noise_model.add_quantum_error(error=thermal_error_rz, instructions="reset", 
                                       qubits=[qubit], warnings=False)
+    
+    
+    def __check_noise_model(self) -> None:
+        """Checks if a noise model exists in the current object of NoiseCreator """
+        if not self.__noise_model:
+            raise RuntimeError(f"{MESSAGES["error_no_noise_model"]}")
+
     
     def __get_basis_gates(self) -> list[str]:
         """Helps to create and return a list of basis gates

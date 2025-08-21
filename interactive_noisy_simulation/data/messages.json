@@ -13,7 +13,15 @@
 
     "csv_information": "----- Information on all currently relevant CSV calibration data columns -----",
 
+    "error_large_qubit_number": "There is no qubit with the number {qubit}. The largest number to access a qubit from this data is {max_qubits}!",
+
     "error_negative_qubit_number": "Qubit numbers cannot be lower than 0! The number {qubit} goes against this!",
+
+    "error_no_dataframe": "There is currently no noise data dataframe within this NoiseDataManager class object! Please create one with the help of the method: object.import_csv_data('path/to/file.csv')",
+
+    "error_no_noise_model": "There is currently no created noise model within this NoiseCreator class object! Please create one with the help of the method: object.create_noise_model()",
+
+    "error_no_simulator": "There is currently no created simulator within this SimulatorManager class object! Please create one with the help of the method: object.create_simulator()",
 
     "error_not_linked": "There is no linked {class_name} object! Please use the method {method_name}(object: {class_name}) before executing this method!",
 
