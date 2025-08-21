@@ -1,0 +1,7 @@
+# Ignoring specific directories:
+build/
+interactive_noisy_simulation.egg-info/
+__pycache__/
+
+# Ignoring specific files:
+# Currently none

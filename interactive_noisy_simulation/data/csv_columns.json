@@ -1,0 +1,95 @@
+{
+    "neighboring_qubits": {
+        "name": "Directionally connected qubits",
+        "csv_name": "Neighboring qubits (directional to)",
+        "description": "Other neighboring to a certain qubit that are connected with a directional link - two qubit gates and instructions can only be applied in the available directions, because in IBM Qiskit, qubit coupling maps are considered as oriented graphs. This information is used to create a coupling map."
+    },
+    "t1_time": {
+        "name": "T1 relaxation time (microseconds)",
+        "csv_name": "T1 (us)",
+        "description": "The T1 time represents the average duration a qubit remains in its excited state ∣1⟩ before decaying to its ground state ∣0⟩ due to energy relaxation. This parameter is used to characterize the qubit's energy relaxation behavior, and is expressed in microseconds."
+    },
+    "t2_time": {
+        "name": "T2 relaxation time (microseconds)",
+        "csv_name": "T2 (us)",
+        "description": "The T2 time denotes the timescale over which a qubit maintains phase coherence of a superposition between the ∣0⟩ and ∣1⟩ states. It accounts for both energy relaxation and pure dephasing processes, providing insight into the qubit's coherence properties. It is expressed in microseconds."
+    }, 
+    "1q_gate_time": {
+        "name": "Single-qubit gate time (nanoseconds)",
+        "csv_name": "Single-qubit gate length (ns)",
+        "description": "Amount of time required to complete a single-qubit gate on a specific qubit. When building noise models, this time is used to create a thermal relaxation error for all single-qubit gates on the specific qubit."
+    }, 
+    "2q_gate_time": {
+        "name": "Two-qubit gate time (nanoseconds)",
+        "csv_name": "Gate length (ns)",
+        "description": "Amount of time required to complete a two-qubit gate on a specific pair of qubits in a specific direction. When building noise models, this time is used to create a thermal relaxation error for all two-qubit gates on the specific pair of qubits."
+    }, 
+    "readout_time": {
+        "name": "Qubit value readout time (nanoseconds)",
+        "csv_name": "Readout length (ns)",
+        "description": "Amount of time required to measure a qubit's value, which is described in nanoseconds. When building noise models, this time is used to create a thermal relaxation error for the measure operation."
+    }, 
+     "reset_time": {
+        "name": "Reset operation time (nanoseconds)",
+        "csv_name": "Reset operation time (ns)",
+        "description": "Amount of time required to complete a reset operation on a specific qubit. When building noise models, this time is used to create a thermal relaxation error for the reset operation."
+    }, 
+    "m1p0": {
+        "name": "Probability to measure 0, when 1 is prepared",
+        "csv_name": "Prob meas0 prep1",
+        "description": "Probability that the measurement of a qubit's value returns '0' immediately after it was prepared as '|1⟩'. This value is used, when creating a readout error."
+    }, 
+    "m0p1": {
+        "name": "Probability to measure 1, when 0 is prepared",
+        "csv_name": "Prob meas1 prep0",
+        "description": "Probability that the measurement of a qubit's value returns '1' immediately after it was prepared as '|0⟩'. This value is used, when creating a readout error."
+    }, 
+    "id_gate_error": {
+        "name": "ID gate error",
+        "code_name": "id",
+        "csv_name": "ID error",
+        "description": "Measure of the depolarizing error that affects the state of a qubit when an ID gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit."
+    }, 
+    "x_gate_error": {
+        "name": "X gate error",
+        "code_name": "x",
+        "csv_name": "Pauli-X error",
+        "description": "Measure of the depolarizing error that affects the state of a qubit when an X gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit."
+    }, 
+    "sx_gate_error": {
+        "name": "SX gate error",
+        "code_name": "sx",
+        "csv_name": "√x (sx) error",
+        "description": "Measure of the depolarizing error that affects the state of a qubit when an SX gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit."
+    }, 
+    "ecr_gate_error": {
+        "name": "ECR gate error",
+        "code_name": "ecr",
+        "csv_name": "ECR error",
+        "description": "Measure of the depolarizing error that affects the state of a two-qubit pair when an ECR gate is applied on them. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit pair."
+    }, 
+    "rz_gate_error": {
+        "name": "RZ gate error",
+        "code_name": "rz",
+        "csv_name": "Z-axis rotation (rz) error",
+        "description": "Measure of the depolarizing error that affects the state of a qubit when an RZ gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit."
+    },
+    "rx_gate_error": {
+        "name": "RX gate error",
+        "code_name": "rx",
+        "csv_name": "RX error",
+        "description": "Measure of the depolarizing error that affects the state of a qubit when an RX gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit."
+    },
+    "cz_gate_error": {
+        "name": "CZ gate error",
+        "code_name": "cz",
+        "csv_name": "CZ error",
+        "description": "Measure of the depolarizing error that affects the state of a two-qubit pair when an CZ gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit pair."
+    },
+    "rzz_gate_error": {
+        "name": "RZZ gate error",
+        "code_name": "rzz",
+        "csv_name": "RZZ error",
+        "description": "Measure of the depolarizing error that affects the state of a two-qubit pair when an RZZ gate is applied to it. When building noise models, this value is used to create a depolarizing error for this specific gate on a specific qubit pair."
+    }
+}
