@@ -12,7 +12,7 @@ from . import data
 from .noise_creator import NoiseCreator
 
 
-with (resources.files(data) / "messages.json").open("r") as file:
+with (resources.files(data) / "messages.json").open("r", encoding="utf8") as file:
     MESSAGES = json.load(file)
 
 
