@@ -8,15 +8,16 @@ import numpy, pandas
 
 # Local project imports:
 from . import data
+from .messages._message_manager import MessageManager
 
 
-with (resources.files(data) / "config.json").open("r") as file:
+with (resources.files(data) / "config.json").open("r", encoding="utf8") as file:
     CONFIG = json.load(file)
 
-with (resources.files(data) / "csv_columns.json").open("r") as file:
+with (resources.files(data) / "csv_columns.json").open("r", encoding="utf8") as file:
     CSV_COLUMNS = json.load(file)
     
-with (resources.files(data) / "messages.json").open("r") as file:
+with (resources.files(data) / "messages.json").open("r", encoding="utf8") as file:
     MESSAGES = json.load(file)
 
 
@@ -24,12 +25,16 @@ class NoiseDataManager:
 
     def __init__(self) -> None:
         """Constructor method """
+        self.__message_manager: MessageManager = MessageManager()
+        msg = self.__message_manager
+        
+        msg.create_output(MESSAGES["creating_new_object"].format(class_name=self.__class__.__name__))
+        
         self.__dataframe: pandas.DataFrame | None = None
-        print(
-            f"{MESSAGES["creating_new_object"].format(class_name=self.__class__.__name__)}\n"
-            f"{MESSAGES["created_new_object"].format(class_name=self.__class__.__name__)}\n"
-            f"{MESSAGES["import_csv"]}\n"
-        )
+
+        msg.add_message(MESSAGES["created_new_object"].format(class_name=self.__class__.__name__))
+        msg.add_message(MESSAGES["import_csv"])
+        msg.end_output()
 
     
     # Class properties
@@ -37,7 +42,7 @@ class NoiseDataManager:
     @property    
     def noise_data(self) -> pandas.DataFrame:
         """Returns a read-only copy of the current dataframe that contains noise data"""
-        self.__chack_dataframe()
+        self.__check_dataframe()
         return self.__dataframe
 
     
@@ -55,7 +60,7 @@ class NoiseDataManager:
             user to see.
         """
         
-        self.__chack_dataframe()
+        self.__check_dataframe()
 
         dataframe = self.__dataframe
         if isinstance(qubits, int):
@@ -64,25 +69,27 @@ class NoiseDataManager:
         # Check for negative numbers and out of bounds indexes
         self.__check_qubit_input(dataframe, qubits)
 
-        print(f"{MESSAGES["retrieving_qubits"].format(qubits=qubits)}")
+        msg = self.__message_manager
+        msg.create_output(MESSAGES["retrieving_qubits"].format(qubits=qubits))
         for qubit in qubits:
-            print(f"Qubit number: {qubit}")
+            msg.add_message(f"Qubit number: {qubit}")
             for column in CSV_COLUMNS.keys():
                 if CSV_COLUMNS[column]["csv_name"] in dataframe.columns:
                     name = CSV_COLUMNS[column]["name"]
                     value = dataframe.loc[qubit, CSV_COLUMNS[column]["csv_name"]]
-                    print(f"{name}: \033[32m{value}\033[0m")
-            print(f"\n")
+                    msg.add_message(f"{name}: {value}")
+        msg.end_output()
 
 
     def help_csv_columns(self) -> None:
         """Prints out information about all dataframe columns """
-        print(f"{MESSAGES["csv_information"]}")
+        msg = self.__message_manager
+        msg.create_output(MESSAGES["csv_information"])
         for column in CSV_COLUMNS.keys():
             name = CSV_COLUMNS[column]["name"]
             description = CSV_COLUMNS[column]["description"]
-            print(f"\033[32m{name}:\033[0m {description}")
-        print(f"\n")
+            msg.add_message(f"{name}: {description}")
+        msg.end_output()
 
 
     def import_csv_data(self, file_path: str) -> None:
@@ -98,16 +105,18 @@ class NoiseDataManager:
         Args:
             file_path: path to the calibration data CSV file.
         """
-        print(f"{MESSAGES["importing_csv"]}")
+        msg = self.__message_manager
+        msg.create_output(MESSAGES["importing_csv"])
+
         dataframe = pandas.read_csv(file_path)
         self.__remove_unnecessary_collumns(dataframe)
         self.__add_additional_columns(dataframe)
         self.__modify_dataframe_data(dataframe)
         self.__dataframe = dataframe
-        print(
-            f"{MESSAGES["successful_csv_import"]}\n"
-        )
-    
+        
+        msg.add_message(MESSAGES["successful_csv_import"])
+        msg.end_output()
+
 
     # Private class methods
 
@@ -137,13 +146,10 @@ class NoiseDataManager:
         
         # This might change, if they add this information in the CSV files at some point in time
         dataframe[CSV_COLUMNS["reset_time"]["csv_name"]] = 1300
-        print(
-            f"CSV files currently do not contain Reset operation times. "
-            f"A default value of \033[32m1300 ns\033[0m has been set."
-        )
+        self.__message_manager.add_message(MESSAGES["reset_time"])
 
 
-    def __chack_dataframe(self) -> None:
+    def __check_dataframe(self) -> None:
         """Checks if a dataframe exists in the current object of NoiseDataManager """
         if self.__dataframe is None:
             raise RuntimeError(f"{MESSAGES["error_no_dataframe"]}")

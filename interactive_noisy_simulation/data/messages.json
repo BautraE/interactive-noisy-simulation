@@ -5,7 +5,7 @@
 
     "created_simulator": "Simulator has been created successfully!",
 
-    "creating_new_object": "----- Creating {class_name} class object -----",
+    "creating_new_object": "Creating {class_name} class object",
 
     "creating_noise_model": "----- Creating noise model from available data -----",
 
@@ -36,6 +36,8 @@
     "linking_object": "----- Linking class {linked_class} object to {this_class} -----",
 
     "linking_success": "Linking completed successfully!",
+
+    "reset_time": "CSV files currently do not contain Reset operation times. A default value of 1300 ns has been set.",
 
     "retrieving_qubits": "----- Retrieving information about qubits {qubits} -----",
 

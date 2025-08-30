@@ -1,0 +1,36 @@
+/* Some thing require a more specific selector due to
+   default Jupyter Notebook styles and the need to
+   overwrite them */
+.content-block {
+    background-color: #3B3F52;
+    width: 100%;
+    max-width: 700px;
+    padding: 20px;
+    filter: drop-shadow(0px 4px 4px #141414);
+    color: white;
+    border-radius:8px;
+}
+
+div.content-block p {
+    font-size: 14px;
+    margin-top: 0px;
+    margin-bottom: 8px;
+}
+
+.content-messages {
+    background-color: #252E5D;
+    border-radius:8px;
+    width: auto;
+    margin-left: 20px;
+    padding: 10px
+}
+
+div.content-block h1.main-headings {
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    filter: drop-shadow(0px 4px 4px #000000);
+}
