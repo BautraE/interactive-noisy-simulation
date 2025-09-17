@@ -25,6 +25,8 @@
 
     "error_not_linked": "There is no linked {class_name} object! Please use the method {method_name}(object: {class_name}) before executing this method!",
 
+    "exception_occurred": "AN EXCEPTION HAS OCCURED. PLEASE VIEW THE ERROR LOG FOR MORE DETAILS!",
+    
     "execute_simulator": "----- Executing circuit with simulator -----",
 
     "execution_complete": "Circuit execution completed successfully! Result job has been returned!",

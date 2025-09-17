@@ -42,7 +42,10 @@ class NoiseDataManager:
     @property    
     def noise_data(self) -> pandas.DataFrame:
         """Returns a read-only copy of the current dataframe that contains noise data"""
-        self.__check_dataframe()
+        try:
+            self.__check_dataframe()
+        except Exception:
+            self.__message_manager.add_traceback()
         return self.__dataframe
 
     
@@ -59,18 +62,23 @@ class NoiseDataManager:
             for which the noise data will be retrieved and printed out for the
             user to see.
         """
-        
-        self.__check_dataframe()
-
-        dataframe = self.__dataframe
-        if isinstance(qubits, int):
-            qubits = [qubits]
-        
-        # Check for negative numbers and out of bounds indexes
-        self.__check_qubit_input(dataframe, qubits)
-
         msg = self.__message_manager
         msg.create_output(MESSAGES["retrieving_qubits"].format(qubits=qubits))
+        
+        
+        try:
+            self.__check_dataframe()
+
+            dataframe = self.__dataframe
+            if isinstance(qubits, int):
+                qubits = [qubits]
+
+            self.__check_qubit_input(dataframe, qubits)
+        except Exception:
+            # traceback & error message is retrieved inside add_traceback()
+            msg.add_traceback()
+            return
+        
         for qubit in qubits:
             msg.add_message(f"Qubit number: {qubit}")
             for column in CSV_COLUMNS.keys():
@@ -78,6 +86,7 @@ class NoiseDataManager:
                     name = CSV_COLUMNS[column]["name"]
                     value = dataframe.loc[qubit, CSV_COLUMNS[column]["csv_name"]]
                     msg.add_message(f"{name}: {value}")
+        
         msg.end_output()
 
 
@@ -85,10 +94,12 @@ class NoiseDataManager:
         """Prints out information about all dataframe columns """
         msg = self.__message_manager
         msg.create_output(MESSAGES["csv_information"])
+
         for column in CSV_COLUMNS.keys():
             name = CSV_COLUMNS[column]["name"]
             description = CSV_COLUMNS[column]["description"]
             msg.add_message(f"{name}: {description}")
+        
         msg.end_output()
 
 

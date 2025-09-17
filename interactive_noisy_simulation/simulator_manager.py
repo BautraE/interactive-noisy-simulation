@@ -33,16 +33,17 @@ class SimulatorManager:
 
 
     # Public class methods
-
+    
     def create_simulator(self) -> None:
         """Creates a AerSimulator object from available data """
         msg = self.__message_manager
         msg.create_output(MESSAGES["creating_simulator"])
 
-        if self.__noise_model is None:
-            raise RuntimeError(
-                f"{MESSAGES["error_not_linked"].format(class_name=NoiseCreator.__name__,
-                                                       method_name=self.link_noise_creator.__name__)}")
+        try:
+            self.__check_noise_creator_link()
+        except Exception:
+            msg.add_traceback()
+            return
 
         self.__simulator = AerSimulator(coupling_map=self.__noise_model["coupling_map"], 
                                         noise_model=self.__noise_model["noise_model"])
@@ -103,6 +104,14 @@ class SimulatorManager:
 
 
     # Private class methods
+
+    def __check_noise_creator_link(self) -> None:
+        """Checks if a NoiseCreator class object is linked to this SimulatorManager object"""
+        if self.__noise_model is None:
+            raise RuntimeError(
+                f"{MESSAGES["error_not_linked"].format(class_name=NoiseCreator.__name__,
+                                                       method_name=self.link_noise_creator.__name__)}")
+
 
     def __check_simulator(self) -> None:
         """Checks if a simulator exists in the current object of SimulatorManager """

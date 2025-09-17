@@ -6,9 +6,9 @@ from importlib import resources
 import pandas
 from qiskit.transpiler import CouplingMap
 from qiskit_aer.noise import (
+    depolarizing_error,
     NoiseModel,
     ReadoutError,
-    depolarizing_error,
     thermal_relaxation_error
 )
 
@@ -48,12 +48,15 @@ class NoiseCreator:
     @property
     def noise_model(self) -> NoiseModel:
         """Returns a read-only copy of the current noise model (dictionary with NoiseModel and CouplingMap object) """
-        self.__check_noise_model()
+        try:
+            self.__check_noise_model()
+        except Exception:
+            self.__message_manager.add_traceback()
         return self.__noise_model
 
 
     # Public class methods
-
+    
     def create_noise_model(self) -> None:
         """Creates a new noise model
         
@@ -64,10 +67,11 @@ class NoiseCreator:
         msg = self.__message_manager
         msg.create_output(MESSAGES["creating_noise_model"])
         
-        if self.__noise_data is None:
-            raise RuntimeError(
-                f"{MESSAGES["error_not_linked"].format(class_name=NoiseDataManager.__name__,
-                                                       method_name=self.link_noise_data_manager.__name__)}")
+        try:
+            self.__check_noise_data_manager_link()
+        except Exception:
+            msg.add_traceback()
+            return
 
         self.__noise_model["noise_model"] = NoiseModel(self.__get_basis_gates())
         self.__get_coupling_map()
@@ -239,6 +243,14 @@ class NoiseCreator:
         noise_model.add_quantum_error(error=thermal_error_rz, instructions="reset", 
                                       qubits=[qubit], warnings=False)
     
+    
+    def __check_noise_data_manager_link(self) -> None:
+        """Checks if a NoiseDataManager class object is linked to this NoiseCreator object"""
+        if self.__noise_data is None:
+            raise RuntimeError(
+                f"{MESSAGES["error_not_linked"].format(class_name=NoiseDataManager.__name__,
+                                                       method_name=self.link_noise_data_manager.__name__)}")
+
     
     def __check_noise_model(self) -> None:
         """Checks if a noise model exists in the current object of NoiseCreator """

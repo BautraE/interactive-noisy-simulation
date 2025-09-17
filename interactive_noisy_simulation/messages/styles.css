@@ -1,6 +1,13 @@
-/* Some thing require a more specific selector due to
+/* General comments:
+
+   Some things require a more specific selector due to
    default Jupyter Notebook styles and the need to
-   overwrite them */
+   overwrite them 
+*/
+
+/* ---------- MAIN CONTENT BLOCK */
+
+/* The whole output container */
 .content-block {
     background-color: #3B3F52;
     width: 100%;
@@ -11,20 +18,7 @@
     border-radius:8px;
 }
 
-div.content-block p {
-    font-size: 14px;
-    margin-top: 0px;
-    margin-bottom: 8px;
-}
-
-.content-messages {
-    background-color: #252E5D;
-    border-radius:8px;
-    width: auto;
-    margin-left: 20px;
-    padding: 10px
-}
-
+/*  Main heading of the main content block */
 div.content-block h1.main-headings {
     text-align: center;
     text-transform: uppercase;
@@ -33,4 +27,44 @@ div.content-block h1.main-headings {
     margin-top: 0px;
     margin-bottom: 10px;
     filter: drop-shadow(0px 4px 4px #000000);
+}
+
+/* Text container headings & text inside of these text containers */
+div.content-block p {
+    font-size: 14px;
+    margin-top: 0px;
+    margin-bottom: 8px;
+}
+
+/* Text container styles for message log, error log, etc. */
+.content-messages {
+    background-color: #1D2331;
+    border-radius:8px;
+    width: auto;
+    margin-left: 20px;
+    padding: 10px;
+}
+
+/* ---------- ERROR LOG CONTAINER */
+
+/* Specific error log text container */
+.traceback-messages {
+    overflow-x: auto;
+}
+
+/* Traceback text containers - Python Pygments
+   automatically adds this element as a part of its
+   functionality.
+
+   Jupyter Notebook has a default style for pre elements
+   that sets their background-color to something instead
+   of being transparent  
+   
+   <div class=\"highlight\"><pre>
+*/
+div.highlight pre{
+    word-wrap: nowrap;
+    word-break: normal;
+    white-space: preserve nowrap;
+    background-color: transparent;
 }
