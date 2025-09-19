@@ -18,8 +18,5 @@ authors = [{name = "Edgars Bautra"}]
 [project.urls]
 Repository = "https://github.com/BautraE/interactive-noisy-simulation"
 
-[tool.setuptools.packages.find]
-where = ["interactive_noisy_simulation"]
-
 [tool.setuptools.package-data]
-data = ["*.json"]
+"interactive_noisy_simulation.data" = ["*.json"]
