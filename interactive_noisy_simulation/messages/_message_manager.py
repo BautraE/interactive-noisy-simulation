@@ -9,7 +9,10 @@ from pygments.lexers import PythonTracebackLexer
 from pygments.formatters import HtmlFormatter
 
 # Local project imports:
-from .. import data, messages
+from .. import messages
+from ..data._data import (
+    ERRORS, MESSAGES, OUTPUT_HEADINGS
+)
 
 
 with (resources.files(messages) / "styles.css").open("r", encoding="utf8") as file:
@@ -21,9 +24,6 @@ with (resources.files(messages) / "scripts.js").open("r", encoding="utf8") as fi
 with (resources.files(messages) / "content.html").open("r", encoding="utf8") as file:
     html_code = file.read()
 
-with (resources.files(data) / "messages.json").open("r", encoding="utf8") as file:
-    MESSAGES = json.load(file)
-
 
 class MessageManager:
     
@@ -34,6 +34,28 @@ class MessageManager:
             <script>{js_code}</script>
             {html_code}
         """
+
+
+    def add_message(
+            self, 
+            message: str | dict, 
+            highlightables: list[str] = None,
+            **kwargs
+    ) -> None:
+        if isinstance(message, str):
+            if kwargs: message = message.format(**kwargs)
+            hl_message = self.__highlight_message(message, highlightables)
+        else:
+            message_text = message["text"]
+            highlightables = message["highlightables"]
+            
+            if kwargs:
+                message_text = message_text.format(**kwargs)
+                highlightables = [hl.format(**kwargs) for hl in highlightables]
+            
+            hl_message = self.__highlight_message(message_text, highlightables)
+
+        display(Javascript(f"addMessage({hl_message});"))
 
 
     def add_traceback(self) -> None:
@@ -58,7 +80,7 @@ class MessageManager:
             When using this method, the functionality of end_output() method
             is automatically applied thus it is not required to write it again.
         """
-        self.add_message(f"{MESSAGES["exception_occurred"]}")
+        self.add_message(MESSAGES["exception_occurred"])
 
         tb_str = self.__get_traceback()
 
@@ -70,11 +92,61 @@ class MessageManager:
         escaped_html = json.dumps(traceback_html)
 
         display(Javascript(
-            f"add_traceback_block();"
-            f"add_traceback({escaped_css}, {escaped_html});"
+            f"addTraceback({escaped_css}, {escaped_html});"
+            f"setStatus({0});"
         ))
 
-        self.end_output()
+        self.__unset_id_values()
+
+
+    def add_qubit_noise_data_container(self) -> None:
+        display(Javascript(f"addQubitNoiseDataContainer();"))
+
+
+    def add_qubit_noise_data_content_box(self) -> None:
+        display(Javascript(f"addQubitNoiseDataContentBox();"))
+
+
+    def add_qubit_noise_data_row(self, attribute_name: str, value) -> None:
+        display(Javascript(
+            f"addQubitNoiseDataRow("
+                f"{json.dumps(str(attribute_name))},"
+                f"{json.dumps(str(value))});"
+        ))
+
+
+    def create_output(self, heading: str) -> None:
+        display(HTML(self.__content_block))
+        display(Javascript(f"setOutputHeading('{heading}');"))
+
+
+    def end_output(self) -> None:
+        display(Javascript(f"setStatus({1});"))
+        self.__unset_id_values()
+
+
+    def generic_content_container(self, heading_text: str) -> None:
+        display(Javascript(
+            f"genericContentContainer({json.dumps(heading_text)});"
+        ))
+
+
+    def __add_highlight_html(self, text_part: str) -> str:
+        return f"<span class='highlighted-text'>{text_part}</span>"
+
+
+    # For some reason json.dumps does not want to work with my custom messages
+    # thus this is the solution for escaping text
+    def __escape_text(self, message: str) -> str:
+        escapables = {
+            "'": "&#39;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+        }
+        for char, replacement in escapables.items():
+            message = message.replace(char, replacement)
+        return message
 
 
     def __get_traceback(self) -> str:
@@ -92,32 +164,15 @@ class MessageManager:
         return "\n".join(tb_lines)
 
 
-    def add_message(self, message: str) -> None:
-        message = self.__escape_text(message)
-        display(Javascript(f"add_message('{message}');"))
-
-
-    def create_output(self, heading: str) -> None:
-        display(HTML(self.__content_block))
-        display(Javascript(f"set_heading('{heading}');"))
-
-
-    def end_output(self) -> None:
-        self.__unset_id_values()
-
-
-    # For some reason json.dumps does not want to work with my custom messages
-    def __escape_text(self, message: str) -> str:
-        escapables = {
-            "'": "&#39;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-        }
-        for char, replacement in escapables.items():
-            message = message.replace(char, replacement)
-        return message
+    def __highlight_message(self, message: str, highlightables: list[str] | None) -> str:
+        esc_message = self.__escape_text(message)
+        if highlightables:
+            for string in highlightables:
+                string = self.__escape_text(string)
+                hl_string = self.__add_highlight_html(string)
+                esc_message = esc_message.replace(string, hl_string)
+        return json.dumps(esc_message)
 
 
     def __unset_id_values(self) -> None:
-        display(Javascript(f"unset_id_values();"))
+        display(Javascript(f"unsetIdValues();"))

@@ -1,7 +1,3 @@
-# Standard library imports:
-import json
-from importlib import resources
-
 #Third party imports:
 import pandas
 from qiskit.transpiler import CouplingMap
@@ -13,19 +9,11 @@ from qiskit_aer.noise import (
 )
 
 # Local project imports:
-from . import data
 from .messages._message_manager import MessageManager
 from .noise_data_manager import NoiseDataManager
-
-
-with (resources.files(data) / "config.json").open("r", encoding="utf8") as file:
-    CONFIG = json.load(file)
-
-with (resources.files(data) / "csv_columns.json").open("r", encoding="utf8") as file:
-    CSV_COLUMNS = json.load(file)
-    
-with (resources.files(data) / "messages.json").open("r", encoding="utf8") as file:
-    MESSAGES = json.load(file)
+from .data._data import (
+    CONFIG, CSV_COLUMNS, ERRORS, MESSAGES, OUTPUT_HEADINGS
+)
 
 
 class NoiseCreator:
@@ -34,12 +22,12 @@ class NoiseCreator:
         """Constructor method """
         self.__message_manager: MessageManager = MessageManager()
         msg = self.__message_manager
-        msg.create_output(MESSAGES["creating_new_object"].format(class_name=self.__class__.__name__))
+        msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(class_name=self.__class__.__name__))
 
         self.__noise_model = {}
         self.__noise_data = None
 
-        msg.add_message(MESSAGES["created_new_object"].format(class_name=self.__class__.__name__))
+        msg.add_message(MESSAGES["created_new_object"], class_name=self.__class__.__name__)
         msg.end_output()
 
 
@@ -52,6 +40,7 @@ class NoiseCreator:
             self.__check_noise_model()
         except Exception:
             self.__message_manager.add_traceback()
+            return
         return self.__noise_model
 
 
@@ -65,7 +54,7 @@ class NoiseCreator:
         object.
         """
         msg = self.__message_manager
-        msg.create_output(MESSAGES["creating_noise_model"])
+        msg.create_output(OUTPUT_HEADINGS["creating_noise_model"])
         
         try:
             self.__check_noise_data_manager_link()
@@ -87,8 +76,8 @@ class NoiseCreator:
     def link_noise_data_manager(self, noise_data_manager: NoiseDataManager) -> None:
         """Links a NoiseDataManager object to gain access to noise data """
         msg = self.__message_manager
-        msg.create_output(MESSAGES["linking_object"].format(linked_class=NoiseDataManager.__name__,
-                                                            this_class=self.__class__.__name__))
+        msg.create_output(OUTPUT_HEADINGS["linking_object"].format(
+            linked_class=NoiseDataManager.__name__, this_class=self.__class__.__name__))
         self.__noise_data = noise_data_manager.noise_data
 
         msg.add_message(MESSAGES["linking_success"])
@@ -248,14 +237,14 @@ class NoiseCreator:
         """Checks if a NoiseDataManager class object is linked to this NoiseCreator object"""
         if self.__noise_data is None:
             raise RuntimeError(
-                f"{MESSAGES["error_not_linked"].format(class_name=NoiseDataManager.__name__,
-                                                       method_name=self.link_noise_data_manager.__name__)}")
+                ERRORS["error_not_linked"].format(class_name=NoiseDataManager.__name__,
+                                                  method_name=self.link_noise_data_manager.__name__))
 
     
     def __check_noise_model(self) -> None:
         """Checks if a noise model exists in the current object of NoiseCreator """
         if not self.__noise_model:
-            raise RuntimeError(f"{MESSAGES["error_no_noise_model"]}")
+            raise RuntimeError(ERRORS["error_no_noise_model"])
 
     
     def __get_basis_gates(self) -> list[str]:

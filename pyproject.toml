@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "interactive_noisy_simulation"
-version = "1.0.0"
+version = "1.0.1"
 description = "A more intuitive and interactive way of creating noise models and simulators, as well as executing circuits with the created simulators."
 readme = "README.md"
 requires-python = ">=3.13"
@@ -17,3 +17,6 @@ authors = [{name = "Edgars Bautra"}]
 
 [project.urls]
 Repository = "https://github.com/BautraE/interactive-noisy-simulation"
+
+[tool.setuptools.package-data]
+"interactive_noisy_simulation.data" = ["*.json"]

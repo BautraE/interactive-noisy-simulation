@@ -1,14 +1,14 @@
 /* General comments:
 
-   Some things require a more specific selector due to
+   Some things require more specific selectors due to
    default Jupyter Notebook styles and the need to
-   overwrite them 
+   overwrite them with higher priority levels.
 */
 
 /* ---------- MAIN CONTENT BLOCK */
 
-/* The whole output container */
-.content-block {
+/* The whole output container (output box) */
+div.output-boxes {
     background-color: #3B3F52;
     width: 100%;
     max-width: 700px;
@@ -16,39 +16,73 @@
     filter: drop-shadow(0px 4px 4px #141414);
     color: white;
     border-radius:8px;
+    margin-bottom: 15px;
 }
 
-/*  Main heading of the main content block */
-div.content-block h1.main-headings {
+/* Space between output boxes for Jupyter Notebook */
+div.jp-OutputArea-output
+div.output-boxes {
+    margin-bottom: 15px;
+}
+
+/*  Main heading of the output box */
+div.output-boxes
+h1.output-headings {
     text-align: center;
     text-transform: uppercase;
     font-weight: bold;
     font-size: 14px;
     margin-top: 0px;
-    margin-bottom: 10px;
-    filter: drop-shadow(0px 4px 4px #000000);
+    margin-bottom: 15px;
+    filter: drop-shadow(0px 3px 4px #141414);
 }
 
-/* Text container headings & text inside of these text containers */
-div.content-block p {
+/* Content box headings & text inside of these content boxes */
+div.output-boxes p.messages-text, 
+div.output-boxes p.content-headings {
     font-size: 14px;
     margin-top: 0px;
     margin-bottom: 8px;
 }
 
-/* Text container styles for message log, error log, etc. */
-.content-messages {
+/* Content box styles for message log, error log, etc. */
+.content-boxes {
     background-color: #1D2331;
     border-radius:8px;
     width: auto;
     margin-left: 20px;
+    margin-bottom: 20px;
     padding: 10px;
 }
+
+.highlighted-text {
+    color: #FFD173;
+}
+
+/* So this right here is a temporary solution for huge white
+   spaces, when using Jupyter Notebook. Every time "display"
+   from within methods of MessageManager executes, a new
+   empty container is created.
+   
+   Unless there is a way to avoid it outside of the things that
+   have already been tried, this is the best solution. Perhaps
+   some solution that could run JavaScript without display (that
+   can modify HTML elements).
+   
+   What has been tried:
+   - deleting these elements -> breaks Jupyter Notebook
+   - saving & reusing a display object -> does not work in Visual
+        Studio Code
+*/
+.jp-OutputArea-child:has(> .jp-OutputArea-output:empty) {
+    display: none !important;
+}
+
 
 /* ---------- ERROR LOG CONTAINER */
 
 /* Specific error log text container */
-.traceback-messages {
+div.traceback-boxes {
     overflow-x: auto;
 }
 
@@ -67,4 +101,52 @@ div.highlight pre{
     word-break: normal;
     white-space: preserve nowrap;
     background-color: transparent;
+}
+
+/* ---------- STATUS MESSAGE */
+p.status-messages {
+    text-align: right;
+    text-transform: uppercase;
+}
+
+/* Different colors for status types */
+.status-in-progress {
+    color:#F3EA69;
+}
+
+.status-completed {
+    color:#37FF8D;
+}
+
+.status-failed {
+    color:#FF8A8A;
+}
+
+/* ---------- QUBIT NOISE DATA */
+.qubit-noise-data-tables {
+    width: 100%;
+}
+
+/* Coloring in every 2nd (even) row of table */
+.qubit-noise-data-rows:nth-child(even) {
+  background-color: #222C42;
+}
+
+/* Table cells */
+table.qubit-noise-data-tables tr 
+td.qubit-noise-data-cells {
+    width: 50%;
+    text-align: left;
+}
+
+/* Border radius for outer edges of rows.
+   Has to be changed for cells and not row elements */
+td.qubit-noise-data-cells:nth-child(odd) {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+td.qubit-noise-data-cells:nth-child(even) {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
 }

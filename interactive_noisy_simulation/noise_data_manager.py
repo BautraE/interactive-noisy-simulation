@@ -1,24 +1,14 @@
 # Standard library imports:
-import json
-from importlib import resources
 from typing import Union
 
 #Third party imports:
 import numpy, pandas
 
 # Local project imports:
-from . import data
 from .messages._message_manager import MessageManager
-
-
-with (resources.files(data) / "config.json").open("r", encoding="utf8") as file:
-    CONFIG = json.load(file)
-
-with (resources.files(data) / "csv_columns.json").open("r", encoding="utf8") as file:
-    CSV_COLUMNS = json.load(file)
-    
-with (resources.files(data) / "messages.json").open("r", encoding="utf8") as file:
-    MESSAGES = json.load(file)
+from .data._data import (
+    CONFIG, CSV_COLUMNS, ERRORS, MESSAGES, OUTPUT_HEADINGS
+)
 
 
 class NoiseDataManager:
@@ -28,11 +18,12 @@ class NoiseDataManager:
         self.__message_manager: MessageManager = MessageManager()
         msg = self.__message_manager
         
-        msg.create_output(MESSAGES["creating_new_object"].format(class_name=self.__class__.__name__))
+        msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(class_name=self.__class__.__name__))
         
         self.__dataframe: pandas.DataFrame | None = None
 
-        msg.add_message(MESSAGES["created_new_object"].format(class_name=self.__class__.__name__))
+        # msg.add_message(MESSAGES["created_new_object"].format(class_name=self.__class__.__name__))
+        msg.add_message(MESSAGES["created_new_object"], class_name=self.__class__.__name__)
         msg.add_message(MESSAGES["import_csv"])
         msg.end_output()
 
@@ -46,12 +37,14 @@ class NoiseDataManager:
             self.__check_dataframe()
         except Exception:
             self.__message_manager.add_traceback()
+            return
+
         return self.__dataframe
 
     
     # Public class methods
 
-    def get_qubit_noise_information(self, qubits: Union[int, list[int]]) -> None:
+    def get_qubit_noise_information(self, qubits: Union[int, list[int]]=None) -> None:
         """Prints out noise data for certain qubits
         
         Retrieves and prints out all noise data from dataframe for the 
@@ -63,13 +56,16 @@ class NoiseDataManager:
             user to see.
         """
         msg = self.__message_manager
-        msg.create_output(MESSAGES["retrieving_qubits"].format(qubits=qubits))
+        msg.create_output(OUTPUT_HEADINGS["retrieving_qubits"].format(qubits=qubits))
         
         
         try:
             self.__check_dataframe()
-
             dataframe = self.__dataframe
+
+            if not qubits:
+                raise ValueError(ERRORS["error-no-qubits-numbers"])
+
             if isinstance(qubits, int):
                 qubits = [qubits]
 
@@ -78,14 +74,16 @@ class NoiseDataManager:
             # traceback & error message is retrieved inside add_traceback()
             msg.add_traceback()
             return
-        
+
+        msg.add_qubit_noise_data_container()
         for qubit in qubits:
-            msg.add_message(f"Qubit number: {qubit}")
+            msg.add_qubit_noise_data_content_box()
+            msg.add_qubit_noise_data_row("Qubit number", qubit)
             for column in CSV_COLUMNS.keys():
                 if CSV_COLUMNS[column]["csv_name"] in dataframe.columns:
                     name = CSV_COLUMNS[column]["name"]
                     value = dataframe.loc[qubit, CSV_COLUMNS[column]["csv_name"]]
-                    msg.add_message(f"{name}: {value}")
+                    msg.add_qubit_noise_data_row(name, value)
         
         msg.end_output()
 
@@ -93,12 +91,13 @@ class NoiseDataManager:
     def help_csv_columns(self) -> None:
         """Prints out information about all dataframe columns """
         msg = self.__message_manager
-        msg.create_output(MESSAGES["csv_information"])
+        msg.create_output(OUTPUT_HEADINGS["csv_information"])
+        msg.generic_content_container("Calibration data attributes:")
 
         for column in CSV_COLUMNS.keys():
             name = CSV_COLUMNS[column]["name"]
             description = CSV_COLUMNS[column]["description"]
-            msg.add_message(f"{name}: {description}")
+            msg.add_message(f"{name}: {description}", [name])
         
         msg.end_output()
 
@@ -117,7 +116,7 @@ class NoiseDataManager:
             file_path: path to the calibration data CSV file.
         """
         msg = self.__message_manager
-        msg.create_output(MESSAGES["importing_csv"])
+        msg.create_output(OUTPUT_HEADINGS["importing_csv"])
 
         dataframe = pandas.read_csv(file_path)
         self.__remove_unnecessary_collumns(dataframe)
@@ -163,7 +162,7 @@ class NoiseDataManager:
     def __check_dataframe(self) -> None:
         """Checks if a dataframe exists in the current object of NoiseDataManager """
         if self.__dataframe is None:
-            raise RuntimeError(f"{MESSAGES["error_no_dataframe"]}")
+            raise RuntimeError(f"{ERRORS["error_no_dataframe"]}")
 
 
     def __check_qubit_input(self, dataframe: pandas.DataFrame, qubits: list[int]) -> None:
@@ -180,9 +179,9 @@ class NoiseDataManager:
         qubit_count = len(dataframe)
         for qubit in qubits:
             if qubit < 0:
-                raise ValueError(f"{MESSAGES["error_negative_qubit_number"].format(qubit=qubit)}")
+                raise ValueError(f"{ERRORS["error_negative_qubit_number"].format(qubit=qubit)}")
             if qubit >= qubit_count:
-                raise ValueError(f"{MESSAGES["error_large_qubit_number"].format(qubit=qubit,
+                raise ValueError(f"{ERRORS["error_large_qubit_number"].format(qubit=qubit,
                                                                                 max_qubits=qubit_count - 1)}")
 
 

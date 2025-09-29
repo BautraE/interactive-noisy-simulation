@@ -1,57 +1,164 @@
-function add_message(message) {
-    var text_element = document.createElement('p');
-    text_element.classList.add("messages-text");
-    text_element.innerHTML = message;
+HTML_IDS = [
+    "output-box", "output-heading", "messages", "status", "tracebacks", "qubit-noise-data",
+    "qubit-noise-data-table", "message-box-heading"
+];
 
-    var message_box = document.getElementById("messages");
-    message_box.appendChild(text_element);
+
+function addMessage(message) {
+    let textElement = document.createElement('p');
+    textElement.classList.add("messages-text");
+    textElement.innerHTML = message;
+
+    __appendThroughId("messages", textElement);
 }
 
 
-function add_traceback(traceback_css, traceback_html) {
+function addTraceback(tracebackCss, tracebackHtml) {
+    let tracebackContentBox = __createTracebackContainer();
+    
     // Dynamically add Python pygments generated CSS for tracebacks
     let style = document.createElement("style");
     style.id = "traceback-style";
-    style.innerHTML = traceback_css;
+    style.innerHTML = tracebackCss;
     document.head.appendChild(style);
 
     // Append traceback HTML
-    let container = document.getElementById("tracebacks");
-    container.insertAdjacentHTML("beforeend", traceback_html);
+    tracebackContentBox.insertAdjacentHTML("beforeend", tracebackHtml);
 }
 
 
-// The created block is very similar to the message log block from content.html
-function add_traceback_block() {
-    let block_heading = document.createElement("p")
-    block_heading.classList.add("block-headings");
-    block_heading.innerHTML = "Error log:";
+function addQubitNoiseDataContainer() {
+    let contentTitle = __createContentTitle("Retrieved qubits:")
+    let contentContainer = __createContentContainer("qubit-noise-data",
+                                                    [contentTitle]);
+    __appendToOutputBox(contentContainer);
+}
 
-    let traceback_container = document.createElement("div");
-    traceback_container.classList.add("content-messages", "traceback-messages");
-    traceback_container.id = "tracebacks"
+
+function addQubitNoiseDataContentBox() {
+    unsetIdValues(["qubit-noise-data-table"]);
     
-    let block_container = document.createElement("div");
-    block_container.appendChild(block_heading)
-    block_container.appendChild(traceback_container)
+    let table = document.createElement("table");
+    table.classList.add("qubit-noise-data-tables");
+    table.id = "qubit-noise-data-table";
+    
+    let contentBox = __createContentBox();
+    contentBox.appendChild(table)
 
-    let output_block = document.getElementById("content")
-    output_block.appendChild(block_container)
+    __appendThroughId("qubit-noise-data", contentBox);
 }
 
 
-function set_heading(heading) {
-    var heading_element = document.getElementById("heading");
-    heading_element.innerHTML = heading;
+function addQubitNoiseDataRow(attributeName, value) {
+    let nameCell = document.createElement("td");
+    nameCell.classList.add("qubit-noise-data-cells")
+    nameCell.innerHTML = attributeName;
+
+    let valueCell = document.createElement("td");
+    valueCell.classList.add("highlighted-text");
+    valueCell.classList.add("qubit-noise-data-cells")
+    valueCell.innerHTML = value;
+
+    let row = document.createElement("tr");
+    row.classList.add("qubit-noise-data-rows");
+    row.appendChild(nameCell);
+    row.appendChild(valueCell);
+
+    __appendThroughId("qubit-noise-data-table", row);
 }
 
 
-function unset_id_values() {
-    var ids = ["content", "heading", "messages", "tracebacks"];
+function genericContentContainer(headingText) {
+    let contentTitle = document.getElementById("message-box-heading");
+    contentTitle.innerHTML = headingText;
+}
+
+
+function setOutputHeading(headingText) {
+    let outputHeading = document.getElementById("output-heading");
+    outputHeading.innerHTML = headingText;
+}
+
+
+function setStatus(status) {
+    let statusMessage = document.getElementById("status");
+    statusMessage.classList.remove('status-in-progress');
+    if (status == 1) {
+        statusMessage.classList.add("status-completed");
+        statusMessage.innerHTML = "completed";
+    } 
+    else {
+        statusMessage.classList.add("status-failed");
+        statusMessage.innerHTML = "failed";
+    }
+}
+
+
+function unsetIdValues(removableIds = null) {
+    let ids = removableIds || HTML_IDS
+
     for (let i = 0; i < ids.length; i++) {
-        element = document.getElementById(ids[i]);
+        let element = document.getElementById(ids[i]);
         if (element) {
             element.removeAttribute("id");
         }
     }
+}
+
+
+// CUSTOM HELPER FUNCTIONS
+
+function __appendThroughId(id, appendableElement) {
+    element = document.getElementById(id);
+    element.appendChild(appendableElement);
+}
+
+
+function __appendToOutputBox(newContainer) {
+    let outputBox = document.getElementById("output-box");
+    outputBox.insertBefore(newContainer, outputBox.lastElementChild);
+}
+
+
+function __createContentBox(id=null, classes=[]) {
+    let contentBox = document.createElement("div");
+    contentBox.classList.add("content-boxes");
+
+    if(id) contentBox.id = id;
+
+    for(let className of classes) {
+        contentBox.classList.add(className);
+    }
+
+    return contentBox;
+}
+
+
+function __createContentContainer(id=null, elements=[]) {
+    let contentContainer = document.createElement("div");
+    
+    if(id) contentContainer.id = id;
+    
+    for(let element of elements) {
+        contentContainer.appendChild(element);
+    }
+    
+    return contentContainer;
+}
+
+
+function __createContentTitle(titleText) {
+    let contentTitle = document.createElement("p")
+    contentTitle.classList.add("content-headings");
+    contentTitle.innerHTML = titleText;
+    return contentTitle;
+}
+
+
+function __createTracebackContainer() {
+    let contentTitle = __createContentTitle("Error log:");
+    let contentBox = __createContentBox(null, ["traceback-boxes"]);
+    let contentContainer = __createContentContainer(null, [contentTitle, contentBox]);
+    __appendToOutputBox(contentContainer);
+    return contentBox;
 }

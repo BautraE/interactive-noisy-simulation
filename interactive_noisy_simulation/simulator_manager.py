@@ -1,6 +1,5 @@
 # Standard library imports:
-import json, warnings
-from importlib import resources
+import warnings
 
 #Third party imports:
 from qiskit import transpile
@@ -8,13 +7,11 @@ from qiskit_aer import AerSimulator
 from qiskit_aer.jobs.aerjob import AerJob
 
 # Local project imports:
-from . import data
 from .messages._message_manager import MessageManager
 from .noise_creator import NoiseCreator
-
-
-with (resources.files(data) / "messages.json").open("r", encoding="utf8") as file:
-    MESSAGES = json.load(file)
+from .data._data import (
+    ERRORS, MESSAGES, OUTPUT_HEADINGS
+)
 
 
 class SimulatorManager:
@@ -23,12 +20,12 @@ class SimulatorManager:
         """Constructor method """
         self.__message_manager: MessageManager = MessageManager()
         msg = self.__message_manager
-        msg.create_output(MESSAGES["creating_new_object"].format(class_name=self.__class__.__name__))
+        msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(class_name=self.__class__.__name__))
 
         self.__simulator = None
         self.__noise_model = None
 
-        msg.add_message(MESSAGES["created_new_object"].format(class_name=self.__class__.__name__))
+        msg.add_message(MESSAGES["created_new_object"], class_name=self.__class__.__name__)
         msg.end_output()
 
 
@@ -37,7 +34,7 @@ class SimulatorManager:
     def create_simulator(self) -> None:
         """Creates a AerSimulator object from available data """
         msg = self.__message_manager
-        msg.create_output(MESSAGES["creating_simulator"])
+        msg.create_output(OUTPUT_HEADINGS["creating_simulator"])
 
         try:
             self.__check_noise_creator_link()
@@ -55,7 +52,7 @@ class SimulatorManager:
     def link_noise_creator(self, noise_creator: NoiseCreator) -> None:
         """Links a NoiseCreator class object to gain access to created noise models """
         msg = self.__message_manager
-        msg.create_output(MESSAGES["linking_object"].format(linked_class=NoiseCreator.__name__,
+        msg.create_output(OUTPUT_HEADINGS["linking_object"].format(linked_class=NoiseCreator.__name__,
                                                             this_class=self.__class__.__name__))
         self.__noise_model = noise_creator.noise_model
         msg.add_message(MESSAGES["linking_success"])
@@ -79,7 +76,7 @@ class SimulatorManager:
                 completed job.
         """
         msg = self.__message_manager
-        msg.create_output(MESSAGES["execute_simulator"])
+        msg.create_output(OUTPUT_HEADINGS["execute_simulator"])
         self.__check_simulator()
 
         # While doing everything correctly, there seems to be an error message
@@ -109,11 +106,11 @@ class SimulatorManager:
         """Checks if a NoiseCreator class object is linked to this SimulatorManager object"""
         if self.__noise_model is None:
             raise RuntimeError(
-                f"{MESSAGES["error_not_linked"].format(class_name=NoiseCreator.__name__,
-                                                       method_name=self.link_noise_creator.__name__)}")
+                ERRORS["error_not_linked"].format(class_name=NoiseCreator.__name__,
+                                                  method_name=self.link_noise_creator.__name__))
 
 
     def __check_simulator(self) -> None:
         """Checks if a simulator exists in the current object of SimulatorManager """
         if self.__simulator is None:
-            raise RuntimeError(f"{MESSAGES["error_no_simulator"]}")
+            raise RuntimeError(ERRORS["error_no_simulator"])
