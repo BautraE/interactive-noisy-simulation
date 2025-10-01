@@ -1,6 +1,3 @@
-# Standard library imports:
-from typing import Union
-
 #Third party imports:
 import numpy, pandas
 
@@ -22,7 +19,6 @@ class NoiseDataManager:
         
         self.__dataframe: pandas.DataFrame | None = None
 
-        # msg.add_message(MESSAGES["created_new_object"].format(class_name=self.__class__.__name__))
         msg.add_message(MESSAGES["created_new_object"], class_name=self.__class__.__name__)
         msg.add_message(MESSAGES["import_csv"])
         msg.end_output()
@@ -33,27 +29,22 @@ class NoiseDataManager:
     @property    
     def noise_data(self) -> pandas.DataFrame:
         """Returns a read-only copy of the current dataframe that contains noise data"""
-        try:
-            self.__check_dataframe()
-        except Exception:
-            self.__message_manager.add_traceback()
-            return
-
+        self.__check_dataframe()
         return self.__dataframe
 
     
     # Public class methods
 
-    def get_qubit_noise_information(self, qubits: Union[int, list[int]]=None) -> None:
+    def get_qubit_noise_information(self, qubits: int | list = None) -> None:
         """Prints out noise data for certain qubits
         
         Retrieves and prints out all noise data from dataframe for the 
         selected qubits by the user.
 
         Args:
-            qubits: either a single qubit number or a list of qubit numbers,
-            for which the noise data will be retrieved and printed out for the
-            user to see.
+            qubits: Either a single qubit number or a list of qubit numbers,
+                for which the noise data will be retrieved and printed out for the
+                user to see.
         """
         msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["retrieving_qubits"].format(qubits=qubits))
@@ -85,6 +76,7 @@ class NoiseDataManager:
                     value = dataframe.loc[qubit, CSV_COLUMNS[column]["csv_name"]]
                     msg.add_qubit_noise_data_row(name, value)
         
+        msg.add_message(MESSAGES["qubit_noise_data_retrieved"])
         msg.end_output()
 
 
@@ -113,7 +105,7 @@ class NoiseDataManager:
         noise models.
 
         Args:
-            file_path: path to the calibration data CSV file.
+            file_path: Path to the calibration data CSV file.
         """
         msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["importing_csv"])
@@ -146,7 +138,7 @@ class NoiseDataManager:
         which is where the value 1300 came from.
 
         Args:
-            dataframe: dataframe from which the columns will be removed
+            dataframe: Dataframe to which the new columns will be added.
         """
         # Initializing new column for neighboring qubits
         neighboring_qubits_column = CSV_COLUMNS["neighboring_qubits"] ["csv_name"]
@@ -162,7 +154,7 @@ class NoiseDataManager:
     def __check_dataframe(self) -> None:
         """Checks if a dataframe exists in the current object of NoiseDataManager """
         if self.__dataframe is None:
-            raise RuntimeError(f"{ERRORS["error_no_dataframe"]}")
+            raise RuntimeError(ERRORS["error_no_dataframe"])
 
 
     def __check_qubit_input(self, dataframe: pandas.DataFrame, qubits: list[int]) -> None:
@@ -173,16 +165,16 @@ class NoiseDataManager:
 
         Args:
             datafrane: The dataframe, from which the information will be extracted
-                from.
+                from. Here it is only used to check the total number of qubits.
             qubits: Numbers of qubits that got passed as arguments.
         """
         qubit_count = len(dataframe)
         for qubit in qubits:
             if qubit < 0:
-                raise ValueError(f"{ERRORS["error_negative_qubit_number"].format(qubit=qubit)}")
+                raise ValueError(ERRORS["error_negative_qubit_number"].format(qubit=qubit))
             if qubit >= qubit_count:
-                raise ValueError(f"{ERRORS["error_large_qubit_number"].format(qubit=qubit,
-                                                                                max_qubits=qubit_count - 1)}")
+                raise ValueError(ERRORS["error_large_qubit_number"].format(qubit=qubit,
+                                                                           max_qubits=qubit_count - 1))
 
 
     def __modify_dataframe_data(self, dataframe) -> None:
@@ -204,7 +196,7 @@ class NoiseDataManager:
         in these multi-data columns.
 
         Args:
-            dataframe: dataframe from which the columns will be removed
+            dataframe: Data from this dataframe will be modified.
         """
         neighboring_qubits_column = CSV_COLUMNS["neighboring_qubits"] ["csv_name"]
 
@@ -241,7 +233,7 @@ class NoiseDataManager:
         as "not_required_columns".
 
         Args:
-            dataframe: dataframe from which the columns will be removed
+            dataframe: Dataframe from which the columns will be removed.
         """
         for column in CONFIG["not_required_columns"]:
             if column in dataframe.columns:

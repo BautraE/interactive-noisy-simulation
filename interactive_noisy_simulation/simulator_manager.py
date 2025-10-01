@@ -54,7 +54,13 @@ class SimulatorManager:
         msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["linking_object"].format(linked_class=NoiseCreator.__name__,
                                                             this_class=self.__class__.__name__))
-        self.__noise_model = noise_creator.noise_model
+        
+        try:
+            self.__noise_model = noise_creator.noise_model
+        except Exception:
+            self.__message_manager.add_traceback()
+            return
+        
         msg.add_message(MESSAGES["linking_success"])
         msg.end_output()
 
@@ -77,7 +83,12 @@ class SimulatorManager:
         """
         msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["execute_simulator"])
-        self.__check_simulator()
+        
+        try:
+            self.__check_simulator()
+        except Exception:
+            msg.add_traceback()
+            return
 
         # While doing everything correctly, there seems to be an error message
         # regarding providing the coupling_map and basis_bates together with

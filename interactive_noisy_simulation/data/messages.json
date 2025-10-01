@@ -85,6 +85,11 @@
         "successful_csv_import": {
             "text": "Data from CSV file has been imported successfully!",
             "highlightables": []
+        },
+        
+        "qubit_noise_data_retrieved": {
+            "text": "Noise data for all requested qubits has been retrieved successfully!",
+            "highlightables": []
         }
     }
 }

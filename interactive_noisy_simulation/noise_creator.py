@@ -36,11 +36,7 @@ class NoiseCreator:
     @property
     def noise_model(self) -> NoiseModel:
         """Returns a read-only copy of the current noise model (dictionary with NoiseModel and CouplingMap object) """
-        try:
-            self.__check_noise_model()
-        except Exception:
-            self.__message_manager.add_traceback()
-            return
+        self.__check_noise_model()
         return self.__noise_model
 
 
@@ -78,7 +74,12 @@ class NoiseCreator:
         msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["linking_object"].format(
             linked_class=NoiseDataManager.__name__, this_class=self.__class__.__name__))
-        self.__noise_data = noise_data_manager.noise_data
+        
+        try:
+            self.__noise_data = noise_data_manager.noise_data
+        except Exception:
+            self.__message_manager.add_traceback()
+            return
 
         msg.add_message(MESSAGES["linking_success"])
         msg.end_output()
