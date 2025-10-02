@@ -1,4 +1,0 @@
-# Keep the version from the branch you are merging into (e.g. main),
-# and ignore changes from the branch you are merging from.
-media/* merge=ours
-README.md merge=ours

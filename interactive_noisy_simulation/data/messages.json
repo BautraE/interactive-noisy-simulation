@@ -1,43 +1,95 @@
 {
-    "created_new_object": "{class_name} class object has been created successfully!",
+    "output-headings": {
+        "creating_new_object": "Creating {class_name} class object",
 
-    "created_noise_model": "Noise model has been created successfully!",
+        "creating_noise_model": "Creating noise model from available data",
 
-    "created_simulator": "Simulator has been created successfully!",
+        "creating_simulator": "Creating simulator from noise model and coupling map",
 
-    "creating_new_object": "----- Creating {class_name} class object -----",
+        "csv_information": "Information on all currently relevant CSV calibration data columns",
 
-    "creating_noise_model": "----- Creating noise model from available data -----",
+        "execute_simulator": "Executing circuit with simulator",
 
-    "creating_simulator": "----- Creating simulator from noise model and coupling map -----",
+        "importing_csv": "Importing data from the selected CSV file",
 
-    "csv_information": "----- Information on all currently relevant CSV calibration data columns -----",
+        "linking_object": "Linking class {linked_class} object to {this_class}",
 
-    "error_large_qubit_number": "There is no qubit with the number {qubit}. The largest number to access a qubit from this data is {max_qubits}!",
+        "retrieving_qubits": "Retrieving information about qubits {qubits}"
+    },
 
-    "error_negative_qubit_number": "Qubit numbers cannot be lower than 0! The number {qubit} goes against this!",
+    "errors": {
+        "error_large_qubit_number": "There is no qubit with the number {qubit}. The largest number to access a qubit from this data is {max_qubits}!",
 
-    "error_no_dataframe": "There is currently no noise data dataframe within this NoiseDataManager class object! Please create one with the help of the method: object.import_csv_data('path/to/file.csv')",
+        "error_negative_qubit_number": "Qubit numbers cannot be lower than 0! The number {qubit} goes against this!",
 
-    "error_no_noise_model": "There is currently no created noise model within this NoiseCreator class object! Please create one with the help of the method: object.create_noise_model()",
+        "error_no_dataframe": "There is currently no noise data dataframe within this NoiseDataManager class object! Please create one with the help of the method: object.import_csv_data('path/to/file.csv')",
 
-    "error_no_simulator": "There is currently no created simulator within this SimulatorManager class object! Please create one with the help of the method: object.create_simulator()",
+        "error_no_noise_model": "There is currently no created noise model within this NoiseCreator class object! Please create one with the help of the method: object.create_noise_model()",
 
-    "error_not_linked": "There is no linked {class_name} object! Please use the method {method_name}(object: {class_name}) before executing this method!",
+        "error_no_simulator": "There is currently no created simulator within this SimulatorManager class object! Please create one with the help of the method: object.create_simulator()",
 
-    "execute_simulator": "----- Executing circuit with simulator -----",
+        "error-no-qubits-numbers": "At least one qubit number must be given in order to retrieve noise data!",
 
-    "execution_complete": "Circuit execution completed successfully! Result job has been returned!",
+        "error_not_linked": "There is no linked {class_name} object! Please use the method {method_name}(object: {class_name}) before executing this method!"
+    },
 
-    "import_csv": "Continue by importing the QPU calibration data CSV file: object.import_csv_data('path/to/file.csv')",
+    "messages": {
+        "created_new_object": {
+            "text": "{class_name} class object has been created successfully!",
+            "highlightables": [
+                "{class_name}"
+            ]
+        },
 
-    "importing_csv": "----- Importing data from the selected CSV file -----",
+        "created_noise_model": {
+            "text": "Noise model has been created successfully!",
+            "highlightables": []
+        },
 
-    "linking_object": "----- Linking class {linked_class} object to {this_class} -----",
+        "created_simulator": {
+            "text": "Simulator has been created successfully!",
+            "highlightables": []
+        },
 
-    "linking_success": "Linking completed successfully!",
+        "exception_occurred": {
+            "text": "AN EXCEPTION HAS OCCURED. PLEASE VIEW THE ERROR LOG FOR MORE DETAILS!",
+            "highlightables": [
+                "AN EXCEPTION HAS OCCURED. PLEASE VIEW THE ERROR LOG FOR MORE DETAILS!"
+            ]
+        },
 
-    "retrieving_qubits": "----- Retrieving information about qubits {qubits} -----",
+        "execution_complete": {
+            "text": "Circuit execution completed successfully! Result job has been returned!",
+            "highlightables": []
+        },
 
-    "successful_csv_import": "Data from CSV file has been imported successfully!"
+        "import_csv": {
+            "text": "Continue by importing the QPU calibration data CSV file: object.import_csv_data('path/to/file.csv')",
+            "highlightables": [
+                "object.import_csv_data('path/to/file.csv')"
+            ]
+        },
+
+        "linking_success": {
+            "text": "Linking completed successfully!",
+            "highlightables": []
+        },
+
+        "reset_time": {
+            "text": "CSV files currently do not contain Reset operation times. A default value of 1300 ns has been set.",
+            "highlightables": [
+                "Reset", "1300 ns"
+            ]
+        },
+
+        "successful_csv_import": {
+            "text": "Data from CSV file has been imported successfully!",
+            "highlightables": []
+        },
+        
+        "qubit_noise_data_retrieved": {
+            "text": "Noise data for all requested qubits has been retrieved successfully!",
+            "highlightables": []
+        }
+    }
 }
