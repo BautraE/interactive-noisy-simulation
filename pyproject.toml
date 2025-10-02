@@ -20,3 +20,11 @@ Repository = "https://github.com/BautraE/interactive-noisy-simulation"
 
 [tool.setuptools.package-data]
 "interactive_noisy_simulation.data" = ["*.json"]
+"interactive_noisy_simulation.messages" = [
+    "*.css", "*.html", "*.js"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["interactive_noisy_simulation*"]
+exclude = ["media*"]

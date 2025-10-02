@@ -2,9 +2,9 @@
 
 This additional feature aims to replace the generic console outputs of the previous version with something more visually appealing. 
 
-Though it was initially planned to implement this with the library *Python [Rich](https://github.com/Textualize/rich)*, there were some issues in regards to how different cell outputs are handled for *Jupyter Notebook* (*.ipynb*) files thus *Rich* was not used. However, it is possible to render ***HTML*** inside of cell outputs, as well as use ***CSS*** and ***JavaScript*** alongside it - which is the solution that was used.
+Though it was initially planned to implement this with the library *Python [Rich](https://github.com/Textualize/rich)*, there were some issues in regards to how cell outputs are handled for *Jupyter Notebook* (*.ipynb*) files thus *Rich* was not used. However, it is possible to render ***HTML*** inside of cell outputs, as well as use ***CSS*** and ***JavaScript*** alongside it - which is the solution that was used.
 
-Alongside the current output stylization upgrades, this feature lays the foundation of being able to add more different outputs for future functionality features with the same new style, as well as the wide possibilities of ***HTML*** + ***CSS*** + ***JavaScript***.
+Alongside the current output stylization upgrades, this feature lays the foundation of being able to add more different outputs for future functionality features with the same new style, as well as having access to the extensive possibilities of ***HTML*** + ***CSS*** + ***JavaScript***.
 
 ## 1. Feature functionality overview
 
@@ -18,7 +18,7 @@ Example of new output:
 ![output_box_example.jpg](media/output_box_example.jpg)
 
 Additional changes:
-- Static messages that are stored inside of the `messages.json` file are now sorted into three categories - messages, output-headings, and errors;
+- Static messages that are stored inside of the `messages.json` file are now sorted into three categories - *messages*, *output-headings*, and *errors*;
 - It is now possible to highlight parts of a message under the *message* category inside of `messages.json`, simply by adding the highlightable parts under the *highlightables* key of the desired message.
 
 
@@ -28,22 +28,22 @@ New output design sketch:
 
 ![new_output_sketch](media/new_output_sketch.jpg)
 
-Each output consists of an **output box** - a container for all renderable content as a result of executing one of the main function.
+Each output consists of an **output box** - a container for all renderable content as a result of executing one of the main functions.
 
 Every output box has an **output title/heading** that informs users about the expected goal of the current function.
 
-All other content inside of these output boxes is inside of separate **content containers**. Such a container is added for every different type of information being displayed inside of output boxes (message log, error log, qubit noise data, etc.)
+All other content inside of these output boxes is inside of separate **content containers**. Such containers are added for every different type of information being displayed inside of output boxes (message log, error log, qubit noise data, etc.)
 
 Each of these containers consists of two other parts:
 - A signle **content title/heading**, for example, *Message log*;
-- A single (or many, based on the information being displayed) **content box**, that is another container, inside of which the specific content will be inserted, for example, message log related texts.
+- A single (could also be multiple, depending on the information being displayed) **content box**, that is another container, inside of which the specific content will be inserted, for example, message log related texts.
 
-At the very bottom of every output box, there is also a **status** indicator that has 3 potential states:
+At the very bottom of every output box, there is also a **status** indicator that has 3 possible states:
 - In progress;
 - Completed;
 - Failed.
 
-**NOTE:** This terminology is used throughout the newly written code, so an explanation for each of them might have been useful.
+**NOTE:** This terminology is used throughout the newly written code, so an explanation for each term might be useful, therefore, it is all explained here.
 
 ## 3. Slight issues with the current solution
 
@@ -55,16 +55,16 @@ Both showing *HTML* content and executing *JavaScript* functions that interact w
 The issue comes from the fact that every time `IPython.display.display` is used, a new empty `div` element is created and rendered (not really 'empty', as it contains 2x more `div` elements inside of it, however, they appear as invisible elements with no content).
 
 Now this isn't all too good for 2 reasons:
-1. Huge whitespaces appear inside of Jupyter Notebook cell outputs between two output boxes (especially if the function uses a lot of JavaScript functions);
-2. Every div is an additional element that exists in the DOM tree, which may eventually cause slight performance issues.
+1. Huge whitespaces appear inside of *Jupyter Notebook* cell outputs between two output boxes (especially if the function uses a lot of JavaScript functions);
+2. Every `div` element is an additional element that exists in the *DOM* tree, which may eventually cause slight performance issues.
 
 ### 3.2. Attempted solutions
 
 #### 3.2.1. Hide the elements through CSS
 
-It is very simple to just hide all of these elements with the help of ***CSS***, however, it's still a lot of unnecessary elements that exist in the *DOM* tree.
+It is very simple to just hide all of these elements with the help of ***CSS***, however, this does not remove any of the unnecessary elements from the *DOM* tree.
 
-For the lack of a better solution, this is something that was used in the end. (Issues about alternative solutions are mentioned further on).
+For the lack of a better solution, this is something that was used in the end. (Issues with alternative solutions are mentioned further on).
 
 Used *CSS* code:
 ```css
@@ -80,7 +80,7 @@ It is possible to do something like this with `IPython.display.display`:
 js_display = display(Javascript(f"jsFunction();"), display_id=True)
 ```
 
-By adding another argument `display_id`, it will return the display instance as an object. If this object is then stored properly, the same display can be reused as follows:
+By adding another argument `display_id`, it will return the display instance as an object. If this object is then stored and properly managed, the same display can be reused as follows:
 ```python
 js_display.update(Javascript(f"anotherJsFunction();"))
 ```
@@ -91,7 +91,7 @@ However, *Visual Studio Code* had some issues, which just broke the main functio
 
 **NOTE:** The following code example may not include certain changes that are in the most recent final version of the file. The goal here is to give an example as to how this solution was implemented.
 
-Full code that used to try out this solution:
+Full code that was used to try out this solution:
 ```python
 # Standard library imports:
 import json, traceback
@@ -228,4 +228,8 @@ class MessageManager:
 
 #### 3.2.3. Automatically removing the unnecessary elements through *JavaScript*
 
-Since *HTML* element IDs are used to edit the current active output box in real time, it is possible to traverse the *DOM* tree. So after inspecting the final *HTML* code through the browser console, a solution was made that removes these empty `div` elements.
+Since *HTML* element IDs are used to edit the current active output box in real time, it is possible to traverse the *DOM* tree and access the other elements. After inspecting the final *HTML* code through the browser console, a solution was made that removes these empty `div` elements.
+
+Everything worked as planned, even in *Visual Studio Code*, but that was until some other interraction with Jupyter Notebook would occur, causing it to break and eventually crash.
+
+Without a full understanding of how *Jupyter Notebook* actually works, it is not recommended to remove any elements, even if they seem useless, just like in this case with these `div` elements. They still seem to serve some sort of purpose or play a part in some algorithm that ends up breaking if something is unexpectedly removed from the 'equation'.
