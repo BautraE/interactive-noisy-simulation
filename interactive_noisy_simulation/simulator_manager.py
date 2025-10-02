@@ -1,5 +1,6 @@
 # Standard library imports:
-import warnings
+import json, warnings
+from importlib import resources
 
 #Third party imports:
 from qiskit import transpile
@@ -7,62 +8,49 @@ from qiskit_aer import AerSimulator
 from qiskit_aer.jobs.aerjob import AerJob
 
 # Local project imports:
-from .messages._message_manager import MessageManager
+from . import data
 from .noise_creator import NoiseCreator
-from .data._data import (
-    ERRORS, MESSAGES, OUTPUT_HEADINGS
-)
+
+
+with (resources.files(data) / "messages.json").open("r", encoding="utf8") as file:
+    MESSAGES = json.load(file)
 
 
 class SimulatorManager:
 
     def __init__(self) -> None:
         """Constructor method """
-        self.__message_manager: MessageManager = MessageManager()
-        msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(class_name=self.__class__.__name__))
-
         self.__simulator = None
         self.__noise_model = None
-
-        msg.add_message(MESSAGES["created_new_object"], class_name=self.__class__.__name__)
-        msg.end_output()
+        print(
+            f"{MESSAGES["creating_new_object"].format(class_name=self.__class__.__name__)}\n"
+            f"{MESSAGES["created_new_object"].format(class_name=self.__class__.__name__)}\n"
+        )
 
 
     # Public class methods
-    
+
     def create_simulator(self) -> None:
         """Creates a AerSimulator object from available data """
-        msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["creating_simulator"])
-
-        try:
-            self.__check_noise_creator_link()
-        except Exception:
-            msg.add_traceback()
-            return
+        if self.__noise_model is None:
+            raise RuntimeError(
+                f"{MESSAGES["error_not_linked"].format(class_name=NoiseCreator.__name__,
+                                                       method_name=self.link_noise_creator.__name__)}")
+        
+        print(f"{MESSAGES["creating_simulator"]}")
 
         self.__simulator = AerSimulator(coupling_map=self.__noise_model["coupling_map"], 
                                         noise_model=self.__noise_model["noise_model"])
         
-        msg.add_message(MESSAGES["created_simulator"])
-        msg.end_output()
+        print(f"{MESSAGES["created_simulator"]}\n")
 
 
     def link_noise_creator(self, noise_creator: NoiseCreator) -> None:
         """Links a NoiseCreator class object to gain access to created noise models """
-        msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["linking_object"].format(linked_class=NoiseCreator.__name__,
-                                                            this_class=self.__class__.__name__))
-        
-        try:
-            self.__noise_model = noise_creator.noise_model
-        except Exception:
-            self.__message_manager.add_traceback()
-            return
-        
-        msg.add_message(MESSAGES["linking_success"])
-        msg.end_output()
+        print(f"{MESSAGES["linking_object"].format(linked_class=NoiseCreator.__name__,
+                                                   this_class=self.__class__.__name__)}")
+        self.__noise_model = noise_creator.noise_model
+        print(f"{MESSAGES["linking_success"]}\n")
 
 
     def run_simulator(self, circuit, optimization, shots) -> AerJob:
@@ -81,14 +69,9 @@ class SimulatorManager:
                 extract the result counts and other data associated with the
                 completed job.
         """
-        msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["execute_simulator"])
-        
-        try:
-            self.__check_simulator()
-        except Exception:
-            msg.add_traceback()
-            return
+        self.__check_simulator()
+
+        print(f"{MESSAGES["execute_simulator"]}")
 
         # While doing everything correctly, there seems to be an error message
         # regarding providing the coupling_map and basis_bates together with
@@ -106,22 +89,13 @@ class SimulatorManager:
         
         result_job = self.__simulator.run(transpiled_circuit, shots = shots)
 
-        msg.add_message(MESSAGES["execution_complete"])
-        msg.end_output()
+        print(f"{MESSAGES["execution_complete"]}\n")
         return result_job
 
 
     # Private class methods
 
-    def __check_noise_creator_link(self) -> None:
-        """Checks if a NoiseCreator class object is linked to this SimulatorManager object"""
-        if self.__noise_model is None:
-            raise RuntimeError(
-                ERRORS["error_not_linked"].format(class_name=NoiseCreator.__name__,
-                                                  method_name=self.link_noise_creator.__name__))
-
-
     def __check_simulator(self) -> None:
         """Checks if a simulator exists in the current object of SimulatorManager """
         if self.__simulator is None:
-            raise RuntimeError(ERRORS["error_no_simulator"])
+            raise RuntimeError(f"{MESSAGES["error_no_simulator"]}")
