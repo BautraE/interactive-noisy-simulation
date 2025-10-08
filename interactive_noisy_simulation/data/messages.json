@@ -14,7 +14,11 @@
 
         "linking_object": "Linking class {linked_class} object to {this_class}",
 
-        "retrieving_qubits": "Retrieving information about qubits {qubits}"
+        "noise_data_instances": "All currently available noise data instances",
+
+        "remove_noise_data_instance": "Removing noise data instance '{reference_key}'.",
+
+        "retrieving_qubits": "Retrieving information about qubits {qubits} from noise data instance {reference_key}"
     },
 
     "errors": {
@@ -30,7 +34,9 @@
 
         "error-no-qubits-numbers": "At least one qubit number must be given in order to retrieve noise data!",
 
-        "error_not_linked": "There is no linked {class_name} object! Please use the method {method_name}(object: {class_name}) before executing this method!"
+        "error_not_linked": "There is no linked {class_name} object! Please use the method {method_name}(object: {class_name}) before executing this method!",
+
+        "no_key_noise_data_instance": "There is no currently available noise data instance with the reference key '{reference_key}'!"
     },
 
     "messages": {
@@ -51,6 +57,13 @@
             "highlightables": []
         },
 
+        "deleted_noise_data_instance": {
+            "text": "The noise data instance {reference_key} has been deleted successfully!",
+            "highlightables": [
+                "{reference_key}"
+            ]
+        },
+
         "exception_occurred": {
             "text": "AN EXCEPTION HAS OCCURED. PLEASE VIEW THE ERROR LOG FOR MORE DETAILS!",
             "highlightables": [
@@ -64,9 +77,16 @@
         },
 
         "import_csv": {
-            "text": "Continue by importing the QPU calibration data CSV file: object.import_csv_data('path/to/file.csv')",
+            "text": "Continue by importing the QPU calibration data CSV file: object.import_csv_data('path/to/file.csv').",
             "highlightables": [
                 "object.import_csv_data('path/to/file.csv')"
+            ]
+        },
+
+        "import_csv_file_information": {
+            "text": "Importing noise data from the CSV file {file_name} located at the following path: {file_path}.",
+            "highlightables": [
+                "{file_name}", "{file_path}"
             ]
         },
 
@@ -83,13 +103,17 @@
         },
 
         "successful_csv_import": {
-            "text": "Data from CSV file has been imported successfully!",
-            "highlightables": []
+            "text": "Data from CSV file has been imported successfully! It can now be accessed with the following reference key: {reference_key}.",
+            "highlightables": [
+                "{reference_key}"
+            ]
         },
         
         "qubit_noise_data_retrieved": {
-            "text": "Noise data for all requested qubits has been retrieved successfully!",
-            "highlightables": []
+            "text": "Noise data for all requested qubits from the instance {reference_key} has been retrieved successfully!",
+            "highlightables": [
+                "{reference_key}"
+            ]
         }
     }
 }

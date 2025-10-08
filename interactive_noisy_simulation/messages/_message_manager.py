@@ -1,5 +1,5 @@
 # Standard library imports:
-import json, traceback
+import json, re, traceback
 from importlib import resources
 from typing import Any
 
@@ -40,7 +40,7 @@ class MessageManager:
     def add_message(
             self, 
             message: str | dict, 
-            highlightables: list[str] = None,
+            highlightables: list[str] = [],
             **placeholder_strings
     ) -> None:
         """Adds a message to the default "Message log" content box
@@ -80,9 +80,9 @@ class MessageManager:
             message_text = message_text.format(**placeholder_strings)
             highlightables = [hl.format(**placeholder_strings) for hl in highlightables]
 
-        hl_message = self.__highlight_message(message_text, highlightables)
+        message_text = self.__modify_message(message_text, highlightables)
 
-        display(Javascript(f"addMessage({hl_message});"))
+        display(Javascript(f"addMessage({message_text});"))
 
 
     def add_traceback(self) -> None:
@@ -192,6 +192,7 @@ class MessageManager:
             heading: Text for the output box title (main title at the top of
                 the container).
         """
+        heading = self.__escape_text(heading)
         display(HTML(self.__content_block))
         display(Javascript(f"setOutputHeading('{heading}');"))
 
@@ -228,21 +229,43 @@ class MessageManager:
 
     # Private class methods
 
-    def __add_highlight_html(self, text_part: str) -> str:
-        """Adds highlight-related HTLM code around the required text
-        
-        This is a helper method for another helper method: __highlight_message()
+    def __add_highlight_tags(
+            self, 
+            message: str, 
+            highlightable: str, 
+            start_position: int, 
+            end_position: int
+    ) -> str:
+        """Adds HTML tags to message text with highlight style
 
-        Text fragment highlighting is acomplished by surrounding the highlightable
-        text part with a span element that has a CSS class with style related to
-        highlighting.
+        This is a helper method for the class method __modify_message().
+
+        This method takes the current message and adds "span" HTML tags
+        around the highlightable message fragment. This is acomplished
+        with the start and end position of the highlightable part by
+        creating a new message that consists of:
+            1. everything before the highlightable part;
+            2. the highlightable fragment with added HTML tags;
+            3. everything after the highlightable part.
 
         Args:
-            text_part: The text par that needs to be highlighted.
+            message (str): The current message that needs to be modified.
+            highlightable (str): The message fragment that needs to be
+                highlighted (surrounded by HTML tags).
+            start_position (int): Start position of the highlightable
+                fragment inside of the current message.
+            end_position (int): End position of the highlightable
+                fragment inside of the current message.
+        
+        Returns:
+            srt: The modified message with added highlight style for
+                the highlightable message fragment (added HTML tags
+                around it).
         """
-        return f"<span class='highlighted-text'>{text_part}</span>"
+        highlight_element = f"<span class='highlighted-text'>{highlightable}</span>"
+        return message[:start_position] + highlight_element + message[end_position:]
 
-
+    
     # For some reason json.dumps does not want to work with my custom messages
     # thus this is the solution for escaping text. It might be useful to some day
     # check, which symbols actually cause an issue.
@@ -288,32 +311,112 @@ class MessageManager:
         return "\n".join(tb_lines)
 
 
-    def __highlight_message(self, message: str, highlightables: list[str] | None) -> str:
+    def __highlight_message(
+            self,
+            message: str, 
+            highlightable: str, 
+    ) -> str:
+        """Adds highlighting style to each highlightable in message
+
+        This is a helper method for the method __modify_message().
+
+        The simple str.replace() function did not work for this, because
+        it would highlight fragments that are a part of a word, which is
+        not the goal - highlighting specific words, phrases, elements from
+        messages.
+        Instead of replacing the highlightable with a variant of it with
+        added HTML tags added, the tags are 'appended' to the text.
+        This functionality is implemented in the class method 
+        __add_highlight_tags().
+        The appending process works in reverse by starting with highlightable
+        instances that are located closer to the end of the message. This is
+        done so that position numbers don't get messed up after something gets
+        highlighted, because the modified message text replaces the current one
+        all the time.
+        Validation if the matchet message fragment is a valid highlightable
+        (a specific word, phrase, element) is achieved with certain 
+        acceptable symbols before and after the matched fragment. If both
+        are acceptable, the fragment will be highlighted.
+
+        Args:
+            message (str): Text that contains highlightables that need highlight
+                related styles applied to them.
+            highlightable (str): The current highlightable fragment that will be
+                located in the current message and have highlighting style applied
+                to it.
+
+        Returns:
+            str: Message text with all valid cases of a highlightable highlighted
+                (with added <span> elements that give the required highlight style)
+        """
+        escaped_highlightable = re.escape(highlightable)
+        
+        # All found matches for the current highlightable
+        matches = re.finditer(rf'{escaped_highlightable}', message)
+        # Iterates through matches in reverse order. The reverse order
+        # is determined by the key function, which will sort by the start
+        # position of each found match.
+        for match in sorted(matches, key=lambda m: m.start(), reverse=True):
+
+            start, end = match.start(), match.end()
+            
+            before = message[start - 1] if start > 0 else ''
+            after = message[end] if end < len(message) else ''
+            
+            is_prev_allowed = False
+            is_next_allowed = False
+            if before in ["", " "]:
+                is_prev_allowed = True
+            if after in ["", " ", "!", "?", ".", ","]:
+                is_next_allowed = True
+
+            if is_prev_allowed and is_next_allowed:
+                message = self.__add_highlight_tags(
+                    message,
+                    highlightable,
+                    start_position=start,
+                    end_position=end
+                )
+        
+        return message
+
+    
+    def __modify_message(
+            self, 
+            message: str, 
+            highlightables: list[str]
+    ) -> str:
         """Highlights certain parts of a message
 
         This is a helper method for the class method add_message().
 
         Both the message text and all highlightable text fragments are
-        'escaped'. If highlightables are given, this method goes through
-        all of them, retrieves the highlighted variant, replaces the regular
-        variant with the highlighted one in the main message, and returns
-        the final message back for usage.
+        'escaped'. 
+        If highlightables are given, this method goes through all of them, 
+        modifies the current message text by adding the required highlighting
+        style for each highlightable in it, and returns the final message
+        back for display.
 
         Args:
             message: The main message that may contain fragments needing to be
                 highlighted.
             highlightables: A list of text fragments from the main message that 
                 must be highlighted.
+
+        Returns:
+            str: Modified message that is ready to be displayed.
         """
-        esc_message = self.__escape_text(message)
-        if highlightables:
-            for string in highlightables:
-                string = self.__escape_text(string)
-                hl_string = self.__add_highlight_html(string)
-                esc_message = esc_message.replace(string, hl_string)
-        return json.dumps(esc_message)
+        message = self.__escape_text(message)
+        
+        for highlightable in highlightables:
+            highlightable = self.__escape_text(highlightable) 
+            message = self.__highlight_message(
+                message, highlightable
+            )
+        
+        return json.dumps(message)
 
-
+    
     def __unset_id_values(self) -> None:
         """Removes id attributes from current output box."""
         display(Javascript(f"unsetIdValues();"))
