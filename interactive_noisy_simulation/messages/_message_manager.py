@@ -367,7 +367,7 @@ class MessageManager:
             is_next_allowed = False
             if before in ["", " "]:
                 is_prev_allowed = True
-            if after in ["", " ", "!", "?", ".", ","]:
+            if after in ["", " ", "!", "?", ".", ",", ":"]:
                 is_next_allowed = True
 
             if is_prev_allowed and is_next_allowed:

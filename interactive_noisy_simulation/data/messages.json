@@ -14,9 +14,13 @@
 
         "linking_object": "Linking class {linked_class} object to {this_class}",
 
-        "noise_data_instances": "All currently available noise data instances",
+        "noise_data_instances": "All currently created noise data instances",
+
+        "noise_model_instances": "All currently created noise models",
 
         "remove_noise_data_instance": "Removing noise data instance '{reference_key}'.",
+
+        "remove_noise_model_instance": "Removing noise model instance '{reference_key}'.",
 
         "retrieving_qubits": "Retrieving information about qubits {qubits} from noise data instance {reference_key}"
     },
@@ -36,10 +40,17 @@
 
         "error_not_linked": "There is no linked {class_name} object! Please use the method {method_name}(object: {class_name}) before executing this method!",
 
-        "no_key_noise_data_instance": "There is no currently available noise data instance with the reference key '{reference_key}'!"
+        "no_key_noise_data_instance": "There is no currently available noise data instance with the reference key '{reference_key}'!",
+
+        "no_key_noise_model_instance": "There is no currently available noise model instance with the reference key '{reference_key}'!"
     },
 
     "messages": {
+        "adding_errors": {
+            "text": "Creating and adding depolarizing, thermal relaxation, and readout errors.",
+            "highlightables": []
+        },
+
         "created_new_object": {
             "text": "{class_name} class object has been created successfully!",
             "highlightables": [
@@ -48,8 +59,10 @@
         },
 
         "created_noise_model": {
-            "text": "Noise model has been created successfully!",
-            "highlightables": []
+            "text": "Noise model has been created successfully! It can now be accessed with the following reference key: {reference_key}.",
+            "highlightables": [
+                "{reference_key}"
+            ]
         },
 
         "created_simulator": {
@@ -59,6 +72,13 @@
 
         "deleted_noise_data_instance": {
             "text": "The noise data instance {reference_key} has been deleted successfully!",
+            "highlightables": [
+                "{reference_key}"
+            ]
+        },
+
+        "deleted_noise_model_instance": {
+            "text": "The noise model instance {reference_key} has been deleted successfully!",
             "highlightables": [
                 "{reference_key}"
             ]
@@ -99,6 +119,20 @@
             "text": "CSV files currently do not contain Reset operation times. A default value of 1300 ns has been set.",
             "highlightables": [
                 "Reset", "1300 ns"
+            ]
+        },
+
+        "retrieving_basis_gates": {
+            "text": "Retrieving list of basis gates.",
+            "highlightables": [
+                
+            ]
+        },
+
+        "retrieving_coupling_map": {
+            "text": "Retrieving map of coupled qubits.",
+            "highlightables": [
+                
             ]
         },
 

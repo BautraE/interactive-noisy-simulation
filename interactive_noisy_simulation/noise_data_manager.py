@@ -21,7 +21,7 @@ class NoiseDataManager:
         msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(
             class_name=self.__class__.__name__))
         
-        self.__data_instances: dict[str, str | pandas.DataFrame] = {}
+        self.__noise_data: dict[str, str | pandas.DataFrame] = {}
 
         msg.add_message(MESSAGES["created_new_object"], 
                         class_name=self.__class__.__name__)
@@ -33,26 +33,26 @@ class NoiseDataManager:
 
     # TODO Things that will need changes.
 
-    # TODO since this is a copy, it might not transfer any new changes.....
     @property    
     def noise_data(self) -> pandas.DataFrame:
-        """Returns a read-only copy of the current dataframe that contains noise data"""
-        self.__check_dataframe()
-        return self.__data_instances
+        """Returns a reference to data structure containing noise data instances """
+        return self.__noise_data
     
     ## This one will need to be edited or removed down the road
-    def __check_dataframe(self) -> None:
-        """Checks if a dataframe exists in the current object of NoiseDataManager """
-        if self.__data_instances is None:
-            raise RuntimeError(ERRORS["error_no_dataframe"])
+    # def __check_dataframe(self) -> None:
+    #     """Checks if a dataframe exists in the current object of NoiseDataManager """
+    #     if self.__noise_data is None:
+    #         raise RuntimeError(ERRORS["error_no_dataframe"])
+
+    # TODO check out the error message "error_no_dataframe". Perhaps there is no more use for it
         
     # TODO this one will still be edited after a specific style for it is designed
     def view_noise_data_instances(self) -> None:
         msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["noise_data_instances"])
 
-        if self.__data_instances:
-            for key, instance in self.__data_instances.items():
+        if self.__noise_data:
+            for key, instance in self.__noise_data.items():
                 msg.add_message(key)
                 msg.add_message(instance["name"])
                 msg.add_message(instance["path"])
@@ -83,7 +83,7 @@ class NoiseDataManager:
             msg.add_traceback()
             return
 
-        del self.__data_instances[reference_key]
+        del self.__noise_data[reference_key]
         msg.add_message(
             MESSAGES["deleted_noise_data_instance"],
             reference_key=reference_key)
@@ -115,7 +115,7 @@ class NoiseDataManager:
         
         try:
             self.__check_data_instance_key(reference_key)
-            dataframe = self.__data_instances[reference_key]["dataframe"]
+            dataframe = self.__noise_data[reference_key]["dataframe"]
 
             if not qubits:
                 raise ValueError(ERRORS["error-no-qubits-numbers"])
@@ -197,7 +197,7 @@ class NoiseDataManager:
         self.__modify_dataframe_data(dataframe)
         new_instance["dataframe"] = dataframe
 
-        self.__data_instances[reference_key] = new_instance
+        self.__noise_data[reference_key] = new_instance
         
         msg.add_message(
             MESSAGES["successful_csv_import"],
@@ -245,7 +245,7 @@ class NoiseDataManager:
         Args:
             reference_key (str): The reference key that will be checked.   
         """
-        if not reference_key in self.__data_instances:
+        if not reference_key in self.__noise_data:
             raise KeyError(
                     ERRORS["no_key_noise_data_instance"].format(
                         reference_key=reference_key))   
