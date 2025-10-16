@@ -52,6 +52,8 @@ class NoiseCreator:
 
         if self.__noise_models:
             for noise_model_key, instance in self.__noise_models.items():
+                noise_model = instance["noise_model"]
+                msg.add_message(f"Basis gates: {noise_model.basis_gates}")
                 msg.add_message(noise_model_key)
                 data_instance_key = instance["data_source"]
                 msg.add_message(data_instance_key)
@@ -63,31 +65,6 @@ class NoiseCreator:
         else:
             msg.add_message("There are currently no created noise noise models!")
         
-        msg.end_output()
-
-
-    def remove_noise_model_instance(self, reference_key: str) -> None:
-        """Removes existing noise model instance by reference key.
-        
-        Args:
-            reference_key (str): Key of the removable noise model
-                instance.
-        """
-        msg = self.__message_manager
-        msg.create_output(
-            OUTPUT_HEADINGS["remove_noise_model_instance"].format(
-                reference_key=reference_key))
-        
-        try:
-            self.__check_noise_model_instance_key(reference_key)
-        except Exception:
-            msg.add_traceback()
-            return
-
-        del self.__noise_models[reference_key]
-        msg.add_message(
-            MESSAGES["deleted_noise_model_instance"],
-            reference_key=reference_key)
         msg.end_output()
 
     # TEMPORARY DEFINITION:
@@ -124,14 +101,6 @@ class NoiseCreator:
             raise KeyError(
                     ERRORS["no_key_noise_model_instance"].format(
                         reference_key=reference_key))
-        
-    # NOT SURE IF REQUIRED
-    # def __check_noise_model(self) -> None:
-    #     """Checks if a noise model exists in the current object of 
-    #        NoiseCreator."""
-    #     if not self.__noise_models:
-    #         raise RuntimeError(ERRORS["error_no_noise_model"])
-    # TODO check out the error message "error_no_noise_model". Perhaps there is no more use for it
     ###############################################################
 
     # Public class methods
@@ -208,6 +177,30 @@ class NoiseCreator:
         msg.add_message(MESSAGES["linking_success"])
         msg.end_output()
 
+
+    def remove_noise_model_instance(self, reference_key: str) -> None:
+        """Removes existing noise model instance by reference key.
+        
+        Args:
+            reference_key (str): Key of the removable noise model
+                instance.
+        """
+        msg = self.__message_manager
+        msg.create_output(
+            OUTPUT_HEADINGS["remove_noise_model_instance"].format(
+                reference_key=reference_key))
+        
+        try:
+            self.__check_noise_model_instance_key(reference_key)
+        except Exception:
+            msg.add_traceback()
+            return
+
+        del self.__noise_models[reference_key]
+        msg.add_message(
+            MESSAGES["deleted_noise_model_instance"],
+            reference_key=reference_key)
+        msg.end_output()
 
     # Private class methods
 

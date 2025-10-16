@@ -8,7 +8,7 @@
 
         "csv_information": "Information on all currently relevant CSV calibration data columns",
 
-        "execute_simulator": "Executing circuit with simulator",
+        "execute_simulator": "Executing circuit with simulator {reference_key}",
 
         "importing_csv": "Importing data from the selected CSV file",
 
@@ -18,11 +18,15 @@
 
         "noise_model_instances": "All currently created noise models",
 
-        "remove_noise_data_instance": "Removing noise data instance '{reference_key}'.",
+        "remove_noise_data_instance": "Removing noise data instance '{reference_key}'",
 
-        "remove_noise_model_instance": "Removing noise model instance '{reference_key}'.",
+        "remove_noise_model_instance": "Removing noise model instance '{reference_key}'",
+        
+        "remove_simulator_instance": "Removing simulator instance '{reference_key}'",
 
-        "retrieving_qubits": "Retrieving information about qubits {qubits} from noise data instance {reference_key}"
+        "retrieving_qubits": "Retrieving information about qubits {qubits} from noise data instance {reference_key}",
+
+        "simulator_instances": "All currently created simulator instances"
     },
 
     "errors": {
@@ -30,19 +34,15 @@
 
         "error_negative_qubit_number": "Qubit numbers cannot be lower than 0! The number {qubit} goes against this!",
 
-        "error_no_dataframe": "There is currently no noise data dataframe within this NoiseDataManager class object! Please create one with the help of the method: object.import_csv_data('path/to/file.csv')",
-
-        "error_no_noise_model": "There is currently no created noise model within this NoiseCreator class object! Please create one with the help of the method: object.create_noise_model()",
-
-        "error_no_simulator": "There is currently no created simulator within this SimulatorManager class object! Please create one with the help of the method: object.create_simulator()",
-
         "error-no-qubits-numbers": "At least one qubit number must be given in order to retrieve noise data!",
 
         "error_not_linked": "There is no linked {class_name} object! Please use the method {method_name}(object: {class_name}) before executing this method!",
 
         "no_key_noise_data_instance": "There is no currently available noise data instance with the reference key '{reference_key}'!",
 
-        "no_key_noise_model_instance": "There is no currently available noise model instance with the reference key '{reference_key}'!"
+        "no_key_noise_model_instance": "There is no currently available noise model instance with the reference key '{reference_key}'!",
+
+        "no_key_simulator_instance": "There is no currently available simulator instance with the reference key '{reference_key}'!"
     },
 
     "messages": {
@@ -66,8 +66,10 @@
         },
 
         "created_simulator": {
-            "text": "Simulator has been created successfully!",
-            "highlightables": []
+            "text": "Simulator has been created successfully! It can now be accessed with the following reference key: {reference_key}.",
+            "highlightables": [
+                "{reference_key}"
+            ]
         },
 
         "deleted_noise_data_instance": {
@@ -84,6 +86,13 @@
             ]
         },
 
+        "deleted_simulator_instance": {
+            "text": "The simulator instance {reference_key} has been deleted successfully!",
+            "highlightables": [
+                "{reference_key}"
+            ]
+        },
+
         "exception_occurred": {
             "text": "AN EXCEPTION HAS OCCURED. PLEASE VIEW THE ERROR LOG FOR MORE DETAILS!",
             "highlightables": [
@@ -91,6 +100,13 @@
             ]
         },
 
+        "executing_simulator": {
+            "text": "Executing {qubit_count} qubit circuit with {shots} shots on the simulator {reference_key}.",
+            "highlightables": [
+                "{qubit_count}", "{shots}", "{reference_key}"
+            ]
+        },
+        
         "execution_complete": {
             "text": "Circuit execution completed successfully! Result job has been returned!",
             "highlightables": []
@@ -140,6 +156,13 @@
             "text": "Data from CSV file has been imported successfully! It can now be accessed with the following reference key: {reference_key}.",
             "highlightables": [
                 "{reference_key}"
+            ]
+        },
+
+        "transpiling_circuit": {
+            "text": "Transpiling circuit with optimization level {optimization_level} for simulator execution.",
+            "highlightables": [
+                "{optimization_level}"
             ]
         },
         

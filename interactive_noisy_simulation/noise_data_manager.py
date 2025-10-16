@@ -31,20 +31,12 @@ class NoiseDataManager:
     
     # Class properties
 
-    # TODO Things that will need changes.
-
     @property    
     def noise_data(self) -> pandas.DataFrame:
-        """Returns a reference to data structure containing noise data instances """
+        """Returns a reference to data structure containing noise 
+           data instances."""
         return self.__noise_data
-    
-    ## This one will need to be edited or removed down the road
-    # def __check_dataframe(self) -> None:
-    #     """Checks if a dataframe exists in the current object of NoiseDataManager """
-    #     if self.__noise_data is None:
-    #         raise RuntimeError(ERRORS["error_no_dataframe"])
-
-    # TODO check out the error message "error_no_dataframe". Perhaps there is no more use for it
+  
         
     # TODO this one will still be edited after a specific style for it is designed
     def view_noise_data_instances(self) -> None:
@@ -95,17 +87,20 @@ class NoiseDataManager:
             reference_key: str, 
             qubits: int | list[int] = None
     ) -> None:
-        """Prints out noise data for certain qubits from a specific data instance
+        """Prints out noise data for certain qubits from a specific 
+           data instance.
         
-        Retrieves and prints out all noise data from a specific noise data
-        instance for the selected qubits by the user.
+        Retrieves and prints out all noise data from a specific noise
+        data instance for the selected qubits by the user.
 
         Args:
-            reference_key (str): Key that is used to access a specific noise data
-                instance from all of the currently available ones.
-            qubits (int | list[int]): Either a single qubit number or a list of 
-                qubit numbers, for which the noise data will be retrieved and
-                printed out so the user can see the specific data.
+            reference_key (str): Key that is used to access a specific 
+                noise datainstance from all of the currently available
+                ones.
+            qubits (int | list[int]): Either a single qubit number or 
+                a list of qubit numbers, for which the noise data will 
+                be retrieved and printed out so the user can see the 
+                specific data.
         """
         msg = self.__message_manager
         msg.create_output(
@@ -135,7 +130,8 @@ class NoiseDataManager:
             for column in CSV_COLUMNS.keys():
                 if CSV_COLUMNS[column]["csv_name"] in dataframe.columns:
                     name = CSV_COLUMNS[column]["name"]
-                    value = dataframe.loc[qubit, CSV_COLUMNS[column]["csv_name"]]
+                    value = dataframe.loc[qubit, 
+                                          CSV_COLUMNS[column]["csv_name"]]
                     msg.add_qubit_noise_data_row(name, value)
         
         msg.add_message(MESSAGES["qubit_noise_data_retrieved"],
@@ -144,7 +140,7 @@ class NoiseDataManager:
 
 
     def help_csv_columns(self) -> None:
-        """Prints out information about all dataframe columns """
+        """Prints out information about all dataframe columns."""
         msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["csv_information"])
         msg.generic_content_container("Calibration data attributes:")
@@ -158,19 +154,20 @@ class NoiseDataManager:
 
 
     def import_csv_data(self, reference_key: str, file_path: str) -> None:
-        """Imports and modifies data from a given calibration data file 
+        """Imports and modifies data from a given calibration data file.
         
-        Calibration data files are downloadable from the IBM Quantum platform for
-        every available QPU (even if you do not pay for real access to all of them).
-        These files can be used to create noise models that will have similar results
-        to the real devices. This method reads the imported CSV file, removes 
-        unnecessary columns and modifies the data for further use in creating
-        noise models.
+        Calibration data files are downloadable from the IBM Quantum 
+        platform for every available QPU (even if you do not pay for 
+        real access to all of them). These files can be used to create 
+        noise models that will have similar results to the real devices. 
+        This method reads the imported CSV file, removes unnecessary 
+        columns and modifies the data for further use in creating noise 
+        models.
 
         Args:
             file_path (str): Path to the calibration data CSV file.
-            reference_key (str): Key that will be used to access specific CSV noise 
-                data instances after they are imported.
+            reference_key (str): Key that will be used to access specific 
+                CSV noise data instances after they are imported.
         """
         msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["importing_csv"])
@@ -209,7 +206,7 @@ class NoiseDataManager:
     # Private class methods
 
     def __add_additional_columns(self, dataframe: pandas.DataFrame) -> None:
-        """Adds additional columns for noise data storage
+        """Adds additional columns for noise data storage.
 
         Helper methods for class method "import_csv_data":
 
@@ -218,22 +215,24 @@ class NoiseDataManager:
         - storing reset operation time.
         Values for the neighboring qubits column are retrieved in another 
         method: "__modify_dataframe_data".
-        Since the reset operation time is not currently available in the CSV 
-        files, a default value of 1300 nanoseconds is set. It is possible to 
-        get these gate times by other means from other ready noise models, 
-        which is where the value 1300 came from.
+        Since the reset operation time is not currently available in the 
+        CSV files, a default value of 1300 nanoseconds is set. It is 
+        possible to get these gate times by other means from other ready 
+        noise models, which is where the value 1300 came from.
 
         Args:
-            dataframe (pandas.DataFrame): Dataframe to which the new columns
-                will be added.
+            dataframe (pandas.DataFrame): Dataframe to which the new
+                columns will be added.
         """
         # Initializing new column for neighboring qubits
-        neighboring_qubits_column = CSV_COLUMNS["neighboring_qubits"] ["csv_name"]
+        neighboring_qubits_column = CSV_COLUMNS["neighboring_qubits"]["csv_name"]
         dataframe[neighboring_qubits_column] = numpy.nan
         # This is done so that dataframe can store lists
-        dataframe[neighboring_qubits_column] = dataframe[neighboring_qubits_column].astype(object)
+        dataframe[neighboring_qubits_column] = dataframe[
+            neighboring_qubits_column].astype(object)
         
-        # This might change, if they add this information in the CSV files at some point in time
+        # This might change, if they add this information in the CSV files
+        # at some point in time
         dataframe[CSV_COLUMNS["reset_time"]["csv_name"]] = 1300
         self.__message_manager.add_message(MESSAGES["reset_time"])
 
@@ -251,22 +250,32 @@ class NoiseDataManager:
                         reference_key=reference_key))   
 
 
-    def __check_qubit_input(self, dataframe: pandas.DataFrame, qubits: list[int]) -> None:
-        """Validates input qubit numbers for method "get_qubit_noise_information()"
+    def __check_qubit_input(
+            self, 
+            dataframe: pandas.DataFrame, 
+            qubits: list[int]
+    ) -> None:
+        """Validates input qubit numbers for method 
+           "get_qubit_noise_information()".
 
-        Helper method checks if the passed qubit numbers are above 0 and below
-        the max index of qubits based on the selected dataframe.
+        Helper method checks if the passed qubit numbers are above 0
+        and below the max index of qubits based on the selected dataframe.
 
         Args:
             datafrane (pandas.DataFrame): The dataframe, from which the 
                 information will be extracted from. Here it is only used 
                 to check the total number of qubits.
-            qubits (list[int]): Numbers of qubits that got passed as arguments.
+            qubits (list[int]): Numbers of qubits that got passed as
+                arguments.
         """
         qubit_count = len(dataframe)
         for qubit in qubits:
+            
             if qubit < 0:
-                raise ValueError(ERRORS["error_negative_qubit_number"].format(qubit=qubit))
+                raise ValueError(
+                    ERRORS["error_negative_qubit_number"].format(
+                        qubit=qubit))
+            
             if qubit >= qubit_count:
                 raise ValueError(ERRORS["error_large_qubit_number"].format(
                     qubit=qubit,
@@ -278,23 +287,27 @@ class NoiseDataManager:
 
         Helper methods for class method "import_csv_data":
 
-        Some of the data columns in the CSV file are initially designed to store
-        multiple values in one row as strings, where each one is divided by ";".
-        This method goes through each of these columns and separates each of the 
-        values, changing the data type to a dictionary:
-            {target_qubit: value}
-        This is done for simpler actions down the road in regards to using these
-        columns.
-        A list of all multi-data columns that this method goes through is available
-        in the configuration file "config.json".
-        Alongside this, neighboring qubits are also retrieved during this process
-        since you iterate through each qubit, for which you see all target qubits
-        in these multi-data columns.
+        Some of the data columns in the CSV file are initially designed
+        to store multiple values in one row as strings, where each one 
+        is divided by ";". This method goes through each of these columns
+        and separates each of the values, changing the data type to a 
+        dictionary: {target_qubit: value}
+        
+        This is done for simpler actions down the road in regards to 
+        using these columns.
+        
+        A list of all multi-data columns that this method goes through is 
+        available in the configuration file "config.json".
+
+        Alongside this, neighboring qubits are also retrieved during this 
+        process since you iterate through each qubit, for which you see all 
+        target qubits in these multi-data columns.
 
         Args:
-            dataframe (pandas.DataFrame): Data from this dataframe will be modified.
+            dataframe (pandas.DataFrame): Data from this dataframe will 
+            be modified.
         """
-        neighboring_qubits_column = CSV_COLUMNS["neighboring_qubits"] ["csv_name"]
+        neighboring_qubits_column = CSV_COLUMNS["neighboring_qubits"]["csv_name"]
 
         for current_qubit in range(len(dataframe)):
             found_neighbors = []
@@ -312,25 +325,32 @@ class NoiseDataManager:
                             modified_data[int(target_qubit)] = float(value)
                             if not are_neighbors_found:
                                 found_neighbors.append(int(target_qubit))
-                        dataframe.at[current_qubit, column_name] = modified_data
-                        dataframe.at[current_qubit, neighboring_qubits_column] = found_neighbors
-                        # Only need to go through one multi-value column to find neighbors
+                        dataframe.at[
+                            current_qubit, column_name] = modified_data
+                        dataframe.at[
+                            current_qubit, 
+                            neighboring_qubits_column] = found_neighbors
+                        # Only need to go through one multi-value column to 
+                        # find neighbors
                         are_neighbors_found = True
 
 
-    def __remove_unnecessary_collumns(self, dataframe: pandas.DataFrame) -> None:
+    def __remove_unnecessary_collumns(
+            self, 
+            dataframe: pandas.DataFrame
+    ) -> None:
         """Removes data columns that are not used to simulate noise
 
         Helper methods for class method "import_csv_data":
 
-        Not all columns in the provided CSV files are used in the creation of
-        errors for a noise model, therefore they are removed. A list of all 
-        removable columns is available in the configuration file "config.json"
-        as "not_required_columns".
+        Not all columns in the provided CSV files are used in the
+        creation of errors for a noise model, therefore they are 
+        removed. A list of all removable columns is available in the 
+        configuration file "config.json" as "not_required_columns".
 
         Args:
-            dataframe (pandas.DataFrame): Dataframe from which the columns
-            will be removed.
+            dataframe (pandas.DataFrame): Dataframe from which the 
+            columns will be removed.
         """
         for column in CONFIG["not_required_columns"]:
             if column in dataframe.columns:
