@@ -32,37 +32,6 @@ class SimulatorManager:
         msg.end_output()
 
     ####################################################################
-    # NEW DEFINITIONS:
-    def testt(self):
-        for simulator_key, instance in self.__simulators.items():
-            simulator = instance["simulator"]
-            print(simulator.operation_names)
-
-    def view_simulators(self) -> None:
-        msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["simulator_instances"])
-
-        # Perhaps this needs a check if NoiseCreator was linked
-        # If not, it will just display a different message:
-        # something along the lines of "link so and so first"
-
-        if self.__simulators:
-            for simulator_key, instance in self.__simulators.items():
-                msg.add_message(simulator_key)
-                simulator = instance["simulator"]
-                msg.add_message(f"max qubits: {simulator.num_qubits}")
-                nm_key = instance["noise_model_source"]
-                msg.add_message(nm_key)
-                if self.__check_noise_model_instance_key(nm_key,
-                                                         raise_error=False):
-                    msg.add_message("Available")
-                else: msg.add_message("Removed")
-                msg.add_message("-----------------------------------------")
-        else:
-            msg.add_message("There are currently no created noise models!")
-        
-        msg.end_output()
-    
     # TEMPORARY DEFINITIONS:
     def __check_simulator_instance_key(
             self, 
@@ -258,6 +227,65 @@ class SimulatorManager:
         msg.add_message(MESSAGES["execution_complete"])
         msg.end_output()
         return result_job
+    
+
+    def view_simulators(self) -> None:
+        """Displays all currently available simulator instances.
+
+        If no instances are available, method simply displays a
+        message that states this fact.
+        The visual output from this method is placed inside of the
+        default "message" content container.
+
+        Displayed information includes:
+        - Reference key for the current instance;
+        - Maximum circuit qubit count that the simulator instance 
+          supports;
+        - Reference key for the source noise model instance that was
+          used in the making of the current simulator instance;
+        - Availability of the source noise model instance (Available
+          or Removed).
+        """
+        msg = self.__message_manager
+        msg.create_output(OUTPUT_HEADINGS["simulator_instances"])
+        msg.generic_content_container("Simulator instances:")
+
+        if self.__simulators:
+            
+            msg.add_generic_table()
+            msg.add_generic_table_row(
+                row_content=["Reference key", "Max qubit count",
+                             "Source noise model", 
+                             "Noise model availability"],
+                row_type="th")
+
+            for simulator_key, instance in self.__simulators.items():
+                
+                simulator = instance["simulator"]
+                # At some point some research would be good as for what
+                # exactly does this number mean, because it differs from
+                # the max amount of qubits in the noise model.
+                qubit_count = str(simulator.num_qubits)
+
+                noise_model_key = instance["noise_model_source"]
+
+                if self.__check_noise_model_instance_key(noise_model_key,
+                                                         raise_error=False):
+                    availability = "Available"
+                else: 
+                    availability = "Removed"
+                noise_model_availability = msg.style_availability_status(
+                    availability)
+                
+                msg.add_generic_table_row(
+                    row_content=[simulator_key, qubit_count, 
+                                 noise_model_key, noise_model_availability],
+                    row_type="td")
+        else:
+            msg.add_message(MESSAGES["no_instances"],
+                            instance_type="created simulator instances")
+        
+        msg.end_output()
 
 
     # Private class methods

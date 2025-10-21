@@ -42,31 +42,6 @@ class NoiseCreator:
            instances."""
         return self.__noise_models
 
-    ###############################################################
-    # TODO this one will still be edited after a specific style for it is designed
-    def view_noise_models(self) -> None:
-        msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["noise_model_instances"])
-
-        # Perhaps this needs a check if NoiseDataManager was linked
-
-        if self.__noise_models:
-            for noise_model_key, instance in self.__noise_models.items():
-                noise_model = instance["noise_model"]
-                msg.add_message(f"Basis gates: {noise_model.basis_gates}")
-                msg.add_message(noise_model_key)
-                data_instance_key = instance["data_source"]
-                msg.add_message(data_instance_key)
-                if self.__check_data_instance_key(data_instance_key,
-                                                  raise_error=False):
-                    msg.add_message("Available")
-                else: msg.add_message("Removed")
-                msg.add_message("-----------------------------------------")
-        else:
-            msg.add_message("There are currently no created noise noise models!")
-        
-        msg.end_output()
-
     # TEMPORARY DEFINITION:
 
     def __check_data_instance_key(
@@ -201,6 +176,66 @@ class NoiseCreator:
             MESSAGES["deleted_noise_model_instance"],
             reference_key=reference_key)
         msg.end_output()
+
+    
+    def view_noise_models(self) -> None:
+        """Displays all currently available noise model instances.
+
+        If no instances are available, method simply displays a
+        message that states this fact.
+        The visual output from this method is placed inside of the
+        default "message" content container.
+
+        Displayed information includes:
+        - Reference key for the current instance;
+        - Noise model qubit count; 
+        - List of basis gates;
+        - Reference key for the source noise data instance that was
+          used in the making of the current instance;
+        - Availability of the source noise data instance (Available
+          or Removed).
+        """
+        msg = self.__message_manager
+        msg.create_output(OUTPUT_HEADINGS["noise_model_instances"])
+        msg.generic_content_container("Noise model instances:")
+
+        if self.__noise_models:
+
+            msg.add_generic_table()
+            msg.add_generic_table_row(
+                row_content=["Reference key", "Qubit count", 
+                             "Basis gates", "Source noise data", 
+                             "Noise data availability"],
+                row_type="th")
+
+            for noise_model_key, instance in self.__noise_models.items():
+                
+                noise_model = instance["noise_model"]
+                basis_gates = "; ".join(noise_model.basis_gates)
+
+                qubit_count = str(len(noise_model.noise_qubits))
+                
+                data_instance_key = instance["data_source"]
+                
+                if self.__check_data_instance_key(data_instance_key,
+                                                  raise_error=False):
+                    availability = "Available"
+                else: 
+                    availability = "Removed"
+                noise_data_availability = msg.style_availability_status(
+                    availability)
+                
+                msg.add_generic_table_row(
+                    row_content=[noise_model_key, qubit_count,
+                                 basis_gates, data_instance_key,
+                                 noise_data_availability],
+                    row_type="td")
+        else:
+            msg.add_message(MESSAGES["no_instances"],
+                            instance_type="created noise models")
+        
+        msg.end_output()
+
 
     # Private class methods
 

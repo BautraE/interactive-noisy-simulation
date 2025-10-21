@@ -131,6 +131,11 @@
             "highlightables": []
         },
 
+        "no_instances": {
+            "text": "There are currently no {instance_type}!",
+            "highlightables": []
+        },
+
         "reset_time": {
             "text": "CSV files currently do not contain Reset operation times. A default value of 1300 ns has been set.",
             "highlightables": [

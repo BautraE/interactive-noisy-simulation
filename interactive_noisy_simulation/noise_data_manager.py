@@ -36,51 +36,9 @@ class NoiseDataManager:
         """Returns a reference to data structure containing noise 
            data instances."""
         return self.__noise_data
-  
-        
-    # TODO this one will still be edited after a specific style for it is designed
-    def view_noise_data_instances(self) -> None:
-        msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["noise_data_instances"])
-
-        if self.__noise_data:
-            for key, instance in self.__noise_data.items():
-                msg.add_message(key)
-                msg.add_message(instance["name"])
-                msg.add_message(instance["path"])
-                msg.add_message("-----------------------------------------")
-        else:
-            msg.add_message("There are currently no imported noise data instances")
-        
-        msg.end_output()
-
     
+
     # Public class methods
-
-    def remove_noise_data_instance(self, reference_key: str) -> None:
-        """Removes existing noise data instance by reference key
-        
-        Args:
-            reference_key (str): Key of the removable noise data
-                instance.
-        """
-        msg = self.__message_manager
-        msg.create_output(
-            OUTPUT_HEADINGS["remove_noise_data_instance"].format(
-                reference_key=reference_key))
-        
-        try:
-            self.__check_data_instance_key(reference_key)
-        except Exception:
-            msg.add_traceback()
-            return
-
-        del self.__noise_data[reference_key]
-        msg.add_message(
-            MESSAGES["deleted_noise_data_instance"],
-            reference_key=reference_key)
-        msg.end_output()
-
 
     def get_qubit_noise_information(
             self, 
@@ -200,6 +158,72 @@ class NoiseDataManager:
             MESSAGES["successful_csv_import"],
             reference_key=reference_key
         )
+        msg.end_output()
+
+
+    def remove_noise_data_instance(self, reference_key: str) -> None:
+        """Removes existing noise data instance by reference key.
+        
+        Args:
+            reference_key (str): Key of the removable noise data
+                instance.
+        """
+        msg = self.__message_manager
+        msg.create_output(
+            OUTPUT_HEADINGS["remove_noise_data_instance"].format(
+                reference_key=reference_key))
+        
+        try:
+            self.__check_data_instance_key(reference_key)
+        except Exception:
+            msg.add_traceback()
+            return
+
+        del self.__noise_data[reference_key]
+        msg.add_message(
+            MESSAGES["deleted_noise_data_instance"],
+            reference_key=reference_key)
+        msg.end_output()
+
+
+    def view_noise_data_instances(self) -> None:
+        """Displays all currently available noise data instances.
+
+        If no instances are available, method simply displays a
+        message that states this fact.
+        The visual output from this method is placed inside of the
+        default "message" content container.
+
+        Displayed information includes:
+        - Reference key for the current instance;
+        - File name, from which the data was imported;
+        - Full path to this file on the local device (this does not
+          update if the file was moved, it only shows the original
+          location from the import process).
+        """
+        msg = self.__message_manager
+        msg.create_output(OUTPUT_HEADINGS["noise_data_instances"])
+        msg.generic_content_container("Noise data instances:")
+
+        if self.__noise_data:
+
+            msg.add_generic_table()
+            msg.add_generic_table_row(
+                row_content=["Reference key", "Source file", 
+                             "Source file path on device"],
+                row_type="th")
+
+            for key, instance in self.__noise_data.items():
+                file_name = msg.style_italic(instance["name"])
+                file_path = msg.style_file_path(instance["path"])
+                
+                msg.add_generic_table_row(
+                    row_content=[key, file_name, file_path],
+                    row_type="td")
+        else:
+            msg.add_message(MESSAGES["no_instances"],
+                            instance_type="imported noise data instances")
+        
         msg.end_output()
 
 
