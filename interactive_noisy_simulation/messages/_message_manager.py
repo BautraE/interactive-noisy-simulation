@@ -1,7 +1,6 @@
 # Standard library imports:
 import json, re, traceback
 from importlib import resources
-from typing import Any
 
 #Third party imports:
 from IPython.display import display, HTML, Javascript
@@ -14,6 +13,9 @@ from .. import messages
 from ..data._data import (
     MESSAGES
 )
+
+# Imports only used for type definition:
+from typing import Any
 
 # Static code that is used for main class method output boxes
 with (resources.files(messages) / "styles.css").open("r", encoding="utf8") as file:
@@ -41,11 +43,11 @@ class MessageManager:
         """Adds regular table to the 'messages' content box.
         
         This is acomplished with the JavaScript function
-        "addGenericTable()".
+        `addGenericTable()`.
         """
         display(Javascript(f"addGenericTable();"))
 
-
+    
     def add_generic_table_row(
             self,
             row_content: list[str],
@@ -59,15 +61,17 @@ class MessageManager:
         with the way that it is being done currently.
 
         This is acomplished with the JavaScript function
-        "addGenericTableRow(row_as_string, row_type)".
+        `addGenericTableRow(row_as_string, row_type)`.
 
         Args:
             row_content (list[str]): Content for all cells of a
                 row.
-            row_type (str): Either 'td' for regular data rows
-                or 'th' for header row.
+            row_type (str): Either `td` for regular data rows
+                or `th` for header row.
         """
-        row_as_string = ",".join(row_content)
+        row_content = [
+            self.__wrap_div(cell_text) for cell_text in row_content]
+        row_as_string = ",SEPARATOR,".join(row_content)
         row_as_string = json.dumps(row_as_string)
         
         display(Javascript(
@@ -81,16 +85,16 @@ class MessageManager:
             highlightables: list[str] = [],
             **placeholder_strings: str
     ) -> None:
-        """Adds a message to the default "Message log" content box
+        """Adds a message to the default "Message log" content box.
 
         This method is made to be pretty versatile in terms of being
         able to add and highlight required parts of the given text.
         There are two options for passing the message:
         - As a string in cases, when the message is not stored inside
-            of messages.json;
+            of `messages.json`;
         - As a dictionary in cases, when the message is stored inside
-            of messages.json.
-        If the message is inside of messages.json, passing highlightables
+            of `messages.json`.
+        If the message is inside of `messages.json`, passing highlightables
         is not necessary as they are stored together with the message 
         text inside of the file.
 
@@ -98,7 +102,7 @@ class MessageManager:
             message (str | dict): The message, that will be added to the 
                 content box. It can either be passed as a string (for 
                 more general use) or as a dictionary (when the message is
-                stored in the messages.json file).
+                stored in the `messages.json` file).
             highlightables (list[str]): A list of highlightable string 
                 fragments from the current message. This argument should 
                 only be passed if this method is used for more general 
@@ -106,10 +110,10 @@ class MessageManager:
                 dictionary). It can also not be passed, in which case no 
                 parts of the message will be highlighted.
             **placeholder_strings (str): Keyword arguments for the 
-                str.format() method. They are passed if the message contains 
-                placeholders that will be replaced with actual text (in 
-                cases, where the messages may be reused for different 
-                purposes and situation).
+                `str.format()` method. They are passed if the message 
+                contains placeholders that will be replaced with actual 
+                text (in cases, where the messages may be reused for 
+                different purposes and situation).
         """
         if isinstance(message, dict):
             message_text = message["text"]
@@ -128,31 +132,32 @@ class MessageManager:
 
 
     def add_traceback(self) -> None:
-        """Adds simplified traceback message to output block
+        """Adds simplified traceback message to output block.
 
-        The default traceback from Jupyter Notebook files (.ipynb) is
+        The default traceback from Jupyter Notebook files (`.ipynb`) is
         much more detailed, however, there is no direct way of getting
         the exact traceback that would be printed out by default (at 
         least a method to do so has not yet been discovered or searched
         for).
 
         The current solution retrieves the traceback string 
-        (with self.__get_traceback), formats it to HTML code with CSS 
+        (with `self.__get_traceback`), formats it to HTML code with CSS 
         styles from the selected formatter style (in this case 
-        "lightbulb"), and then passes the HTML and CSS code to a 
+        `"lightbulb"`), and then passes the HTML and CSS code to a 
         JavaScript function that does the rest.
 
         This is one of two ways of extracting tracebacks that has been
-        tried out (with the other one being sys.exc_info() and VerboseTB).
-        The current solution was picked as the other one has some 
-        complications regarding automatic styling with Python Pygments.
+        tried out (with the other one being `sys.exc_info()` and 
+        `VerboseTB`). The current solution was picked as the other one 
+        has some complications regarding automatic styling with `Python 
+        Pygments`.
         
         Furthermore, regular users of this package might not even need 
         a more detailed traceback as error messages are designed to be 
         intuitive and self explanatory as to what exactly went wrong.
 
         Note: 
-            When using this method, the functionality of end_output()
+            When using this method, the functionality of `end_output()`
             method is automatically applied thus it is not required to 
             write it again.
         """
@@ -176,32 +181,36 @@ class MessageManager:
 
 
     def add_qubit_noise_data_container(self) -> None:
-        """Adds div container for retrieved qubit noise data
+        """Adds div container for retrieved qubit noise data.
 
         The created container is initially empty, with the only content
         being the content title "Retrieved qubits:". All the required
         content boxes are added afterwards through other methods.
 
         This is acomplished with the JavaScript function 
-        "addQubitNoiseDataContainer()".
+        `addQubitNoiseDataContainer()`.
         """
         display(Javascript(f"addQubitNoiseDataContainer();"))
 
 
     def add_qubit_noise_data_content_box(self) -> None:
-        """Adds content box for one qubit's noise data
+        """Adds content box for one qubit's noise data.
 
         Each requested qubit will have its own content box for its CSV
         noise data to be inserted into.
 
         This is acomplished with the JavaScript function 
-        "addQubitNoiseDataContentBox()".
+        `addQubitNoiseDataContentBox()`.
         """
         display(Javascript(f"addQubitNoiseDataContentBox();"))
 
 
-    def add_qubit_noise_data_row(self, attribute_name: str, value: Any) -> None:
-        """Adds row with one qubit's noise data attribute and value
+    def add_qubit_noise_data_row(
+            self, 
+            attribute_name: str, 
+            value: Any
+    ) -> None:
+        """Adds row with one qubit's noise data attribute and value.
         
         Since every content box for the qubit noise data will contain
         a table, each attribute is being interpreted as a row with two
@@ -211,7 +220,7 @@ class MessageManager:
         simply being printed out, it is transformed to a string.
 
         This is acomplished with the JavaScript function 
-        "addQubitNoiseDataRow(attribute_name, value)".
+        `addQubitNoiseDataRow(attribute_name, value)`.
         
         Args:
             attribute_name (str): Name of the current attribute from the 
@@ -231,7 +240,7 @@ class MessageManager:
 
         This creates the main content container that is displayed after
         executing any main method from the main classes of this module:
-        NoiseDataManager, NoiseCreator, etc.
+        `NoiseDataManager`, `NoiseCreator`, etc.
 
         Args:
             heading (str): Text for the output box title (main title at 
@@ -248,7 +257,7 @@ class MessageManager:
         In order for the other output boxes to work as intended, cleanup
         must be done with the current one - mainly by removing ids from 
         the currently rendered elements (otherwise there will be issues). 
-        The helper method __unset_id_values() does this.
+        The helper method `__unset_id_values()` does this.
 
         As well as the status of the current output box is modified to
         mark a successful execution.
@@ -259,10 +268,10 @@ class MessageManager:
 
     def generic_content_container(self, heading_text: str) -> None:
         """Modifies the default "Message log" content container for 
-           general use.
+        general use.
 
         In some cases, there is no real need for the "Message log", for 
-        example,printing out informative static content that just simply 
+        example, printing out informative static content that just simply 
         cannot fail or has no steps to the functionality process.
 
         Args:
@@ -306,7 +315,10 @@ class MessageManager:
             str: Modified text with added HTML style elements.
         """
         replacable = "<span class='path-separators'>\\</span>"
-        new_text = re.sub(r'\\', replacable, text)
+        new_text = re.sub(
+            pattern=r'\\', 
+            repl=replacable, 
+            string=text)
         return "<span class='path-texts'>" + new_text + "</span>"
     
     
@@ -334,9 +346,9 @@ class MessageManager:
         """Adds HTML tags to message text with highlight style.
 
         This is a helper method for the class method
-        "__modify_message()".
+        `__modify_message()`.
 
-        This method takes the current message and adds "span" HTML tags
+        This method takes the current message and adds `span` HTML tags
         around the highlightable message fragment. This is acomplished
         with the start and end position of the highlightable part by
         creating a new message that consists of:
@@ -367,11 +379,11 @@ class MessageManager:
     # useful to some day check, which symbols actually cause an issue.
     def __escape_text(self, message: str) -> str:
         """Replaces (escapes) certain symbols of a text so that it is 
-           accepted in JavaScript.
+        accepted in JavaScript.
 
         This is a helper method that can be used in other class methods.
 
-        Even though json.dumps() already should do the trick, for some 
+        Even though `json.dumps()` already should do the trick, for some 
         reason there are things that it does not take care of, leading 
         to issues with adding the messages.
         
@@ -394,10 +406,10 @@ class MessageManager:
 
 
     def __get_traceback(self) -> str:
-        """Retrieves traceback text for further use by "add_traceback" 
-           method.
+        """Retrieves traceback text for further use by `add_traceback()`
+        method.
 
-        This is a helper method for the class method "add_traceback()".
+        This is a helper method for the class method `add_traceback()`.
 
         In addition to the base functionality, two extra lines are added
         for white space purposes - after first ("Traceback (most recent 
@@ -423,9 +435,9 @@ class MessageManager:
     ) -> str:
         """Adds highlighting style to each highlightable in message.
 
-        This is a helper method for the method __modify_message().
+        This is a helper method for the method `__modify_message()`.
 
-        The simple str.replace() function did not work for this, because
+        The simple `str.replace()` function did not work for this, because
         it would highlight fragments that are a part of a word, which 
         is not the goal - highlighting specific words, phrases, elements 
         from messages.
@@ -433,7 +445,7 @@ class MessageManager:
         Instead of replacing the highlightable with a variant of it with
         added HTML tags added, the tags are 'appended' to the text.
         This functionality is implemented in the class method 
-        "__add_highlight_tags()".
+        `__add_highlight_tags()`.
         
         The appending process works in reverse by starting with 
         highlightable instances that are located closer to the end of the 
@@ -455,7 +467,7 @@ class MessageManager:
 
         Returns:
             str: Message text with all valid cases of a highlightable 
-                highlighted (with added <span> elements that give the 
+                highlighted (with added `<span>` elements that give the 
                 required highlight style)
         """
         escaped_highlightable = re.escape(highlightable)
@@ -497,14 +509,14 @@ class MessageManager:
     ) -> str:
         """Highlights certain parts of a message.
 
-        This is a helper method for the class method add_message().
+        This is a helper method for the class method `add_message()`.
 
         Both the message text and all highlightable text fragments are
         'escaped'. 
         If highlightables are given, this method goes through all of 
         them, modifies the current message text by adding the required
         highlighting style for each highlightable in it, and returns 
-        the final message back for display.
+        the final message back for `display`.
 
         Args:
             message (str): The main message that may contain fragments 
@@ -533,3 +545,17 @@ class MessageManager:
         issues.
         """
         display(Javascript(f"unsetIdValues();"))
+
+
+    def __wrap_div(self, text: str) -> str:
+        """Adds HTML `<div>` tags around text.
+
+        Workaround used for table cells to limit the automatic width.
+
+        Args:
+            text (str): Text that will have HTML `<div>` tags added around it.
+
+        Returns:
+            str: Text with added `<div>` tags around it.
+        """
+        return "<div class='cell-content'>" + text + "</div>"

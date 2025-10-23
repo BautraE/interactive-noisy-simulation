@@ -179,6 +179,12 @@ tr.regular-rows:last-child td {
     border-bottom-right-radius: 8px;
 }
 
+/* Setting max width for table cell content */
+tr.regular-rows td div.cell-content,
+tr.header-rows th div.cell-content{
+    max-width: 200px;
+}
+
 /* CERTAIN TEXT PART STYLES */
 
 .path-texts {

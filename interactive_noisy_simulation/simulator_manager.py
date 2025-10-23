@@ -4,15 +4,20 @@ import warnings
 #Third party imports:
 from qiskit import transpile
 from qiskit_aer import AerSimulator
-from qiskit_aer.jobs.aerjob import AerJob
-from qiskit import QuantumCircuit
 
 # Local project imports:
 from .messages._message_manager import MessageManager
 from .noise_creator import NoiseCreator
+from .utils.validators import (
+    check_instance_key, validate_instance_name
+)
 from .data._data import (
     ERRORS, MESSAGES, OUTPUT_HEADINGS
 )
+
+# Imports only used for type definition:
+from qiskit_aer.jobs.aerjob import AerJob
+from qiskit import QuantumCircuit
 
 
 class SimulatorManager:
@@ -31,40 +36,6 @@ class SimulatorManager:
                         class_name=self.__class__.__name__)
         msg.end_output()
 
-    ####################################################################
-    # TEMPORARY DEFINITIONS:
-    def __check_simulator_instance_key(
-            self, 
-            reference_key: str,
-            raise_error: bool = True
-    ) -> None:        
-        if reference_key in self.__simulators:
-            return True
-        
-        elif raise_error:
-            raise KeyError(
-                    ERRORS["no_key_simulator_instance"].format(
-                        reference_key=reference_key))
-        else:
-            return False
-    
-
-    def __check_noise_model_instance_key(
-            self, 
-            reference_key: str,
-            raise_error: bool = True
-    ) -> None:        
-        if reference_key in self.__noise_models:
-            return True
-        
-        elif raise_error:
-            raise KeyError(
-                    ERRORS["no_key_noise_model_instance"].format(
-                        reference_key=reference_key))
-        else:
-            return False
-
-    ####################################################################
 
     # Public class methods
     
@@ -73,11 +44,11 @@ class SimulatorManager:
             noise_model_reference_key: str, 
             simulator_reference_key: str
     ) -> None:
-        """Creates an AerSimulator simulator instance from specific 
-           noise model.
+        """Creates an `AerSimulator` simulator instance from specific 
+        noise model.
 
         The created simulators can be then used to run circuits with
-        the method "run_simulator".
+        the method `run_simulator`.
         
         Args:
             noise_model_reference_key (str): Reference key to access
@@ -87,15 +58,27 @@ class SimulatorManager:
                 created simulator that will be used to access it.
         """
         msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["creating_simulator"])
-
+        msg.create_output(OUTPUT_HEADINGS["creating_simulator"].format(
+            reference_key=noise_model_reference_key))
+        
         try:
             self.__check_noise_creator_link()
-            self.__check_noise_model_instance_key(noise_model_reference_key)
+            check_instance_key(reference_key=noise_model_reference_key,
+                               should_exist=True, 
+                               instances=self.__noise_models,
+                               instance_type="noise model instance")
+            check_instance_key(reference_key=simulator_reference_key,
+                               should_exist=False, 
+                               instances=self.__simulators,
+                               instance_type="simulator instance")
         except Exception:
             msg.add_traceback()
             return
         
+        simulator_reference_key = validate_instance_name(
+            simulator_reference_key,
+            msg)
+
         new_instance = {}
         new_instance["noise_model_source"] = noise_model_reference_key
 
@@ -108,14 +91,15 @@ class SimulatorManager:
         self.__simulators[simulator_reference_key] = new_instance
         
         msg.add_message(
-            MESSAGES["created_simulator"],
+            MESSAGES["created_instance"],
+            instance_type="Simulator",
             reference_key=simulator_reference_key)
         msg.end_output()
 
 
     def link_noise_creator(self, noise_creator: NoiseCreator) -> None:
-        """Links a NoiseCreator class object to gain access to 
-           created noise models."""
+        """Links a `NoiseCreator` class object to gain access to 
+        created noise models."""
         msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["linking_object"].format(
             linked_class=NoiseCreator.__name__,
@@ -136,18 +120,23 @@ class SimulatorManager:
         """
         msg = self.__message_manager
         msg.create_output(
-            OUTPUT_HEADINGS["remove_simulator_instance"].format(
+            OUTPUT_HEADINGS["remove_instance"].format(
+                instance_type="simulator instance",
                 reference_key=reference_key))
         
         try:
-            self.__check_simulator_instance_key(reference_key)
+            check_instance_key(reference_key=reference_key,
+                               should_exist=True, 
+                               instances=self.__simulators,
+                               instance_type="simulator instance")
         except Exception:
             msg.add_traceback()
             return
 
         del self.__simulators[reference_key]
         msg.add_message(
-            MESSAGES["deleted_simulator_instance"],
+            MESSAGES["deleted_instance"],
+            instance_type="simulator instance",
             reference_key=reference_key)
         msg.end_output()
     
@@ -185,8 +174,10 @@ class SimulatorManager:
             reference_key=simulator_reference_key))
         
         try:
-            self.__check_noise_creator_link()
-            self.__check_simulator_instance_key(simulator_reference_key)
+            check_instance_key(reference_key=simulator_reference_key,
+                               should_exist=True, 
+                               instances=self.__simulators,
+                               instance_type="simulator instance")
         except Exception:
             msg.add_traceback()
             return
@@ -247,7 +238,8 @@ class SimulatorManager:
           or Removed).
         """
         msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["simulator_instances"])
+        msg.create_output(OUTPUT_HEADINGS["created_instances"].format(
+            instance_type="simulator instances"))
         msg.generic_content_container("Simulator instances:")
 
         if self.__simulators:
@@ -269,8 +261,11 @@ class SimulatorManager:
 
                 noise_model_key = instance["noise_model_source"]
 
-                if self.__check_noise_model_instance_key(noise_model_key,
-                                                         raise_error=False):
+                if check_instance_key(reference_key=noise_model_key,
+                                      should_exist=True, 
+                                      instances=self.__noise_models,
+                                      instance_type="noise model instance",
+                                      raise_error=False):
                     availability = "Available"
                 else: 
                     availability = "Removed"
@@ -291,8 +286,13 @@ class SimulatorManager:
     # Private class methods
 
     def __check_noise_creator_link(self) -> None:
-        """Checks if a NoiseCreator class object is linked to this 
-           SimulatorManager object."""
+        """Checks if a `NoiseCreator` class object is linked to this 
+        `SimulatorManager` object.
+
+        Raises:
+            RuntimeError: If `NoiseCreator` class object is not linked
+                to this `SimulatorManager` object.   
+        """
         if self.__noise_models is None:
             raise RuntimeError(
                 ERRORS["error_not_linked"].format(

@@ -1,20 +1,25 @@
 #Third party imports:
 import pandas
-from pandas.core.series import Series
 from qiskit.transpiler import CouplingMap
 from qiskit_aer.noise import (
-    depolarizing_error,
     NoiseModel,
     ReadoutError,
+    depolarizing_error,
     thermal_relaxation_error
 )
 
 # Local project imports:
 from .messages._message_manager import MessageManager
 from .noise_data_manager import NoiseDataManager
+from .utils.validators import (
+    check_instance_key, validate_instance_name
+)
 from .data._data import (
     CONFIG, CSV_COLUMNS, ERRORS, MESSAGES, OUTPUT_HEADINGS
 )
+
+# Imports only used for type definition:
+from pandas.core.series import Series
 
 
 class NoiseCreator:
@@ -41,42 +46,7 @@ class NoiseCreator:
         """Returns a reference to data structure containing noise model 
            instances."""
         return self.__noise_models
-
-    # TEMPORARY DEFINITION:
-
-    def __check_data_instance_key(
-            self, 
-            reference_key: str, 
-            raise_error: bool = True
-    ) -> bool:
-        """Checks if the given key is linked to an existing noise data
-           instance. 
-
-        Args:
-            reference_key (str): The reference key that will be checked.
-            raise_error (bool): Should the error be raised if the key does
-                not exist among currently available noise data instances.
-
-        Returns:
-            bool: Validation of the searched noise data instances existing.
-        """
-        if reference_key in self.__noise_data:
-            return True
-        
-        elif raise_error:
-            raise KeyError(
-                    ERRORS["no_key_noise_data_instance"].format(
-                        reference_key=reference_key))
-        else:
-            return False
-
-        
-    def __check_noise_model_instance_key(self, reference_key: str) -> None:
-        if not reference_key in self.__noise_models:
-            raise KeyError(
-                    ERRORS["no_key_noise_model_instance"].format(
-                        reference_key=reference_key))
-    ###############################################################
+    
 
     # Public class methods
     
@@ -85,11 +55,11 @@ class NoiseCreator:
             data_reference_key: str,
             noise_model_reference_key: str
     ) -> None:
-        """Creates a new noise model
+        """Creates a new noise model.
         
-        Method creates a new noise model intance (new NoiseModel
+        Method creates a new noise model intance (new `NoiseModel`
         class object with errors based on proviced noise data from
-        linked NoiseDataManager class object + a coupling map based
+        linked `NoiseDataManager` class object + a coupling map based
         on the same data)
 
         Args:
@@ -101,14 +71,26 @@ class NoiseCreator:
                 afterwards.
         """
         msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["creating_noise_model"])
+        msg.create_output(OUTPUT_HEADINGS["creating_noise_model"].format(
+            reference_key=data_reference_key))
         
         try:
             self.__check_noise_data_manager_link()
-            self.__check_data_instance_key(data_reference_key)
+            check_instance_key(reference_key=data_reference_key,
+                               should_exist=True, 
+                               instances=self.__noise_data,
+                               instance_type="noise data instance")
+            check_instance_key(reference_key=noise_model_reference_key,
+                               should_exist=False, 
+                               instances=self.__noise_models,
+                               instance_type="noise model instance")
         except Exception:
             msg.add_traceback()
             return
+        
+        noise_model_reference_key = validate_instance_name(
+            noise_model_reference_key,
+            msg)
 
         new_instance = {}
         new_instance["data_source"] = data_reference_key
@@ -132,7 +114,8 @@ class NoiseCreator:
         self.__noise_models[noise_model_reference_key] = new_instance
         
         msg.add_message(
-            MESSAGES["created_noise_model"],
+            MESSAGES["created_instance"],
+            instance_type="Noise model",
             reference_key=noise_model_reference_key)
         msg.end_output()
 
@@ -141,7 +124,7 @@ class NoiseCreator:
             self, 
             noise_data_manager: NoiseDataManager
     ) -> None:
-        """Links a NoiseDataManager object to gain access to noise data."""
+        """Links a `NoiseDataManager` object to gain access to noise data."""
         msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["linking_object"].format(
             linked_class=NoiseDataManager.__name__, 
@@ -162,18 +145,23 @@ class NoiseCreator:
         """
         msg = self.__message_manager
         msg.create_output(
-            OUTPUT_HEADINGS["remove_noise_model_instance"].format(
+            OUTPUT_HEADINGS["remove_instance"].format(
+                instance_type="noise model instance",
                 reference_key=reference_key))
         
         try:
-            self.__check_noise_model_instance_key(reference_key)
+            check_instance_key(reference_key=reference_key,
+                               should_exist=True, 
+                               instances=self.__noise_models,
+                               instance_type="noise model instance")
         except Exception:
             msg.add_traceback()
             return
 
         del self.__noise_models[reference_key]
         msg.add_message(
-            MESSAGES["deleted_noise_model_instance"],
+            MESSAGES["deleted_instance"],
+            instance_type="noise model instance",
             reference_key=reference_key)
         msg.end_output()
 
@@ -196,7 +184,8 @@ class NoiseCreator:
           or Removed).
         """
         msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["noise_model_instances"])
+        msg.create_output(OUTPUT_HEADINGS["created_instances"].format(
+            instance_type="noise models"))
         msg.generic_content_container("Noise model instances:")
 
         if self.__noise_models:
@@ -215,10 +204,13 @@ class NoiseCreator:
 
                 qubit_count = str(len(noise_model.noise_qubits))
                 
-                data_instance_key = instance["data_source"]
+                data_reference_key = instance["data_source"]
                 
-                if self.__check_data_instance_key(data_instance_key,
-                                                  raise_error=False):
+                if check_instance_key(reference_key=data_reference_key,
+                                      should_exist=True,
+                                      instances=self.__noise_data,
+                                      instance_type="noise data instance",
+                                      raise_error=False):
                     availability = "Available"
                 else: 
                     availability = "Removed"
@@ -227,7 +219,7 @@ class NoiseCreator:
                 
                 msg.add_generic_table_row(
                     row_content=[noise_model_key, qubit_count,
-                                 basis_gates, data_instance_key,
+                                 basis_gates, data_reference_key,
                                  noise_data_availability],
                     row_type="td")
         else:
@@ -247,7 +239,7 @@ class NoiseCreator:
         ) -> None:
         """Helps create and add depolarizing error to noise model
         
-        Helper method for the class method "create_noise_model".
+        Helper method for the class method `create_noise_model`.
 
         By using available noise data, method creates depolarizing 
         errors for every basis gate operating on every specific 
@@ -264,8 +256,8 @@ class NoiseCreator:
             qubit (int): The number of the current qubit.
             columns (Series): Table data for the current qubit. 
                 Basically a row, however, to access a certain attribute, 
-                you must do as follows: column["attribute_name"], where 
-                "attribute_name" is the column name in the dataframe
+                you must do as follows: `column["attribute_name"]`, where 
+                `"attribute_name"` is the column name in the dataframe
                 and CSV file.
             noise_model (NoiseModel): The noise model object, to which
                 the newly created errors will be added.
@@ -311,9 +303,9 @@ class NoiseCreator:
             columns: Series, 
             noise_model: NoiseModel
     ) -> None:
-        """Helps create and add readout error to noise model
+        """Helps create and add readout error to noise model.
 
-        Helper method for the class method "create_noise_model".
+        Helper method for the class method `create_noise_model`.
 
         By using available noise data, method creates readout errors 
         for every qubit and adds them to a class NoiseModel object. 
@@ -328,8 +320,8 @@ class NoiseCreator:
             qubit (int): The number of the current qubit.
             columns (Series): Table data for the current qubit. Basically 
                 a row, however, to access a certain attribute, you must do 
-                as follows: column["attribute_name"], where "attribute_name" 
-                is the column name in the dataframe.
+                as follows: `column["attribute_name"]`, where 
+                `"attribute_name"` is the column name in the dataframe.
             noise_model (NoiseModel): The noise model object, to which
                 the newly created errors will be added.
         """
@@ -348,7 +340,7 @@ class NoiseCreator:
     ) -> None:
         """Helps create and add thermal relaxation error to noise model.
         
-        Helper method for the class method "create_noise_model".
+        Helper method for the class method `create_noise_model`.
 
         By using available noise data, method creates thermal relaxation 
         errors for every basis gate operating on every specific qubit 
@@ -372,8 +364,8 @@ class NoiseCreator:
             qubit (int): The number of the current qubit.
             columns (Series): Table data for the current qubit. Basically 
                 a row, however, to access a certain attribute, you must do 
-                as follows: column["attribute_name"], where "attribute_name"
-                is the column name in the dataframe.
+                as follows: `column["attribute_name"]`, where 
+                `"attribute_name"` is the column name in the dataframe.
             noise_model (NoiseModel):
             noise_dataframe (pandas.DataFrame): The same dataframe, from 
                 which the qubit number and columns attributes are from. 
@@ -480,8 +472,13 @@ class NoiseCreator:
     
     
     def __check_noise_data_manager_link(self) -> None:
-        """Checks if a NoiseDataManager class object is linked to this 
-           NoiseCreator object."""
+        """Checks if a `NoiseDataManager` class object is linked to this 
+        `NoiseCreator` object.
+           
+        Raises:
+            RuntimeError: If `NoiseDataManager` class object is not linked to
+                `NoiseCreator` object.
+        """
         if self.__noise_data is None:
             raise RuntimeError(
                 ERRORS["error_not_linked"].format(
@@ -493,15 +490,15 @@ class NoiseCreator:
             self, 
             noise_dataframe: pandas.DataFrame
     ) -> list[str]:
-        """Helps to create and return a list of basis gates
+        """Helps to create and return a list of basis gates.
 
-        Helper method for the class method "create_noise_model".
+        Helper method for the class method `create_noise_model`.
 
         Creates a list of basis gates that is based on the current noise 
         data. All possible base gates are taken from the configuration 
-        file "config.json", after which they are filtered based on what 
+        file `config.json`, after which they are filtered based on what 
         kind of columns does the noise data table have. The basis gate 
-        list is required when creating a NouiseModel object. If no basis 
+        list is required when creating a `NouiseModel` object. If no basis 
         gates are presented during the creation, it will pick a set of 
         default basis gates. If you add the basis gates later, it will 
         add them together with the default basis gates instead of 
@@ -514,7 +511,7 @@ class NoiseCreator:
         
         Returns:
             list[str]: A list of basis gate names in the form that they 
-            are accepted.For example: ["id", "ecr", "rz"]
+                are accepted.For example: `["id", "ecr", "rz"]`
         """ 
         msg = self.__message_manager
         msg.add_message(MESSAGES["retrieving_basis_gates"])
@@ -538,11 +535,11 @@ class NoiseCreator:
     ) -> CouplingMap:
         """Helps tp create a coupling map.
 
-        Helper method for the class method "create_noise_model".
+        Helper method for the class method `create_noise_model`.
 
         Creates a coupling map that is based on the noise data. The 
-        created coupling map object CouplingMap is to be used along 
-        with the NoiseModel object when creating a AerSimulator 
+        created coupling map object `CouplingMap` is to be used along 
+        with the `NoiseModel` object when creating a `AerSimulator` 
         simulator instance.
         
         noise_dataframe (pandas.DataFrame): The current noise data

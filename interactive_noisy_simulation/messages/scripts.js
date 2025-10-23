@@ -39,7 +39,7 @@ function addGenericTable() {
 function addGenericTableRow(rowAsString, rowType) {
     let row = document.createElement("tr");
 
-    let rowContent = rowAsString.split(",");
+    let rowContent = rowAsString.split(",SEPARATOR,");
     for(let cellContent of rowContent) {
         let tableCell = document.createElement(rowType);
         tableCell.innerHTML = cellContent;

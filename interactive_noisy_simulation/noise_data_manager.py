@@ -6,6 +6,9 @@ import numpy, pandas
 
 # Local project imports:
 from .messages._message_manager import MessageManager
+from .utils.validators import (
+    check_instance_key, validate_instance_name
+)
 from .data._data import (
     CONFIG, CSV_COLUMNS, ERRORS, MESSAGES, OUTPUT_HEADINGS
 )
@@ -46,7 +49,7 @@ class NoiseDataManager:
             qubits: int | list[int] = None
     ) -> None:
         """Prints out noise data for certain qubits from a specific 
-           data instance.
+        data instance.
         
         Retrieves and prints out all noise data from a specific noise
         data instance for the selected qubits by the user.
@@ -59,6 +62,9 @@ class NoiseDataManager:
                 a list of qubit numbers, for which the noise data will 
                 be retrieved and printed out so the user can see the 
                 specific data.
+        
+        Raises:
+            ValueError: If nothing is passed as the argument `qubits`.
         """
         msg = self.__message_manager
         msg.create_output(
@@ -67,7 +73,10 @@ class NoiseDataManager:
                 reference_key=reference_key))
         
         try:
-            self.__check_data_instance_key(reference_key)
+            check_instance_key(reference_key=reference_key,
+                               should_exist=True,
+                               instances=self.__noise_data,
+                               instance_type="noise data instance")
             dataframe = self.__noise_data[reference_key]["dataframe"]
 
             if not qubits:
@@ -130,6 +139,18 @@ class NoiseDataManager:
         msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["importing_csv"])
 
+        reference_key = validate_instance_name(reference_key,
+                                               msg)
+        
+        try:
+            check_instance_key(reference_key=reference_key,
+                               should_exist=False,
+                               instances=self.__noise_data,
+                               instance_type="noise data instance")
+        except Exception:
+            msg.add_traceback()
+            return
+
         new_instance = {}
 
         csv_file = Path(file_path)
@@ -170,18 +191,23 @@ class NoiseDataManager:
         """
         msg = self.__message_manager
         msg.create_output(
-            OUTPUT_HEADINGS["remove_noise_data_instance"].format(
+            OUTPUT_HEADINGS["remove_instance"].format(
+                instance_type="noise data instance",
                 reference_key=reference_key))
         
         try:
-            self.__check_data_instance_key(reference_key)
+            check_instance_key(reference_key=reference_key,
+                               should_exist=True,
+                               instances=self.__noise_data,
+                               instance_type="noise data instance")
         except Exception:
             msg.add_traceback()
             return
 
         del self.__noise_data[reference_key]
         msg.add_message(
-            MESSAGES["deleted_noise_data_instance"],
+            MESSAGES["deleted_instance"],
+            instance_type="noise data instance",
             reference_key=reference_key)
         msg.end_output()
 
@@ -202,7 +228,8 @@ class NoiseDataManager:
           location from the import process).
         """
         msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["noise_data_instances"])
+        msg.create_output(OUTPUT_HEADINGS["created_instances"].format(
+            instance_type="noise data instances"))
         msg.generic_content_container("Noise data instances:")
 
         if self.__noise_data:
@@ -232,13 +259,13 @@ class NoiseDataManager:
     def __add_additional_columns(self, dataframe: pandas.DataFrame) -> None:
         """Adds additional columns for noise data storage.
 
-        Helper methods for class method "import_csv_data":
+        Helper methods for class method `import_csv_data`:
 
         Adds 2 additional columns to the dataframe for:
         - storing information about neighboring qubits;
         - storing reset operation time.
         Values for the neighboring qubits column are retrieved in another 
-        method: "__modify_dataframe_data".
+        method: `__modify_dataframe_data`.
         Since the reset operation time is not currently available in the 
         CSV files, a default value of 1300 nanoseconds is set. It is 
         possible to get these gate times by other means from other ready 
@@ -261,26 +288,13 @@ class NoiseDataManager:
         self.__message_manager.add_message(MESSAGES["reset_time"])
 
 
-    def __check_data_instance_key(self, reference_key: str) -> None:
-        """Checks if the given key is linked to an existing noise data
-           instance. 
-
-        Args:
-            reference_key (str): The reference key that will be checked.   
-        """
-        if not reference_key in self.__noise_data:
-            raise KeyError(
-                    ERRORS["no_key_noise_data_instance"].format(
-                        reference_key=reference_key))   
-
-
     def __check_qubit_input(
             self, 
             dataframe: pandas.DataFrame, 
             qubits: list[int]
     ) -> None:
         """Validates input qubit numbers for method 
-           "get_qubit_noise_information()".
+        `get_qubit_noise_information`.
 
         Helper method checks if the passed qubit numbers are above 0
         and below the max index of qubits based on the selected dataframe.
@@ -291,6 +305,11 @@ class NoiseDataManager:
                 to check the total number of qubits.
             qubits (list[int]): Numbers of qubits that got passed as
                 arguments.
+
+        Raises:
+            ValueError:
+                - If qubit number is lower than 0;
+                - If qubit number exceeds max qubit number.
         """
         qubit_count = len(dataframe)
         for qubit in qubits:
@@ -307,21 +326,21 @@ class NoiseDataManager:
 
 
     def __modify_dataframe_data(self, dataframe: pandas.DataFrame) -> None:
-        """Modifies all multi data columns in the dataframe
+        """Modifies all multi data columns in the dataframe.
 
-        Helper methods for class method "import_csv_data":
+        Helper methods for class method `import_csv_data`.
 
         Some of the data columns in the CSV file are initially designed
         to store multiple values in one row as strings, where each one 
         is divided by ";". This method goes through each of these columns
         and separates each of the values, changing the data type to a 
-        dictionary: {target_qubit: value}
+        `dictionary: {target_qubit: value}`
         
         This is done for simpler actions down the road in regards to 
         using these columns.
         
         A list of all multi-data columns that this method goes through is 
-        available in the configuration file "config.json".
+        available in the configuration file `config.json`.
 
         Alongside this, neighboring qubits are also retrieved during this 
         process since you iterate through each qubit, for which you see all 
@@ -329,7 +348,7 @@ class NoiseDataManager:
 
         Args:
             dataframe (pandas.DataFrame): Data from this dataframe will 
-            be modified.
+                be modified.
         """
         neighboring_qubits_column = CSV_COLUMNS["neighboring_qubits"]["csv_name"]
 
@@ -363,18 +382,18 @@ class NoiseDataManager:
             self, 
             dataframe: pandas.DataFrame
     ) -> None:
-        """Removes data columns that are not used to simulate noise
+        """Removes data columns that are not used to simulate noise.
 
-        Helper methods for class method "import_csv_data":
+        Helper methods for class method `import_csv_data`.
 
         Not all columns in the provided CSV files are used in the
         creation of errors for a noise model, therefore they are 
         removed. A list of all removable columns is available in the 
-        configuration file "config.json" as "not_required_columns".
+        configuration file `config.json` as `not_required_columns`.
 
         Args:
             dataframe (pandas.DataFrame): Dataframe from which the 
-            columns will be removed.
+                columns will be removed.
         """
         for column in CONFIG["not_required_columns"]:
             if column in dataframe.columns:
