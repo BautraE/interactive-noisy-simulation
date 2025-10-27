@@ -11,6 +11,9 @@ from qiskit_aer.noise import (
 # Local project imports:
 from .messages._message_manager import MessageManager
 from .noise_data_manager import NoiseDataManager
+from .utils.key_availability import (
+    block_key, check_blocked_key, unblock_key
+)
 from .utils.validators import (
     check_instance_key, validate_instance_name
 )
@@ -53,7 +56,8 @@ class NoiseCreator:
     def create_noise_model(
             self, 
             data_reference_key: str,
-            noise_model_reference_key: str
+            noise_model_reference_key: str,
+            has_noise: bool = True
     ) -> None:
         """Creates a new noise model.
         
@@ -76,14 +80,19 @@ class NoiseCreator:
         
         try:
             self.__check_noise_data_manager_link()
+            # Is there a usable noise data instance with the given key
             check_instance_key(reference_key=data_reference_key,
                                should_exist=True, 
                                instances=self.__noise_data,
                                instance_type="noise data instance")
+            # Does key exist among created noise model instances
             check_instance_key(reference_key=noise_model_reference_key,
                                should_exist=False, 
                                instances=self.__noise_models,
                                instance_type="noise model instance")
+            # Is key being blocked by a simulator instance reference
+            check_blocked_key(key=noise_model_reference_key,
+                              instance_type="noise_models")
         except Exception:
             msg.add_traceback()
             return
@@ -99,12 +108,15 @@ class NoiseCreator:
         
         noise_model = NoiseModel(self.__get_basis_gates(noise_dataframe))
         
-        msg.add_message(MESSAGES["adding_errors"])
-        for qubit_nr, columns in noise_dataframe.iterrows():
-            self.__add_readout_error(qubit_nr, columns, noise_model)
-            self.__add_depolarizing_error(qubit_nr, columns, noise_model)
-            self.__add_thermal_error(qubit_nr, columns, 
-                                     noise_model, noise_dataframe)
+        if has_noise:
+            msg.add_message(MESSAGES["adding_errors"])
+            for qubit_nr, columns in noise_dataframe.iterrows():
+                self.__add_readout_error(qubit_nr, columns, noise_model)
+                self.__add_depolarizing_error(qubit_nr, columns, noise_model)
+                self.__add_thermal_error(qubit_nr, columns, 
+                                        noise_model, noise_dataframe)
+        else:
+            msg.add_message(MESSAGES["not_adding_errors"])
 
         new_instance["noise_model"] = noise_model
 
@@ -112,6 +124,12 @@ class NoiseCreator:
         new_instance["coupling_map"] = coupling_map
 
         self.__noise_models[noise_model_reference_key] = new_instance
+
+        # Blocks noise data instance key until this noise model instance
+        # gets deleted (noise model has reference to used noise data key)
+        block_key(key=data_reference_key,
+                  instance_type="noise_data",
+                  blocker_key=noise_model_reference_key)
         
         msg.add_message(
             MESSAGES["created_instance"],
@@ -150,6 +168,7 @@ class NoiseCreator:
                 reference_key=reference_key))
         
         try:
+            # Is there even an instance to delete with given key
             check_instance_key(reference_key=reference_key,
                                should_exist=True, 
                                instances=self.__noise_models,
@@ -158,7 +177,14 @@ class NoiseCreator:
             msg.add_traceback()
             return
 
+        # Unblocking referenced noise data key
+        instance = self.__noise_models[reference_key]
+        data_reference_key = instance["data_source"]
+        unblock_key(key=data_reference_key,
+                    instance_type="noise_data")
+        
         del self.__noise_models[reference_key]
+
         msg.add_message(
             MESSAGES["deleted_instance"],
             instance_type="noise model instance",
@@ -193,16 +219,19 @@ class NoiseCreator:
             msg.add_generic_table()
             msg.add_generic_table_row(
                 row_content=["Reference key", "Qubit count", 
-                             "Basis gates", "Source noise data", 
+                             "Basis gates", "Has noise", 
+                             "Source noise data", 
                              "Noise data availability"],
                 row_type="th")
 
             for noise_model_key, instance in self.__noise_models.items():
                 
                 noise_model = instance["noise_model"]
-                basis_gates = "; ".join(noise_model.basis_gates)
+                coupling_map = instance["coupling_map"]
 
-                qubit_count = str(len(noise_model.noise_qubits))
+                qubit_count = str(coupling_map.size())
+                basis_gates = "; ".join(noise_model.basis_gates)
+                has_noise = self.__has_noise(noise_model)
                 
                 data_reference_key = instance["data_source"]
                 
@@ -219,7 +248,8 @@ class NoiseCreator:
                 
                 msg.add_generic_table_row(
                     row_content=[noise_model_key, qubit_count,
-                                 basis_gates, data_reference_key,
+                                 basis_gates, has_noise, 
+                                 data_reference_key,
                                  noise_data_availability],
                     row_type="td")
         else:
@@ -562,3 +592,23 @@ class NoiseCreator:
                     coupled_qubits.append([qubit, paired_qubit])
 
         return CouplingMap(couplinglist=coupled_qubits)
+    
+
+    def __has_noise(
+            self, 
+            noise_model: NoiseModel
+    ) -> str:
+        """Checks if `NoiseModel` object has noise or is it noiseless.
+        
+        Args:
+            noise_model (NoiseModel): Noise model that will be checked.
+
+        Returns:
+            str: 
+                - "Yes" if it has noise.
+                - "No" if it is noiseless.
+        """
+        if noise_model.is_ideal():
+            return "No"
+        else:
+            return "Yes"

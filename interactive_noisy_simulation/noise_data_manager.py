@@ -6,6 +6,7 @@ import numpy, pandas
 
 # Local project imports:
 from .messages._message_manager import MessageManager
+from .utils.key_availability import check_blocked_key
 from .utils.validators import (
     check_instance_key, validate_instance_name
 )
@@ -143,10 +144,14 @@ class NoiseDataManager:
                                                msg)
         
         try:
+            # Does key exist among created noise data instances
             check_instance_key(reference_key=reference_key,
                                should_exist=False,
                                instances=self.__noise_data,
                                instance_type="noise data instance")
+            # Is key being blocked by a noise model instance reference
+            check_blocked_key(key=reference_key,
+                              instance_type="noise_data")
         except Exception:
             msg.add_traceback()
             return
@@ -311,7 +316,7 @@ class NoiseDataManager:
                 - If qubit number is lower than 0;
                 - If qubit number exceeds max qubit number.
         """
-        qubit_count = len(dataframe)
+        qubit_count = len(dataframe) - 1
         for qubit in qubits:
             
             if qubit < 0:
@@ -319,10 +324,10 @@ class NoiseDataManager:
                     ERRORS["error_negative_qubit_number"].format(
                         qubit=qubit))
             
-            if qubit >= qubit_count:
+            elif qubit > qubit_count:
                 raise ValueError(ERRORS["error_large_qubit_number"].format(
                     qubit=qubit,
-                    max_qubits=qubit_count - 1))
+                    max_qubits=qubit_count))
 
 
     def __modify_dataframe_data(self, dataframe: pandas.DataFrame) -> None:

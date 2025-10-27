@@ -8,6 +8,9 @@ from qiskit_aer import AerSimulator
 # Local project imports:
 from .messages._message_manager import MessageManager
 from .noise_creator import NoiseCreator
+from .utils.key_availability import (
+    block_key, unblock_key
+)
 from .utils.validators import (
     check_instance_key, validate_instance_name
 )
@@ -89,6 +92,12 @@ class SimulatorManager:
             noise_model=noise_model_instance["noise_model"])
         
         self.__simulators[simulator_reference_key] = new_instance
+
+        # Blocks noise model instance key until this simulator instance
+        # gets deleted (simulator has reference to used noise model key)
+        block_key(key=noise_model_reference_key,
+                  instance_type="noise_models",
+                  blocker_key=simulator_reference_key)
         
         msg.add_message(
             MESSAGES["created_instance"],
@@ -125,6 +134,7 @@ class SimulatorManager:
                 reference_key=reference_key))
         
         try:
+            # Is there even an instance to delete with given key
             check_instance_key(reference_key=reference_key,
                                should_exist=True, 
                                instances=self.__simulators,
@@ -133,14 +143,21 @@ class SimulatorManager:
             msg.add_traceback()
             return
 
+        # Unblocking referenced noise data key
+        instance = self.__simulators[reference_key]
+        noise_model_reference_key = instance["noise_model_source"]
+        unblock_key(key=noise_model_reference_key,
+                    instance_type="noise_models")
+
         del self.__simulators[reference_key]
+
         msg.add_message(
             MESSAGES["deleted_instance"],
             instance_type="simulator instance",
             reference_key=reference_key)
         msg.end_output()
-    
-    
+
+
     def run_simulator(
             self,
             simulator_reference_key: str,
@@ -174,6 +191,7 @@ class SimulatorManager:
             reference_key=simulator_reference_key))
         
         try:
+            self.__validate_optimization_level(optimization)
             check_instance_key(reference_key=simulator_reference_key,
                                should_exist=True, 
                                instances=self.__simulators,
@@ -219,7 +237,7 @@ class SimulatorManager:
         msg.end_output()
         return result_job
     
-
+    
     def view_simulators(self) -> None:
         """Displays all currently available simulator instances.
 
@@ -247,13 +265,14 @@ class SimulatorManager:
             msg.add_generic_table()
             msg.add_generic_table_row(
                 row_content=["Reference key", "Max qubit count",
-                             "Source noise model", 
+                             "Has noise", "Source noise model", 
                              "Noise model availability"],
                 row_type="th")
 
             for simulator_key, instance in self.__simulators.items():
                 
                 simulator = instance["simulator"]
+                has_noise = self.__has_noise(simulator)
                 # At some point some research would be good as for what
                 # exactly does this number mean, because it differs from
                 # the max amount of qubits in the noise model.
@@ -273,7 +292,7 @@ class SimulatorManager:
                     availability)
                 
                 msg.add_generic_table_row(
-                    row_content=[simulator_key, qubit_count, 
+                    row_content=[simulator_key, qubit_count, has_noise,
                                  noise_model_key, noise_model_availability],
                     row_type="td")
         else:
@@ -298,3 +317,35 @@ class SimulatorManager:
                 ERRORS["error_not_linked"].format(
                     class_name=NoiseCreator.__name__,
                     method_name=self.link_noise_creator.__name__))
+
+
+    def __has_noise(
+            self, 
+            simulator: AerSimulator
+    ) -> str:
+        """Checks if `AerSimulator` object has noise or is it noiseless.
+        
+        Args:
+            noise_model (NoiseModel): Noise model that will be checked.
+
+        Returns:
+            str: 
+                - "Yes" if it has noise.
+                - "No" if it is noiseless.
+        """
+        noise_model = simulator.options.noise_model
+        if noise_model.is_ideal():
+            return "No"
+        else:
+            return "Yes"
+    
+    
+    def __validate_optimization_level(
+            self, 
+            optimization_level: int
+    ) -> None:
+        """Checks if the given transpilation optimization level 
+        is valid."""
+        if optimization_level < 0 or optimization_level > 3:
+            raise ValueError(ERRORS["invalid_optimization_level"].format(
+                    optimization_level=optimization_level))

@@ -22,6 +22,8 @@
     },
 
     "errors": {
+        "blocked_reference_key": "The provided reference key '{reference_key}' cannot be currently used for a new {instance_type} instance as it is being referenced by a {blocker_instance_type} instance with the reference key '{blocker}'!",
+        
         "error_large_qubit_number": "There is no qubit with the number {qubit}. The largest number to access a qubit from this data is {max_qubits}!",
 
         "error_negative_qubit_number": "Qubit numbers cannot be lower than 0! The number {qubit} goes against this!",
@@ -31,6 +33,8 @@
         "error_not_linked": "There is no linked {class_name} object! Please use the method {method_name}(object: {class_name}) before executing this method!",
 
         "instance_key_exists": "There already exists a {instance_type} with the reference key '{reference_key}'! Either remove it first or use a different reference key!",
+
+        "invalid_optimization_level": "The given optimization level '{optimization_level}' is invalid! Valid values are between 0 and 3 (inclusive)!",
 
         "no_key_instance": "There is currently no available {instance_type} with the reference key '{reference_key}'!"
     },
@@ -109,6 +113,11 @@
 
         "no_instances": {
             "text": "There are currently no {instance_type}!",
+            "highlightables": []
+        },
+
+        "not_adding_errors": {
+            "text": "Creating a noiseless noise model with no errors.",
             "highlightables": []
         },
 

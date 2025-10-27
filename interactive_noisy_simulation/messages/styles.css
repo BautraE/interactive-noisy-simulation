@@ -55,10 +55,6 @@ div.output-boxes p.content-headings {
     padding: 10px;
 }
 
-.highlighted-text {
-    color: #FFD173;
-}
-
 /* So this right here is a temporary solution for huge white
    spaces, when using Jupyter Notebook. Every time "display"
    from within methods of MessageManager executes, a new
@@ -103,6 +99,10 @@ div.highlight pre{
     background-color: transparent;
 }
 
+div.traceback-boxes pre {
+    color: white;
+}
+
 /* ---------- STATUS MESSAGE */
 p.status-messages {
     text-align: right;
@@ -142,8 +142,11 @@ table.tables tr.header-rows th{
 table.tables tr.regular-rows td{
     text-align: left;
     vertical-align: top;
-    color: #ffffff;
     word-break: break-word;
+}
+
+.tables td {
+    color: #ffffff;
 }
 
 /* Additional spacing between table cells for improved
@@ -204,4 +207,9 @@ tr.header-rows th div.cell-content{
 .removed-instance,
 .status-failed {
     color:#FF8A8A;
+}
+
+.highlighted-text,
+td.highlighted-text {
+    color: #FFD173;
 }
