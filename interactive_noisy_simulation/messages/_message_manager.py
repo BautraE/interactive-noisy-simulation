@@ -314,10 +314,9 @@ class MessageManager:
         Returns:
             str: Modified text with added HTML style elements.
         """
-        replacable = "<span class='path-separators'>\\</span>"
         new_text = re.sub(
-            pattern=r'\\', 
-            repl=replacable, 
+            pattern=r'[\\/]', 
+            repl=lambda m: f"<span class='path-separators'>{m.group(0)}</span>",
             string=text)
         return "<span class='path-texts'>" + new_text + "</span>"
     
