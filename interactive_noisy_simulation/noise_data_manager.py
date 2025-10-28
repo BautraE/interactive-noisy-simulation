@@ -121,7 +121,11 @@ class NoiseDataManager:
         msg.end_output()
 
 
-    def import_csv_data(self, reference_key: str, file_path: str) -> None:
+    def import_csv_data(
+            self, 
+            reference_key: str, 
+            file_path: str
+    ) -> None:
         """Imports and modifies data from a given calibration data file.
         
         Calibration data files are downloadable from the IBM Quantum 

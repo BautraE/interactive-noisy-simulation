@@ -43,9 +43,9 @@ class SimulatorManager:
     # Public class methods
     
     def create_simulator(
-            self, 
-            noise_model_reference_key: str, 
-            simulator_reference_key: str
+            self,
+            simulator_reference_key: str,
+            noise_model_reference_key: str 
     ) -> None:
         """Creates an `AerSimulator` simulator instance from specific 
         noise model.

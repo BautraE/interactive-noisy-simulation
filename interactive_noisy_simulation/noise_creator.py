@@ -54,9 +54,9 @@ class NoiseCreator:
     # Public class methods
     
     def create_noise_model(
-            self, 
+            self,
+            noise_model_reference_key: str, 
             data_reference_key: str,
-            noise_model_reference_key: str,
             has_noise: bool = True
     ) -> None:
         """Creates a new noise model.
