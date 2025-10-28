@@ -11,7 +11,7 @@ The module consists of custom classes and methods that provide the additional fu
 - Look up noise data for a certain qubit;
 - Use the imported data to create a noise model and coupling map;
 - Create a simulator instance with the custom noise model and coupling map;
-- Run a provided citruit with the created simulator.
+- Run a user-provided citruit with the created simulator.
 
 Other than this, there are also informative methods:
 - `help_csv_columns()` from `NoiseDataManager` will print out all relevant CSV columns (the ones that are used in the creation of noise models) along with explanations for them.
@@ -27,22 +27,58 @@ noise_creator = NoiseCreator()
 simulator_manager = SimulatorManager()
 
 # NoiseDataManager functionality:
-noise_data_manager.import_csv_data("path/to/file.csv")
+noise_data_manager.import_csv_data(
+    reference_key="noise_data",
+    file_path="path/to/file.csv")
 # Looking up a single qubit - qubit with index 5
-noise_data_manager.get_qubit_noise_information(5)
+noise_data_manager.get_qubit_noise_information(
+    reference_key="noise_data",
+    qubits=5)
 # Looking up multiple qubits - qubits with indexes 1, 10, and 20
-noise_data_manager.get_qubit_noise_information([1, 10, 20])
+noise_data_manager.get_qubit_noise_information(
+    reference_key="noise_data",
+    qubits=[1, 10, 20])
+
 noise_data_manager.help_csv_columns()
 
 # NoiseCreator functionality:
 # Linking is required to access data from other class objects
 noise_creator.link_noise_data_manager(noise_data_manager)
-noise_creator.create_noise_model()
 
-# NoiseCreator functionality:
+noise_creator.create_noise_model(
+    noise_model_reference_key="noise_model",
+    data_reference_key="noise_data",
+    has_noise=True ) # Default value is True. Use False for noiseless.
+
+# SimulatorManager functionality:
 simulator_manager.link_noise_creator(noise_creator)
-simulator_manager.create_simulator()
-result_job = simulator_manager.run_simulator(circuit, optimization, shots)
+
+simulator_manager.create_simulator(
+    simulator_reference_key="simulator", 
+    noise_model_reference_key="noise_model")
+
+result_job = simulator_manager.run_simulator(
+    simulator_reference_key="simulator",
+    circuit=ciircuit, 
+    optimization=0, 
+    shots=1000)
+```
+
+There are also additional methods for managing created noise data, noise model and simulator instances:
+
+```python
+# View all created instances:
+noise_data_manager.view_noise_data_instances()
+noise_creator.view_noise_models()
+simulator_manager.view_simulators()
+
+# Remove created instance:
+noise_data_manager.remove_noise_data_instance(
+   reference_key="noise_data")
+noise_creator.remove_noise_model_instance(
+   reference_key="noise_model")
+simulator_manager.remove_simulator_instance(
+   reference_key="simulator")
 ```
 
 ## 3. Setup guide
@@ -86,7 +122,6 @@ While the functionality is currently working, it is highly dependent on [IBM Qis
 - Some versions of *INS* might require certain versions of other libraries / modules (for example, *Qiskit*) if new updates significantly impact the current functionality of them. Though not all issues can be overcome by this, such as the format of the downloadable calibration data CSV files, which is not tied to any library / module version.
 
 The following points describe some additional functionality features that can be implemented over time in no specific order:
-- Add the **possibility of managing multiple noise data, noise model and simulator objects simultaneously** instead of the current limitations of one at a time. This would just give the user way more freedom in terms of creating multiple objects;
 - Add the **possibility to select certain noisy qubits**, while leaving others noiseless, when creating a noise model. This would provide the ability of creating a wider range of different noise models that can be experimented with;
 - Add the **possibility to modify imported data from CSV files manually**, as well as to create an empty data table and fill it with custom values. Again, this feature would provide even more flexibility to the user in terms of creating noise models;
 - Add **extra informative helper methods to each class** that show and explain all available methods to the user. Even though `help()` already exists in Python, the custom methods would have an improved visual output style that is easier to read for the user. 
