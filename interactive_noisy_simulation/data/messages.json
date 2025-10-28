@@ -1,39 +1,50 @@
 {
     "output-headings": {
+        "created_instances": "All currently created {instance_type}",
+
         "creating_new_object": "Creating {class_name} class object",
 
-        "creating_noise_model": "Creating noise model from available data",
+        "creating_noise_model": "Creating noise model from noise data instance '{reference_key}'",
 
-        "creating_simulator": "Creating simulator from noise model and coupling map",
+        "creating_simulator": "Creating simulator from noise model instance '{reference_key}'",
 
         "csv_information": "Information on all currently relevant CSV calibration data columns",
 
-        "execute_simulator": "Executing circuit with simulator",
+        "execute_simulator": "Executing circuit with simulator '{reference_key}'",
 
         "importing_csv": "Importing data from the selected CSV file",
 
         "linking_object": "Linking class {linked_class} object to {this_class}",
 
-        "retrieving_qubits": "Retrieving information about qubits {qubits}"
+        "remove_instance": "Removing {instance_type} '{reference_key}'",
+
+        "retrieving_qubits": "Retrieving information about qubits {qubits} from noise data instance '{reference_key}'"
     },
 
     "errors": {
+        "blocked_reference_key": "The provided reference key '{reference_key}' cannot be currently used for a new {instance_type} instance as it is being referenced by a {blocker_instance_type} instance with the reference key '{blocker}'!",
+        
         "error_large_qubit_number": "There is no qubit with the number {qubit}. The largest number to access a qubit from this data is {max_qubits}!",
 
         "error_negative_qubit_number": "Qubit numbers cannot be lower than 0! The number {qubit} goes against this!",
 
-        "error_no_dataframe": "There is currently no noise data dataframe within this NoiseDataManager class object! Please create one with the help of the method: object.import_csv_data('path/to/file.csv')",
-
-        "error_no_noise_model": "There is currently no created noise model within this NoiseCreator class object! Please create one with the help of the method: object.create_noise_model()",
-
-        "error_no_simulator": "There is currently no created simulator within this SimulatorManager class object! Please create one with the help of the method: object.create_simulator()",
-
         "error-no-qubits-numbers": "At least one qubit number must be given in order to retrieve noise data!",
 
-        "error_not_linked": "There is no linked {class_name} object! Please use the method {method_name}(object: {class_name}) before executing this method!"
+        "error_not_linked": "There is no linked {class_name} object! Please use the method {method_name}(object: {class_name}) before executing this method!",
+
+        "instance_key_exists": "There already exists a {instance_type} with the reference key '{reference_key}'! Either remove it first or use a different reference key!",
+
+        "invalid_optimization_level": "The given optimization level '{optimization_level}' is invalid! Valid values are between 0 and 3 (inclusive)!",
+
+        "no_key_instance": "There is currently no available {instance_type} with the reference key '{reference_key}'!"
     },
 
     "messages": {
+        "adding_errors": {
+            "text": "Creating and adding depolarizing, thermal relaxation, and readout errors.",
+            "highlightables": []
+        },
+
         "created_new_object": {
             "text": "{class_name} class object has been created successfully!",
             "highlightables": [
@@ -41,14 +52,18 @@
             ]
         },
 
-        "created_noise_model": {
-            "text": "Noise model has been created successfully!",
-            "highlightables": []
+        "created_instance": {
+            "text": "{instance_type} has been created successfully! It can now be accessed with the following reference key: {reference_key}.",
+            "highlightables": [
+                "{reference_key}"
+            ]
         },
 
-        "created_simulator": {
-            "text": "Simulator has been created successfully!",
-            "highlightables": []
+        "deleted_instance": {
+            "text": "The {instance_type} {reference_key} has been deleted successfully!",
+            "highlightables": [
+                "{reference_key}"
+            ]
         },
 
         "exception_occurred": {
@@ -58,20 +73,51 @@
             ]
         },
 
+        "executing_simulator": {
+            "text": "Executing {qubit_count} qubit circuit with {shots} shots on the simulator {reference_key}.",
+            "highlightables": [
+                "{qubit_count}", "{shots}", "{reference_key}"
+            ]
+        },
+        
         "execution_complete": {
             "text": "Circuit execution completed successfully! Result job has been returned!",
             "highlightables": []
         },
 
         "import_csv": {
-            "text": "Continue by importing the QPU calibration data CSV file: object.import_csv_data('path/to/file.csv')",
+            "text": "Continue by importing the QPU calibration data CSV file: object.import_csv_data('path/to/file.csv').",
             "highlightables": [
                 "object.import_csv_data('path/to/file.csv')"
             ]
         },
 
+        "import_csv_file_information": {
+            "text": "Importing noise data from the CSV file {file_name} located at the following path: {file_path}.",
+            "highlightables": [
+                "{file_name}", "{file_path}"
+            ]
+        },
+
         "linking_success": {
             "text": "Linking completed successfully!",
+            "highlightables": []
+        },
+
+        "modified_reference_key": {
+            "text": "Empty spaces (' ') have been detected in the new instance reference key! They have been replaced with '_'! Adjusted reference key: {reference_key}!",
+            "highlightables": [
+                "(' ')", "'_'", "{reference_key}"
+            ]
+        },
+
+        "no_instances": {
+            "text": "There are currently no {instance_type}!",
+            "highlightables": []
+        },
+
+        "not_adding_errors": {
+            "text": "Creating a noiseless noise model with no errors.",
             "highlightables": []
         },
 
@@ -82,14 +128,39 @@
             ]
         },
 
+        "retrieving_basis_gates": {
+            "text": "Retrieving list of basis gates.",
+            "highlightables": [
+                
+            ]
+        },
+
+        "retrieving_coupling_map": {
+            "text": "Retrieving map of coupled qubits.",
+            "highlightables": [
+                
+            ]
+        },
+
         "successful_csv_import": {
-            "text": "Data from CSV file has been imported successfully!",
-            "highlightables": []
+            "text": "Data from CSV file has been imported successfully! It can now be accessed with the following reference key: {reference_key}.",
+            "highlightables": [
+                "{reference_key}"
+            ]
+        },
+
+        "transpiling_circuit": {
+            "text": "Transpiling circuit with optimization level {optimization_level} for simulator execution.",
+            "highlightables": [
+                "{optimization_level}"
+            ]
         },
         
         "qubit_noise_data_retrieved": {
-            "text": "Noise data for all requested qubits has been retrieved successfully!",
-            "highlightables": []
+            "text": "Noise data for all requested qubits from the instance {reference_key} has been retrieved successfully!",
+            "highlightables": [
+                "{reference_key}"
+            ]
         }
     }
 }

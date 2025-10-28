@@ -1,8 +1,57 @@
-/** HTML element IDs that must be removed once a main class method is done executing. */
+/** 
+ * HTML element IDs that must be removed once a main class 
+ * method is done executing. */
 const HTML_IDS = [
-    "output-box", "output-heading", "messages", "status", "tracebacks", "qubit-noise-data",
-    "qubit-noise-data-table", "message-box-heading"
+    "output-box", "output-heading", "messages", "status", "tracebacks", 
+    "qubit-noise-data", "qubit-noise-data-table", "message-box-heading", 
+    "table"
 ];
+
+
+/**
+ * Adds a table element to the "messages" content box.
+ * Before adding new table element, removes id attribute
+ * from any other table that may be present to avoid any
+ * potential conflicts.
+ */
+function addGenericTable() {
+    unsetIdValues(["table"]);
+    
+    let table = document.createElement("table");
+    table.id = "table";
+    table.classList.add("tables");
+    _appendThroughId("messages", table);
+}
+
+
+/**
+ * Adds row to the currently active table inside of
+ * the "messages" content box.
+ * Table row needs to be specified - either a header
+ * row or regular row.
+ * All row elements must be passed as string while
+ * being divided with a certain symbol. Python does
+ * not allow list passing to JavaScript (at least
+ * while using the current solution).
+ * @param {string} rowAsString 
+ * @param {string} rowType 
+ */
+function addGenericTableRow(rowAsString, rowType) {
+    let row = document.createElement("tr");
+
+    let rowContent = rowAsString.split(",SEPARATOR,");
+    for(let cellContent of rowContent) {
+        let tableCell = document.createElement(rowType);
+        tableCell.innerHTML = cellContent;
+
+        row.appendChild(tableCell);
+    }
+
+    if (rowType === "th") row.classList.add("header-rows");
+    else row.classList.add("regular-rows");
+
+    _appendThroughId("table", row);
+}
 
 
 /**
@@ -38,7 +87,8 @@ function addTraceback(tracebackCss, tracebackHtml) {
 
 
 /**
- * Creates and adds container that will contain retrieved qubit CSV noise data.
+ * Creates and adds container that will contain retrieved qubit CSV 
+ * noise data.
  * This container will have content boxes added to it by 
  * {@link addQubitNoiseDataContentBox}.
  */
@@ -51,9 +101,9 @@ function addQubitNoiseDataContainer() {
 
 
 /**
- * Adds a content box that will contain retrieved CSV noise data for a certain
- * qubit. Before this is done, the ID of the previous content box must be removed
- * so that no issues occur.
+ * Adds a content box that will contain retrieved CSV noise data for 
+ * a certain qubit. Before this is done, the ID of the previous content
+ * box must be removed so that no conflicts occur.
  * The content box is added to the content container created by
  * {@link addQubitNoiseDataContainer}.
  */
@@ -61,7 +111,7 @@ function addQubitNoiseDataContentBox() {
     unsetIdValues(["qubit-noise-data-table"]);
     
     let table = document.createElement("table");
-    table.classList.add("qubit-noise-data-tables");
+    table.classList.add("tables");
     table.id = "qubit-noise-data-table";
     
     let contentBox = _createContentBox();
@@ -146,9 +196,9 @@ function setStatus(status) {
 
 /**
  * Removes IDs from HTML elements.
- * Removed IDs can either be passed as an argument (removableIds) or not,
- * in which case the default list of all registered IDs will be 
- * used ({@link HTML_IDS}).
+ * Removed IDs can either be passed as an argument (removableIds)
+ * or not, in which case the default list of all registered IDs 
+ * will be used ({@link HTML_IDS}).
  * @example
  * // removes only the requested ID
  * unsetIdValues("id")
@@ -255,7 +305,7 @@ function _createContentContainer(id=null, elements=[]) {
  * @returns {HTMLParagraphElement}
  */
 function _createContentTitle(titleText) {
-    let contentTitle = document.createElement("p")
+    let contentTitle = document.createElement("p");
     contentTitle.classList.add("content-headings");
     contentTitle.innerHTML = titleText;
     return contentTitle;
@@ -276,7 +326,10 @@ function _createContentTitle(titleText) {
 function _createTracebackContainer() {
     let contentTitle = _createContentTitle("Error log:");
     let contentBox = _createContentBox(null, ["traceback-boxes"]);
-    let contentContainer = _createContentContainer(null, [contentTitle, contentBox]);
+    let contentContainer = _createContentContainer(
+        null, 
+        [contentTitle, contentBox]
+    );
     _appendToOutputBox(contentContainer);
     return contentBox;
 }

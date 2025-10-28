@@ -55,10 +55,6 @@ div.output-boxes p.content-headings {
     padding: 10px;
 }
 
-.highlighted-text {
-    color: #FFD173;
-}
-
 /* So this right here is a temporary solution for huge white
    spaces, when using Jupyter Notebook. Every time "display"
    from within methods of MessageManager executes, a new
@@ -103,50 +99,117 @@ div.highlight pre{
     background-color: transparent;
 }
 
+div.traceback-boxes pre {
+    color: white;
+}
+
 /* ---------- STATUS MESSAGE */
 p.status-messages {
     text-align: right;
     text-transform: uppercase;
 }
 
-/* Different colors for status types */
-.status-in-progress {
-    color:#F3EA69;
-}
-
-.status-completed {
-    color:#37FF8D;
-}
-
-.status-failed {
-    color:#FF8A8A;
-}
-
 /* ---------- QUBIT NOISE DATA */
-.qubit-noise-data-tables {
-    width: 100%;
-}
-
-/* Coloring in every 2nd (even) row of table */
-.qubit-noise-data-rows:nth-child(even) {
-  background-color: #222C42;
-}
-
 /* Table cells */
-table.qubit-noise-data-tables tr 
+table.tables tr 
 td.qubit-noise-data-cells {
     width: 50%;
     text-align: left;
 }
 
+/* ---------- GENERAL TABLE STYLES */
+div table.tables {
+    width: 100%;
+    table-layout: auto;
+    border-collapse: collapse;
+}
+
+/* Coloring in every 2nd (even) row of table */
+.tables tr:nth-child(even) {
+  background-color: #222C42;
+}
+
+/* Row styles */
+table.tables tr.header-rows th{
+    text-align: left;
+    vertical-align: top;
+    text-transform: uppercase;
+    font-style: italic;
+    font-weight: normal;
+    color: #FFD173;
+}
+
+table.tables tr.regular-rows td{
+    text-align: left;
+    vertical-align: top;
+    word-break: break-word;
+}
+
+.tables td {
+    color: #ffffff;
+}
+
+/* Additional spacing between table cells for improved
+   readability. */
+tr.header-rows:not(:first-child):not(:last-child) th,
+tr.regular-rows:not(:first-child):not(:last-child) td {
+    padding: 10px;
+}
+
+tr.header-rows:first-child th,
+tr.regular-rows:first-child td {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+}
+
+tr.header-rows:last-child th,
+tr.regular-rows:last-child td {
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
 /* Border radius for outer edges of rows.
    Has to be changed for cells and not row elements */
-td.qubit-noise-data-cells:nth-child(odd) {
+.tables tr td:first-child {
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
 }
 
-td.qubit-noise-data-cells:nth-child(even) {
+.tables tr td:last-child {
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
+}
+
+/* Setting max width for table cell content */
+tr.regular-rows td div.cell-content,
+tr.header-rows th div.cell-content{
+    max-width: 200px;
+}
+
+/* CERTAIN TEXT PART STYLES */
+
+.path-texts {
+    color: #DFBFFF;
+}
+
+.available-instance,
+.path-separators,
+.status-completed {
+    color: #37FF8D;
+}
+
+.status-in-progress {
+    color:#F3EA69;
+}
+
+.removed-instance,
+.status-failed {
+    color:#FF8A8A;
+}
+
+.highlighted-text,
+td.highlighted-text {
+    color: #FFD173;
 }
