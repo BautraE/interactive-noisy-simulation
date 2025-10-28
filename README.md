@@ -24,6 +24,21 @@ Instead of being limited to a single object (noise data instance, noise model, s
         noise_model_reference_key: str)
     ```
 
+- **Changes for other methods that were using noise data instances** (viewing qubit noise data, running simulator). They now require the user to specify, which instance is going to be used:
+  ```python
+  # Looking up multiple qubits - qubits with indexes 1, 10, and 20
+  NoiseDataManager.get_qubit_noise_information(
+      reference_key="noise_data",
+      qubits=[1, 10, 20])
+  
+  # Running simulator
+  result_job = SimulatorManager.run_simulator(
+      simulator_reference_key="simulator",
+      circuit=circuit, 
+      optimization=0, 
+      shots=1000)
+  ```
+
 - **Added additional methods for viewing and deleting created instances:**
 
      ```python

@@ -6,7 +6,7 @@ import numpy, pandas
 
 # Local project imports:
 from .messages._message_manager import MessageManager
-from .utils.key_availability import check_blocked_key
+from .utils.key_availability import KeyAvailabilityManager
 from .utils.validators import (
     check_instance_key, validate_instance_name
 )
@@ -19,6 +19,7 @@ class NoiseDataManager:
 
     def __init__(self) -> None:
         """Constructor method """
+        self.__key_manager = KeyAvailabilityManager()
         self.__message_manager: MessageManager = MessageManager()
         msg = self.__message_manager
         
@@ -34,6 +35,18 @@ class NoiseDataManager:
 
     
     # Class properties
+    @property
+    def key_manager(self) -> KeyAvailabilityManager:
+        """Returns a reference to a KeyAvailabilityManager
+        
+        A manager that will be used across all main manager
+        classes to keep track of blocked keys:
+            - `NoiseDataManager`
+            - `NoiseCreator`
+            - `SimulatorManager`
+        """
+        return self.__key_manager
+
 
     @property    
     def noise_data(self) -> pandas.DataFrame:
@@ -154,8 +167,9 @@ class NoiseDataManager:
                                instances=self.__noise_data,
                                instance_type="noise data instance")
             # Is key being blocked by a noise model instance reference
-            check_blocked_key(key=reference_key,
-                              instance_type="noise_data")
+            self.__key_manager.check_blocked_key(
+                key=reference_key,
+                instance_type="noise_data")
         except Exception:
             msg.add_traceback()
             return

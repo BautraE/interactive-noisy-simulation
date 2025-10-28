@@ -8,9 +8,6 @@ from qiskit_aer import AerSimulator
 # Local project imports:
 from .messages._message_manager import MessageManager
 from .noise_creator import NoiseCreator
-from .utils.key_availability import (
-    block_key, unblock_key
-)
 from .utils.validators import (
     check_instance_key, validate_instance_name
 )
@@ -27,6 +24,7 @@ class SimulatorManager:
 
     def __init__(self) -> None:
         """Constructor method."""
+        self.__key_manager = None
         self.__message_manager: MessageManager = MessageManager()
         msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(
@@ -95,9 +93,9 @@ class SimulatorManager:
 
         # Blocks noise model instance key until this simulator instance
         # gets deleted (simulator has reference to used noise model key)
-        block_key(key=noise_model_reference_key,
-                  instance_type="noise_models",
-                  blocker_key=simulator_reference_key)
+        self.__key_manager.block_key(key=noise_model_reference_key,
+                                     instance_type="noise_models",
+                                     blocker_key=simulator_reference_key)
         
         msg.add_message(
             MESSAGES["created_instance"],
@@ -115,6 +113,7 @@ class SimulatorManager:
             this_class=self.__class__.__name__))
         
         self.__noise_models = noise_creator.noise_models
+        self.__key_manager = noise_creator.key_manager
         
         msg.add_message(MESSAGES["linking_success"])
         msg.end_output()
@@ -146,8 +145,8 @@ class SimulatorManager:
         # Unblocking referenced noise data key
         instance = self.__simulators[reference_key]
         noise_model_reference_key = instance["noise_model_source"]
-        unblock_key(key=noise_model_reference_key,
-                    instance_type="noise_models")
+        self.__key_manager.unblock_key(key=noise_model_reference_key,
+                                       instance_type="noise_models")
 
         del self.__simulators[reference_key]
 

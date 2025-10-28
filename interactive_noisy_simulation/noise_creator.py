@@ -11,9 +11,7 @@ from qiskit_aer.noise import (
 # Local project imports:
 from .messages._message_manager import MessageManager
 from .noise_data_manager import NoiseDataManager
-from .utils.key_availability import (
-    block_key, check_blocked_key, unblock_key
-)
+from .utils.key_availability import KeyAvailabilityManager
 from .utils.validators import (
     check_instance_key, validate_instance_name
 )
@@ -29,6 +27,7 @@ class NoiseCreator:
 
     def __init__(self) -> None:
         """Constructor method."""
+        self.__key_manager = None
         self.__message_manager: MessageManager = MessageManager()
         msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(
@@ -43,6 +42,18 @@ class NoiseCreator:
 
 
     # Class properties
+    @property
+    def key_manager(self) -> KeyAvailabilityManager:
+        """Returns a reference to a KeyAvailabilityManager
+        
+        A manager that will be used across all main manager
+        classes to keep track of blocked keys:
+            - `NoiseDataManager`
+            - `NoiseCreator`
+            - `SimulatorManager`
+        """
+        return self.__key_manager
+
 
     @property
     def noise_models(self) -> NoiseModel:
@@ -91,8 +102,9 @@ class NoiseCreator:
                                instances=self.__noise_models,
                                instance_type="noise model instance")
             # Is key being blocked by a simulator instance reference
-            check_blocked_key(key=noise_model_reference_key,
-                              instance_type="noise_models")
+            self.__key_manager.check_blocked_key(
+                                key=noise_model_reference_key,
+                                instance_type="noise_models")
         except Exception:
             msg.add_traceback()
             return
@@ -127,9 +139,9 @@ class NoiseCreator:
 
         # Blocks noise data instance key until this noise model instance
         # gets deleted (noise model has reference to used noise data key)
-        block_key(key=data_reference_key,
-                  instance_type="noise_data",
-                  blocker_key=noise_model_reference_key)
+        self.__key_manager.block_key(key=data_reference_key,
+                                     instance_type="noise_data",
+                                     blocker_key=noise_model_reference_key)
         
         msg.add_message(
             MESSAGES["created_instance"],
@@ -149,6 +161,7 @@ class NoiseCreator:
             this_class=self.__class__.__name__))
         
         self.__noise_data = noise_data_manager.noise_data
+        self.__key_manager = noise_data_manager.key_manager
 
         msg.add_message(MESSAGES["linking_success"])
         msg.end_output()
@@ -180,8 +193,8 @@ class NoiseCreator:
         # Unblocking referenced noise data key
         instance = self.__noise_models[reference_key]
         data_reference_key = instance["data_source"]
-        unblock_key(key=data_reference_key,
-                    instance_type="noise_data")
+        self.__key_manager.unblock_key(key=data_reference_key,
+                                       instance_type="noise_data")
         
         del self.__noise_models[reference_key]
 
