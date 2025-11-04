@@ -9,3 +9,5 @@ __all__ = [
     "NoiseCreator",
     "SimulatorManager"
 ]
+
+from .VERSION import __version__

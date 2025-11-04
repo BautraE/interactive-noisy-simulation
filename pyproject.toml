@@ -2,27 +2,43 @@
 requires = ["setuptools >= 77.0.3"]
 build-backend = "setuptools.build_meta"
 
+
 [project]
 name = "interactive_noisy_simulation"
-version = "1.2.1"
 description = "A more intuitive and interactive way of creating noise models and simulators, as well as executing circuits with the created simulators."
-readme = "README.md"
+authors = [{name = "Edgars Bautra"}]
 requires-python = ">=3.13"
 dependencies = [
     "pandas >= 2.3.1",
     "qiskit >= 2.1.1",
-    "qiskit-aer >= 0.17.1"
+    "qiskit-aer >= 0.17.1",
+    "requests >= 2.32.5"
 ]
-authors = [{name = "Edgars Bautra"}]
+dynamic = [
+    "version", 
+    "readme"
+]
+
+
+[project.scripts]
+interactive_noisy_simulation = "interactive_noisy_simulation.__main__:main"
+
 
 [project.urls]
 Repository = "https://github.com/BautraE/interactive-noisy-simulation"
+
+
+[tool.setuptools.dynamic]
+version = { attr = "interactive_noisy_simulation.VERSION.__version__" }
+readme = { file = "README.md", content-type = "text/markdown" }
+
 
 [tool.setuptools.package-data]
 "interactive_noisy_simulation.data" = ["*.json"]
 "interactive_noisy_simulation.messages" = [
     "*.css", "*.html", "*.js"
 ]
+
 
 [tool.setuptools.packages.find]
 where = ["."]
