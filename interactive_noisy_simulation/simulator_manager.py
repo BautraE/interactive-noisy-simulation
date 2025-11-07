@@ -313,7 +313,7 @@ class SimulatorManager:
         """
         if self.__noise_models is None:
             raise RuntimeError(
-                ERRORS["error_not_linked"].format(
+                ERRORS["not_linked"].format(
                     class_name=NoiseCreator.__name__,
                     method_name=self.link_noise_creator.__name__))
 

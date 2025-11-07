@@ -1,42 +1,20 @@
 {
-    "output-headings": {
-        "created_instances": "All currently created {instance_type}",
-
-        "creating_new_object": "Creating {class_name} class object",
-
-        "creating_noise_model": "Creating noise model from noise data instance '{reference_key}'",
-
-        "creating_simulator": "Creating simulator from noise model instance '{reference_key}'",
-
-        "csv_information": "Information on all currently relevant CSV calibration data columns",
-
-        "execute_simulator": "Executing circuit with simulator '{reference_key}'",
-
-        "importing_csv": "Importing data from the selected CSV file",
-
-        "linking_object": "Linking class {linked_class} object to {this_class}",
-
-        "remove_instance": "Removing {instance_type} '{reference_key}'",
-
-        "retrieving_qubits": "Retrieving information about qubits {qubits} from noise data instance '{reference_key}'"
-    },
-
     "errors": {
         "blocked_reference_key": "The provided reference key '{reference_key}' cannot be currently used for a new {instance_type} instance as it is being referenced by a {blocker_instance_type} instance with the reference key '{blocker}'!",
-        
-        "error_large_qubit_number": "There is no qubit with the number {qubit}. The largest number to access a qubit from this data is {max_qubits}!",
-
-        "error_negative_qubit_number": "Qubit numbers cannot be lower than 0! The number {qubit} goes against this!",
-
-        "error-no-qubits-numbers": "At least one qubit number must be given in order to retrieve noise data!",
-
-        "error_not_linked": "There is no linked {class_name} object! Please use the method {method_name}(object: {class_name}) before executing this method!",
 
         "instance_key_exists": "There already exists a {instance_type} with the reference key '{reference_key}'! Either remove it first or use a different reference key!",
 
         "invalid_optimization_level": "The given optimization level '{optimization_level}' is invalid! Valid values are between 0 and 3 (inclusive)!",
+        
+        "large_qubit_number": "There is no qubit with the number {qubit}. The largest number to access a qubit from this data is {max_qubits}!",
 
-        "no_key_instance": "There is currently no available {instance_type} with the reference key '{reference_key}'!"
+        "negative_qubit_number": "Qubit numbers cannot be lower than 0! The number {qubit} goes against this!",
+
+        "no_qubits_numbers": "At least one qubit number must be given in order to retrieve noise data!",
+
+        "no_key_instance": "There is currently no available {instance_type} with the reference key '{reference_key}'!",
+
+        "not_linked": "There is no linked {class_name} object! Please use the method {method_name}(object: {class_name}) before executing this method!"
     },
 
     "messages": {
@@ -162,5 +140,55 @@
                 "{reference_key}"
             ]
         }
+    },
+
+    "output_headings": {
+        "created_instances": "All currently created {instance_type}",
+
+        "creating_new_object": "Creating {class_name} class object",
+
+        "creating_noise_model": "Creating noise model from noise data instance '{reference_key}'",
+
+        "creating_simulator": "Creating simulator from noise model instance '{reference_key}'",
+
+        "csv_information": "Information on all currently relevant CSV calibration data columns",
+
+        "execute_simulator": "Executing circuit with simulator '{reference_key}'",
+
+        "importing_csv": "Importing data from the selected CSV file",
+
+        "linking_object": "Linking class {linked_class} object to {this_class}",
+
+        "remove_instance": "Removing {instance_type} '{reference_key}'",
+
+        "retrieving_qubits": "Retrieving information about qubits {qubits} from noise data instance '{reference_key}'"
+    },
+
+    "terminal": {
+        "confirm_update": "Do you want to update [name]Interactive Noisy Simulation[/name]? [command](y/n)[/command]",
+        
+        "current_version": "[name]Interactive Noisy Simulation[/name] [highlight]v{version}[/highlight]",
+
+        "error": "An error occured:\n[failure]{error}[/failure]",
+
+        "outdated_version": "The current version is outdated.\nAble to update from [highlight]v{current_version}[/highlight] to [highlight]v{latest_version}[/highlight].",
+
+        "update_cancelled": "Cancelling update.",
+
+        "update_failed": "Update failed:\n[failure]{error}[/failure]\nPress [command]ENTER[/command] to continue.",
+
+        "update_successful": "Package [name]Interactive Noisy Simulation[/name] has been [success]updated successfully[/success]!\nPress [command]ENTER[/command] to continue.",
+
+        "updating_version": "\nUpdating [name]Interactive Noisy Simulation[/name]..",
+
+        "version_up_to_date": "Current version [highlight]v{current_version}[/highlight] is already up-to-date!"
+    },
+
+    "terminal_command_descriptions": {
+        "help": "Interactive Noisy Simulation package. Any functionality that is accessed through the terminal is only related to package management and not the functionality that it provides.",
+
+        "update": "Checks if a newer version is available. If yes, the package can be updated, based on choice of user (yes / no).",
+
+        "version": "Prints current version of package and tells if there is a newer version."
     }
 }

@@ -524,7 +524,7 @@ class NoiseCreator:
         """
         if self.__noise_data is None:
             raise RuntimeError(
-                ERRORS["error_not_linked"].format(
+                ERRORS["not_linked"].format(
                     class_name=NoiseDataManager.__name__,
                     method_name=self.link_noise_data_manager.__name__))
 

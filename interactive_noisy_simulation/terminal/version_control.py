@@ -6,7 +6,9 @@ import sys
 import requests
 
 # Local project imports:
+from ._console import console
 from ..VERSION import __version__
+from ..data._data import TERMINAL_MESSAGES
 
 
 REPOSITORY_URL = "https://github.com/BautraE/interactive-noisy-simulation"
@@ -18,7 +20,8 @@ LATEST_RELEASE_API = "https://api.github.com/repos/BautraE/interactive-noisy-sim
 
 def check_version() -> None:
     """Prints out the current version of the package."""
-    print(f"Interactive Noisy Simulation v{__version__}")
+    console.print(TERMINAL_MESSAGES["current_version"].format(
+        version=__version__))
 
 
 def update_version() -> None:
@@ -36,17 +39,20 @@ def update_version() -> None:
     if latest_version == "error": return
 
     if __is_version_newer(current_version, latest_version):
-        print(f"The current version is outdated.")
-        print(f"Able to update from v{current_version} to v{latest_version}.")
+        console.print(TERMINAL_MESSAGES["outdated_version"].format(
+            current_version=current_version,
+            latest_version=latest_version))
 
-        user_choice = input(f"Do you want to update Interactive Noisy Simulation? [y|n]\n")
+        console.print(TERMINAL_MESSAGES["confirm_update"])
+        user_choice = input()
         if user_choice == "y":
             update_url = f"{REPOSITORY_URL}/archive/refs/tags/v{latest_version}.zip"
             __install_update(update_url)
         else:
-            print("Cancelling update.")
+            console.print(TERMINAL_MESSAGES["update_cancelled"])
     else:
-        print(f"Current version v{current_version} is already up-to-date!")
+        console.print(TERMINAL_MESSAGES["version_up_to_date"].format(
+            current_version=current_version))
 
 
 # Helper functions for main functions in this file
@@ -67,7 +73,8 @@ def __get_latest_version() -> str:
         release_data = response.json()
         version = release_data["tag_name"].strip("v")
     except Exception as e:
-        print(f"An error occured: {e}")
+        console.print(TERMINAL_MESSAGES["error"].format(
+            error=e))
         return "error"
 
     return version

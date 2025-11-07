@@ -2,7 +2,10 @@
 import argparse
 
 # Local project imports:
+from .terminal._console import RichHelpFormatter
 from .terminal.version_control import update_version, check_version
+from .data._data import TERMINAL_COMMAND_DESCRIPTION
+
 
 def main() -> None:
     """Provides terminal command functionality.
@@ -14,7 +17,8 @@ def main() -> None:
     """
     parser = argparse.ArgumentParser(
         prog="interactive_noisy_simulation",
-        description="Interactive Noisy Simulation package.\n Any functionality that is accessed through the terminal is only related to package management and not the functionality that it provides."
+        description=TERMINAL_COMMAND_DESCRIPTION["help"],
+        formatter_class=RichHelpFormatter
     )
 
     # Possible arguments:
@@ -23,13 +27,13 @@ def main() -> None:
     group.add_argument(
         "-u", "--update",
         action="store_true",
-        help= "Checks if a newer version is available. If yes, the package gets updated."
+        help=TERMINAL_COMMAND_DESCRIPTION["update"],
     )
 
     group.add_argument(
         "-v", "--version",
         action="store_true",
-        help= "Prints current version of package and tells if there is a newer version."
+        help=TERMINAL_COMMAND_DESCRIPTION["version"],
     )
 
     # Functionality access based on arguments

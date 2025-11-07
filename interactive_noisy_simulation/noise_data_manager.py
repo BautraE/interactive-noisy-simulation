@@ -94,7 +94,7 @@ class NoiseDataManager:
             dataframe = self.__noise_data[reference_key]["dataframe"]
 
             if not qubits:
-                raise ValueError(ERRORS["error-no-qubits-numbers"])
+                raise ValueError(ERRORS["no_qubits_numbers"])
 
             if isinstance(qubits, int):
                 qubits = [qubits]
@@ -339,11 +339,11 @@ class NoiseDataManager:
             
             if qubit < 0:
                 raise ValueError(
-                    ERRORS["error_negative_qubit_number"].format(
+                    ERRORS["negative_qubit_number"].format(
                         qubit=qubit))
             
             elif qubit > qubit_count:
-                raise ValueError(ERRORS["error_large_qubit_number"].format(
+                raise ValueError(ERRORS["large_qubit_number"].format(
                     qubit=qubit,
                     max_qubits=qubit_count))
 

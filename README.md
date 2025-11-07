@@ -8,10 +8,14 @@ The rest of this `README.md` file will consist of changes and comments related t
 
 ### Changes:
 
+#### For end user:
 - It is now possible to check the currently installed version with the help of the following command:
     - `interactive_noisy_simulation [-v | --version]`
 - It is now possible to update the current version of INS automatically, if there is a newer version available. It can be done with the help of the following command:
     - `interactive_noisy_simulation [-u | --update]`
+
+#### For developers:
+- All new terminal command outputs have slight styling adjustments with [*Python Rich*](https://github.com/Textualize/rich). Though there is one exception - the *help* command, as it requires another package called *[rich-argparse](https://github.com/hamdanal/rich-argparse)*.
 
 ### Additional Comments:
 
