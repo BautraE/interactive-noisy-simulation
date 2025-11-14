@@ -6,11 +6,11 @@ from qiskit import transpile
 from qiskit_aer import AerSimulator
 
 # Local project imports:
-from .messages._message_manager import MessageManager
 from .noise_creator import NoiseCreator
 from .utils.validators import (
     check_instance_key, validate_instance_name
 )
+from .messages._message_manager import message_manager as msg
 from .data._data import (
     ERRORS, MESSAGES, OUTPUT_HEADINGS
 )
@@ -24,12 +24,10 @@ class SimulatorManager:
 
     def __init__(self) -> None:
         """Constructor method."""
-        self.__key_manager = None
-        self.__message_manager: MessageManager = MessageManager()
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(
             class_name=self.__class__.__name__))
 
+        self.__key_manager = None
         self.__simulators = {}
         self.__noise_models = None
 
@@ -58,7 +56,6 @@ class SimulatorManager:
             simulator_reference_key (str): Reference key for the
                 created simulator that will be used to access it.
         """
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["creating_simulator"].format(
             reference_key=noise_model_reference_key))
         
@@ -107,7 +104,6 @@ class SimulatorManager:
     def link_noise_creator(self, noise_creator: NoiseCreator) -> None:
         """Links a `NoiseCreator` class object to gain access to 
         created noise models."""
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["linking_object"].format(
             linked_class=NoiseCreator.__name__,
             this_class=self.__class__.__name__))
@@ -126,7 +122,6 @@ class SimulatorManager:
             reference_key (str): Key of the removable simulator
                 instance.
         """
-        msg = self.__message_manager
         msg.create_output(
             OUTPUT_HEADINGS["remove_instance"].format(
                 instance_type="simulator instance",
@@ -185,7 +180,6 @@ class SimulatorManager:
                 extract the result counts and other data associated with the
                 completed job.
         """
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["execute_simulator"].format(
             reference_key=simulator_reference_key))
         
@@ -254,15 +248,14 @@ class SimulatorManager:
         - Availability of the source noise model instance (Available
           or Removed).
         """
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["created_instances"].format(
             instance_type="simulator instances"))
-        msg.generic_content_container("Simulator instances:")
+        msg.modify_content_title("Simulator instances:")
 
         if self.__simulators:
             
-            msg.add_generic_table()
-            msg.add_generic_table_row(
+            msg.add_table(container_id="messages")
+            msg.add_table_row(
                 row_content=["Reference key", "Max qubit count",
                              "Has noise", "Source noise model", 
                              "Noise model availability"],
@@ -290,7 +283,7 @@ class SimulatorManager:
                 noise_model_availability = msg.style_availability_status(
                     availability)
                 
-                msg.add_generic_table_row(
+                msg.add_table_row(
                     row_content=[simulator_key, qubit_count, has_noise,
                                  noise_model_key, noise_model_availability],
                     row_type="td")

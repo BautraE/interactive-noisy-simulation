@@ -9,12 +9,12 @@ from qiskit_aer.noise import (
 )
 
 # Local project imports:
-from .messages._message_manager import MessageManager
 from .noise_data_manager import NoiseDataManager
 from .utils.key_availability import KeyAvailabilityManager
 from .utils.validators import (
     check_instance_key, validate_instance_name
 )
+from .messages._message_manager import message_manager as msg
 from .data._data import (
     CONFIG, CSV_COLUMNS, ERRORS, MESSAGES, OUTPUT_HEADINGS
 )
@@ -27,12 +27,10 @@ class NoiseCreator:
 
     def __init__(self) -> None:
         """Constructor method."""
-        self.__key_manager = None
-        self.__message_manager: MessageManager = MessageManager()
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(
             class_name=self.__class__.__name__))
 
+        self.__key_manager = None
         self.__noise_models = {}
         self.__noise_data = None
 
@@ -85,7 +83,6 @@ class NoiseCreator:
                 allow the user to access the created noise model
                 afterwards.
         """
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["creating_noise_model"].format(
             reference_key=data_reference_key))
         
@@ -126,7 +123,7 @@ class NoiseCreator:
                 self.__add_readout_error(qubit_nr, columns, noise_model)
                 self.__add_depolarizing_error(qubit_nr, columns, noise_model)
                 self.__add_thermal_error(qubit_nr, columns, 
-                                        noise_model, noise_dataframe)
+                                         noise_model, noise_dataframe)
         else:
             msg.add_message(MESSAGES["not_adding_errors"])
 
@@ -155,7 +152,6 @@ class NoiseCreator:
             noise_data_manager: NoiseDataManager
     ) -> None:
         """Links a `NoiseDataManager` object to gain access to noise data."""
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["linking_object"].format(
             linked_class=NoiseDataManager.__name__, 
             this_class=self.__class__.__name__))
@@ -174,7 +170,6 @@ class NoiseCreator:
             reference_key (str): Key of the removable noise model
                 instance.
         """
-        msg = self.__message_manager
         msg.create_output(
             OUTPUT_HEADINGS["remove_instance"].format(
                 instance_type="noise model instance",
@@ -222,15 +217,14 @@ class NoiseCreator:
         - Availability of the source noise data instance (Available
           or Removed).
         """
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["created_instances"].format(
             instance_type="noise models"))
-        msg.generic_content_container("Noise model instances:")
+        msg.modify_content_title("Noise model instances:")
 
         if self.__noise_models:
 
-            msg.add_generic_table()
-            msg.add_generic_table_row(
+            msg.add_table(container_id="messages")
+            msg.add_table_row(
                 row_content=["Reference key", "Qubit count", 
                              "Basis gates", "Has noise", 
                              "Source noise data", 
@@ -259,7 +253,7 @@ class NoiseCreator:
                 noise_data_availability = msg.style_availability_status(
                     availability)
                 
-                msg.add_generic_table_row(
+                msg.add_table_row(
                     row_content=[noise_model_key, qubit_count,
                                  basis_gates, has_noise, 
                                  data_reference_key,
@@ -556,7 +550,6 @@ class NoiseCreator:
             list[str]: A list of basis gate names in the form that they 
                 are accepted.For example: `["id", "ecr", "rz"]`
         """ 
-        msg = self.__message_manager
         msg.add_message(MESSAGES["retrieving_basis_gates"])
 
         basis_gate_list = CONFIG["non_gate_instructions"]
@@ -592,7 +585,6 @@ class NoiseCreator:
         Returns:
             CouplingMap: Representation of the created coupling map.
         """
-        msg = self.__message_manager
         msg.add_message(MESSAGES["retrieving_coupling_map"])
 
         coupled_qubits = []

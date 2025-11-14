@@ -5,11 +5,11 @@ from pathlib import Path
 import numpy, pandas
 
 # Local project imports:
-from .messages._message_manager import MessageManager
 from .utils.key_availability import KeyAvailabilityManager
 from .utils.validators import (
     check_instance_key, validate_instance_name
 )
+from .messages._message_manager import message_manager as msg
 from .data._data import (
     CONFIG, CSV_COLUMNS, ERRORS, MESSAGES, OUTPUT_HEADINGS
 )
@@ -19,13 +19,10 @@ class NoiseDataManager:
 
     def __init__(self) -> None:
         """Constructor method """
-        self.__key_manager = KeyAvailabilityManager()
-        self.__message_manager: MessageManager = MessageManager()
-        msg = self.__message_manager
-        
         msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(
             class_name=self.__class__.__name__))
         
+        self.__key_manager = KeyAvailabilityManager()
         self.__noise_data: dict[str, str | pandas.DataFrame] = {}
 
         msg.add_message(MESSAGES["created_new_object"], 
@@ -80,7 +77,6 @@ class NoiseDataManager:
         Raises:
             ValueError: If nothing is passed as the argument `qubits`.
         """
-        msg = self.__message_manager
         msg.create_output(
             OUTPUT_HEADINGS["retrieving_qubits"].format(
                 qubits=qubits,
@@ -104,16 +100,25 @@ class NoiseDataManager:
             msg.add_traceback()
             return
 
-        msg.add_qubit_noise_data_container()
+        msg.create_content_container(container_id="qubit-noise-data",
+                                         content_heading="Retrieved qubits")
         for qubit in qubits:
-            msg.add_qubit_noise_data_content_box()
-            msg.add_qubit_noise_data_row("Qubit number", qubit)
+            msg.create_content_box(box_id="qubit-noise-content-box", 
+                                   parent_id="qubit-noise-data")
+
+            msg.add_table(container_id="qubit-noise-content-box")
+
+            qubit_str = msg.style_highlight(text=str(qubit))
+            msg.add_table_row(row_content=["Qubit number", qubit_str],
+                              row_type="td")
             for column in CSV_COLUMNS.keys():
                 if CSV_COLUMNS[column]["csv_name"] in dataframe.columns:
                     name = CSV_COLUMNS[column]["name"]
                     value = dataframe.loc[qubit, 
                                           CSV_COLUMNS[column]["csv_name"]]
-                    msg.add_qubit_noise_data_row(name, value)
+                    value_str = msg.style_highlight(text=str(value))
+                    msg.add_table_row(row_content=[name, value_str],
+                                      row_type="td")
         
         msg.add_message(MESSAGES["qubit_noise_data_retrieved"],
                         reference_key=reference_key)
@@ -122,9 +127,8 @@ class NoiseDataManager:
 
     def help_csv_columns(self) -> None:
         """Prints out information about all dataframe columns."""
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["csv_information"])
-        msg.generic_content_container("Calibration data attributes:")
+        msg.modify_content_title("Calibration data attributes:")
 
         for column in CSV_COLUMNS.keys():
             name = CSV_COLUMNS[column]["name"]
@@ -154,7 +158,6 @@ class NoiseDataManager:
             reference_key (str): Key that will be used to access specific 
                 CSV noise data instances after they are imported.
         """
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["importing_csv"])
 
         reference_key = validate_instance_name(reference_key,
@@ -212,7 +215,6 @@ class NoiseDataManager:
             reference_key (str): Key of the removable noise data
                 instance.
         """
-        msg = self.__message_manager
         msg.create_output(
             OUTPUT_HEADINGS["remove_instance"].format(
                 instance_type="noise data instance",
@@ -250,15 +252,14 @@ class NoiseDataManager:
           update if the file was moved, it only shows the original
           location from the import process).
         """
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["created_instances"].format(
             instance_type="noise data instances"))
-        msg.generic_content_container("Noise data instances:")
+        msg.modify_content_title("Noise data instances:")
 
         if self.__noise_data:
 
-            msg.add_generic_table()
-            msg.add_generic_table_row(
+            msg.add_table(container_id="messages")
+            msg.add_table_row(
                 row_content=["Reference key", "Source file", 
                              "Source file path on device"],
                 row_type="th")
@@ -267,7 +268,7 @@ class NoiseDataManager:
                 file_name = msg.style_italic(instance["name"])
                 file_path = msg.style_file_path(instance["path"])
                 
-                msg.add_generic_table_row(
+                msg.add_table_row(
                     row_content=[key, file_name, file_path],
                     row_type="td")
         else:
@@ -308,7 +309,7 @@ class NoiseDataManager:
         # This might change, if they add this information in the CSV files
         # at some point in time
         dataframe[CSV_COLUMNS["reset_time"]["csv_name"]] = 1300
-        self.__message_manager.add_message(MESSAGES["reset_time"])
+        msg.add_message(MESSAGES["reset_time"])
 
 
     def __check_qubit_input(

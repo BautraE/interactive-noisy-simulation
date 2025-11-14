@@ -1,4 +1,10 @@
 {
+    "development_errors": {
+        "ids_dont_exist": "There are currently no elements with the following IDs: {ids}!",
+        
+        "ids_in_use": "The following IDs are already in use by some HTML elements: {ids}!"
+    },
+
     "errors": {
         "blocked_reference_key": "The provided reference key '{reference_key}' cannot be currently used for a new {instance_type} instance as it is being referenced by a {blocker_instance_type} instance with the reference key '{blocker}'!",
 

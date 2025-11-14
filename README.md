@@ -16,6 +16,11 @@ The rest of this `README.md` file will consist of changes and comments related t
 
 #### For developers:
 - All new terminal command outputs have slight styling adjustments with [*Python Rich*](https://github.com/Textualize/rich). Though there is one exception - the *help* command, as it requires another package called *[rich-argparse](https://github.com/hamdanal/rich-argparse)*.
+- `MessageManager` class methods have been adjustes so that it is simpler to create new content containers, content boxes, tables, and table rows in a way that they can be simply reused for any new output, replacing the need to create a lot of things from scratch every time something new gets added.
+- The use of the `MessageManager` class has been altered - there is no more need to define an object of this class in every class that will be using it. Now there is an object already created inside of `_message_manager.py` called `message_manager` that just simply needs to be imported.
+- Methods / functions are now grouped based on their provided functionality, simplifying the process of implementing changes and navigating through relevant methods / functions in the code files. A table of contents is also added at the top to give an overview of all current groups of functionality. The following files have been reorganized:
+    - `_message_manager.py`
+    - `scripts.js`
 
 ### Additional Comments:
 
