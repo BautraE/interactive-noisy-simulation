@@ -25,4 +25,4 @@ __custom_formatter_styles = {
     'argparse.help': "#97a6d4",
     'argparse.prog': "#40A5F3"
 }
-formatter_class = RichHelpFormatter.styles.update(__custom_formatter_styles)
+RichHelpFormatter.styles.update(__custom_formatter_styles)

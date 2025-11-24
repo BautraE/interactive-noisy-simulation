@@ -2,12 +2,11 @@
 import re
 
 # Local project imports:
+from ..exceptions import KeyExistanceError
+from ..messages._message_manager import message_manager as msg
 from ..data._data import (
     ERRORS, MESSAGES
 )
-
-# Imports only used for type definition:
-from ..messages._message_manager import MessageManager
 
 
 def check_instance_key(
@@ -40,9 +39,9 @@ def check_instance_key(
             - `False` if an instance with the requested key does not exist.
  
     Raises:
-        KeyError: If an instance with the requested key does not exist and
-            it was not specified to not raise an exception (instead of
-            returning `False`, it will just raise an exception).
+        KeyExistanceError: If an instance with the requested key does not
+            exist and it was not specified to not raise an exception 
+            (instead of returning `False`, it will just raise an exception).
     """
     # If key should exist among current instances
     if should_exist:
@@ -50,7 +49,7 @@ def check_instance_key(
             return True
         
         elif raise_error:
-            raise KeyError(
+            raise KeyExistanceError(
                     ERRORS["no_key_instance"].format(
                         instance_type=instance_type,
                         reference_key=reference_key))
@@ -62,7 +61,7 @@ def check_instance_key(
             return True
     
         elif raise_error:
-            raise KeyError(
+            raise KeyExistanceError(
                     ERRORS["instance_key_exists"].format(
                         instance_type=instance_type,
                         reference_key=reference_key))
@@ -71,8 +70,7 @@ def check_instance_key(
 
 
 def validate_instance_name(
-        new_instance_key: str,
-        msg: MessageManager
+        new_instance_key: str
 ) -> str:
     """Modifies reference key for new instance.
 
@@ -83,8 +81,6 @@ def validate_instance_name(
     Args:
         new_instance_key (str): Reference key for a new instance, which
             needs to be checked and potentially modified.
-        msg (MessageManager): Currently used `MessageManager` instance
-            through which a message can be added if required.
 
     Returns:
         str: Reference key that will be used for the newly created 

@@ -10,18 +10,19 @@ from pygments.formatters import HtmlFormatter
 
 # Local project imports:
 from .. import messages
+from ..exceptions import DeveloperError
 from ..data._data import (
     DEV_ERRORS, MESSAGES
 )
 
 # Static code that is used for main class method output boxes
-with (resources.files(messages) / "styles.css").open("r", encoding="utf8") as file:
+with (resources.files(messages) / "static/styles.css").open("r", encoding="utf8") as file:
     css_code = file.read()
 
-with (resources.files(messages) / "scripts.js").open("r", encoding="utf8") as file:
+with (resources.files(messages) / "scripts/scripts.js").open("r", encoding="utf8") as file:
     js_code = file.read()
 
-with (resources.files(messages) / "content.html").open("r", encoding="utf8") as file:
+with (resources.files(messages) / "static/content.html").open("r", encoding="utf8") as file:
     html_code = file.read()
 
 
@@ -171,7 +172,7 @@ class MessageManager:
                 the used IDs list.
 
         Raises:
-            Exception: depends on the argument value of `should_exist`:
+            DeveloperError: depends on the argument value of `should_exist`:
                 `False`: if at least one given ID value is already part of
                     the used IDs list.
                 `True`: if at least one given ID value is not part of the
@@ -184,7 +185,7 @@ class MessageManager:
         ]
         if invalid_ids:
             error_key = "ids_in_use" if should_exist else "ids_dont_exist"
-            raise Exception(DEV_ERRORS[error_key].format(ids=invalid_ids))
+            raise DeveloperError(DEV_ERRORS[error_key].format(ids=invalid_ids))
             
 
     def __unset_id_values(self, ids: list[str]) -> None:

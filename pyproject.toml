@@ -38,7 +38,7 @@ readme = { file = "README.md", content-type = "text/markdown" }
 [tool.setuptools.package-data]
 "interactive_noisy_simulation.data" = ["*.json"]
 "interactive_noisy_simulation.messages" = [
-    "*.css", "*.html", "*.js"
+    "static/*.css", "static/*.html", "scripts/*.js"
 ]
 
 

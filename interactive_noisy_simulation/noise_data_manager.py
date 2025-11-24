@@ -6,6 +6,10 @@ import numpy, pandas
 
 # Local project imports:
 from .utils.key_availability import KeyAvailabilityManager
+from .data_structures.noise_data_instance import NoiseDataInstance
+from .exceptions import (
+    INSError, InputArgumentError
+)
 from .utils.validators import (
     check_instance_key, validate_instance_name
 )
@@ -17,13 +21,30 @@ from .data._data import (
 
 class NoiseDataManager:
 
+    # =========================================================================
+    # Table of Contents for NoiseDataManager
+    # =========================================================================
+    # 1. Initialization (constructor method).
+    # 2. Class properties.
+    # 3. Noise data instance management - creating new instances, viewing and
+    #       deleting existing ones.
+    # 4. Retrieving qubit noise information - showing user noise data for
+    #       requested qubits.
+    # 5. Informative helper methods - for giving additional information to
+    #       the user.
+    # =========================================================================
+
+    # =========================================================================
+    # 1. Initialization (constructor method).
+    # =========================================================================
+
     def __init__(self) -> None:
         """Constructor method """
         msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(
             class_name=self.__class__.__name__))
         
         self.__key_manager = KeyAvailabilityManager()
-        self.__noise_data: dict[str, str | pandas.DataFrame] = {}
+        self.__noise_data: dict[str, NoiseDataInstance] = {}
 
         msg.add_message(MESSAGES["created_new_object"], 
                         class_name=self.__class__.__name__)
@@ -31,10 +52,13 @@ class NoiseDataManager:
         msg.end_output()
 
     
-    # Class properties
+    # =========================================================================
+    # 2. Class properties.
+    # =========================================================================
+
     @property
     def key_manager(self) -> KeyAvailabilityManager:
-        """Returns a reference to a KeyAvailabilityManager
+        """Returns a reference to a `KeyAvailabilityManager` object
         
         A manager that will be used across all main manager
         classes to keep track of blocked keys:
@@ -52,91 +76,10 @@ class NoiseDataManager:
         return self.__noise_data
     
 
-    # Public class methods
-
-    def get_qubit_noise_information(
-            self, 
-            reference_key: str, 
-            qubits: int | list[int] = None
-    ) -> None:
-        """Prints out noise data for certain qubits from a specific 
-        data instance.
-        
-        Retrieves and prints out all noise data from a specific noise
-        data instance for the selected qubits by the user.
-
-        Args:
-            reference_key (str): Key that is used to access a specific 
-                noise datainstance from all of the currently available
-                ones.
-            qubits (int | list[int]): Either a single qubit number or 
-                a list of qubit numbers, for which the noise data will 
-                be retrieved and printed out so the user can see the 
-                specific data.
-        
-        Raises:
-            ValueError: If nothing is passed as the argument `qubits`.
-        """
-        msg.create_output(
-            OUTPUT_HEADINGS["retrieving_qubits"].format(
-                qubits=qubits,
-                reference_key=reference_key))
-        
-        try:
-            check_instance_key(reference_key=reference_key,
-                               should_exist=True,
-                               instances=self.__noise_data,
-                               instance_type="noise data instance")
-            dataframe = self.__noise_data[reference_key]["dataframe"]
-
-            if not qubits:
-                raise ValueError(ERRORS["no_qubits_numbers"])
-
-            if isinstance(qubits, int):
-                qubits = [qubits]
-
-            self.__check_qubit_input(dataframe, qubits)
-        except Exception:
-            msg.add_traceback()
-            return
-
-        msg.create_content_container(container_id="qubit-noise-data",
-                                         content_heading="Retrieved qubits")
-        for qubit in qubits:
-            msg.create_content_box(box_id="qubit-noise-content-box", 
-                                   parent_id="qubit-noise-data")
-
-            msg.add_table(container_id="qubit-noise-content-box")
-
-            qubit_str = msg.style_highlight(text=str(qubit))
-            msg.add_table_row(row_content=["Qubit number", qubit_str],
-                              row_type="td")
-            for column in CSV_COLUMNS.keys():
-                if CSV_COLUMNS[column]["csv_name"] in dataframe.columns:
-                    name = CSV_COLUMNS[column]["name"]
-                    value = dataframe.loc[qubit, 
-                                          CSV_COLUMNS[column]["csv_name"]]
-                    value_str = msg.style_highlight(text=str(value))
-                    msg.add_table_row(row_content=[name, value_str],
-                                      row_type="td")
-        
-        msg.add_message(MESSAGES["qubit_noise_data_retrieved"],
-                        reference_key=reference_key)
-        msg.end_output()
-
-
-    def help_csv_columns(self) -> None:
-        """Prints out information about all dataframe columns."""
-        msg.create_output(OUTPUT_HEADINGS["csv_information"])
-        msg.modify_content_title("Calibration data attributes:")
-
-        for column in CSV_COLUMNS.keys():
-            name = CSV_COLUMNS[column]["name"]
-            description = CSV_COLUMNS[column]["description"]
-            msg.add_message(f"{name}: {description}", [name])
-        
-        msg.end_output()
-
+    # =========================================================================
+    # 3. Noise data instance management - creating new instances, viewing and
+    #       deleting existing ones.
+    # =========================================================================
 
     def import_csv_data(
             self, 
@@ -160,8 +103,7 @@ class NoiseDataManager:
         """
         msg.create_output(OUTPUT_HEADINGS["importing_csv"])
 
-        reference_key = validate_instance_name(reference_key,
-                                               msg)
+        reference_key = validate_instance_name(reference_key)
         
         try:
             # Does key exist among created noise data instances
@@ -170,115 +112,61 @@ class NoiseDataManager:
                                instances=self.__noise_data,
                                instance_type="noise data instance")
             # Is key being blocked by a noise model instance reference
-            self.__key_manager.check_blocked_key(
-                key=reference_key,
-                instance_type="noise_data")
-        except Exception:
+            self.__key_manager.check_blocked_key(key=reference_key,
+                                                 instance_type="noise_data")
+        except INSError:
             msg.add_traceback()
             return
 
-        new_instance = {}
-
         csv_file = Path(file_path)
-
         file_name = csv_file.name
-        new_instance["name"] = file_name
-        
         full_path = str(csv_file.resolve())
-        new_instance["path"] = full_path
 
         msg.add_message(
             MESSAGES["import_csv_file_information"],
             file_name=file_name,
-            file_path=full_path
-        )
+            file_path=full_path)
 
+        # Processing imported CSV file:
         dataframe = pandas.read_csv(file_path)
         self.__remove_unnecessary_collumns(dataframe)
         self.__add_additional_columns(dataframe)
         self.__modify_dataframe_data(dataframe)
-        new_instance["dataframe"] = dataframe
-
+        
+        # Defining new noise data instance
+        new_instance = NoiseDataInstance(
+            file_name=file_name,
+            full_path=full_path,
+            dataframe=dataframe)
         self.__noise_data[reference_key] = new_instance
         
         msg.add_message(
             MESSAGES["successful_csv_import"],
-            reference_key=reference_key
-        )
-        msg.end_output()
-
-
-    def remove_noise_data_instance(self, reference_key: str) -> None:
-        """Removes existing noise data instance by reference key.
-        
-        Args:
-            reference_key (str): Key of the removable noise data
-                instance.
-        """
-        msg.create_output(
-            OUTPUT_HEADINGS["remove_instance"].format(
-                instance_type="noise data instance",
-                reference_key=reference_key))
-        
-        try:
-            check_instance_key(reference_key=reference_key,
-                               should_exist=True,
-                               instances=self.__noise_data,
-                               instance_type="noise data instance")
-        except Exception:
-            msg.add_traceback()
-            return
-
-        del self.__noise_data[reference_key]
-        msg.add_message(
-            MESSAGES["deleted_instance"],
-            instance_type="noise data instance",
             reference_key=reference_key)
         msg.end_output()
 
 
-    def view_noise_data_instances(self) -> None:
-        """Displays all currently available noise data instances.
+    def __remove_unnecessary_collumns(
+            self, 
+            dataframe: pandas.DataFrame
+    ) -> None:
+        """Removes data columns that are not used to simulate noise.
 
-        If no instances are available, method simply displays a
-        message that states this fact.
-        The visual output from this method is placed inside of the
-        default "message" content container.
+        Helper methods for class method `import_csv_data`.
 
-        Displayed information includes:
-        - Reference key for the current instance;
-        - File name, from which the data was imported;
-        - Full path to this file on the local device (this does not
-          update if the file was moved, it only shows the original
-          location from the import process).
+        Not all columns in the provided CSV files are used in the
+        creation of errors for a noise model, therefore they are 
+        removed. A list of all removable columns is available in the 
+        configuration file `config.json` as `not_required_columns`.
+
+        Args:
+            dataframe (pandas.DataFrame): Dataframe from which the 
+                columns will be removed.
         """
-        msg.create_output(OUTPUT_HEADINGS["created_instances"].format(
-            instance_type="noise data instances"))
-        msg.modify_content_title("Noise data instances:")
+        for column in CONFIG["not_required_columns"]:
+            if column in dataframe.columns:
+                dataframe.pop(column)
 
-        if self.__noise_data:
-
-            msg.add_table(container_id="messages")
-            msg.add_table_row(
-                row_content=["Reference key", "Source file", 
-                             "Source file path on device"],
-                row_type="th")
-
-            for key, instance in self.__noise_data.items():
-                file_name = msg.style_italic(instance["name"])
-                file_path = msg.style_file_path(instance["path"])
-                
-                msg.add_table_row(
-                    row_content=[key, file_name, file_path],
-                    row_type="td")
-        else:
-            msg.add_message(MESSAGES["no_instances"],
-                            instance_type="imported noise data instances")
-        
-        msg.end_output()
-
-
-    # Private class methods
 
     def __add_additional_columns(self, dataframe: pandas.DataFrame) -> None:
         """Adds additional columns for noise data storage.
@@ -310,43 +198,6 @@ class NoiseDataManager:
         # at some point in time
         dataframe[CSV_COLUMNS["reset_time"]["csv_name"]] = 1300
         msg.add_message(MESSAGES["reset_time"])
-
-
-    def __check_qubit_input(
-            self, 
-            dataframe: pandas.DataFrame, 
-            qubits: list[int]
-    ) -> None:
-        """Validates input qubit numbers for method 
-        `get_qubit_noise_information`.
-
-        Helper method checks if the passed qubit numbers are above 0
-        and below the max index of qubits based on the selected dataframe.
-
-        Args:
-            datafrane (pandas.DataFrame): The dataframe, from which the 
-                information will be extracted from. Here it is only used 
-                to check the total number of qubits.
-            qubits (list[int]): Numbers of qubits that got passed as
-                arguments.
-
-        Raises:
-            ValueError:
-                - If qubit number is lower than 0;
-                - If qubit number exceeds max qubit number.
-        """
-        qubit_count = len(dataframe) - 1
-        for qubit in qubits:
-            
-            if qubit < 0:
-                raise ValueError(
-                    ERRORS["negative_qubit_number"].format(
-                        qubit=qubit))
-            
-            elif qubit > qubit_count:
-                raise ValueError(ERRORS["large_qubit_number"].format(
-                    qubit=qubit,
-                    max_qubits=qubit_count))
 
 
     def __modify_dataframe_data(self, dataframe: pandas.DataFrame) -> None:
@@ -402,23 +253,206 @@ class NoiseDataManager:
                         are_neighbors_found = True
 
 
-    def __remove_unnecessary_collumns(
+    def view_noise_data_instances(self) -> None:
+        """Displays all currently available noise data instances.
+
+        If no instances are available, method simply displays a
+        message that states this fact.
+        The visual output from this method is placed inside of the
+        default "message" content container.
+
+        Displayed information includes:
+        - Reference key for the current instance;
+        - File name, from which the data was imported;
+        - Full path to this file on the local device (this does not
+          update if the file was moved, it only shows the original
+          location from the import process).
+        """
+        msg.create_output(OUTPUT_HEADINGS["created_instances"].format(
+            instance_type="noise data instances"))
+        msg.modify_content_title("Noise data instances:")
+
+        if self.__noise_data:
+
+            msg.add_table(container_id="messages")
+            msg.add_table_row(
+                row_content=["Reference key", "Source file", 
+                             "Source file path on device"],
+                row_type="th")
+
+            for key, instance in self.__noise_data.items():
+                file_name = msg.style_italic(instance.file_name)
+                file_path = msg.style_file_path(instance.full_path)
+                
+                msg.add_table_row(
+                    row_content=[key, file_name, file_path],
+                    row_type="td")
+        else:
+            msg.add_message(MESSAGES["no_instances"],
+                            instance_type="imported noise data instances")
+        
+        msg.end_output()
+
+
+    def remove_noise_data_instance(self, reference_key: str) -> None:
+        """Removes existing noise data instance by reference key.
+        
+        Args:
+            reference_key (str): Key of the removable noise data
+                instance.
+        """
+        msg.create_output(
+            OUTPUT_HEADINGS["remove_instance"].format(
+                instance_type="noise data instance",
+                reference_key=reference_key))
+        
+        try:
+            # Is there even an instance to delete with given key
+            check_instance_key(reference_key=reference_key,
+                               should_exist=True,
+                               instances=self.__noise_data,
+                               instance_type="noise data instance")
+        except INSError:
+            msg.add_traceback()
+            return
+
+        del self.__noise_data[reference_key]
+        
+        msg.add_message(
+            MESSAGES["deleted_instance"],
+            instance_type="noise data instance",
+            reference_key=reference_key)
+        msg.end_output()
+
+
+    # =========================================================================
+    # 4. Retrieving qubit noise information - showing user noise data for
+    #       requested qubits.
+    # =========================================================================
+
+    def get_qubit_noise_information(
             self, 
-            dataframe: pandas.DataFrame
+            reference_key: str, 
+            qubits: int | list[int] = None
     ) -> None:
-        """Removes data columns that are not used to simulate noise.
-
-        Helper methods for class method `import_csv_data`.
-
-        Not all columns in the provided CSV files are used in the
-        creation of errors for a noise model, therefore they are 
-        removed. A list of all removable columns is available in the 
-        configuration file `config.json` as `not_required_columns`.
+        """Prints out noise data for certain qubits from a specific 
+        data instance.
+        
+        Retrieves and prints out all noise data from a specific noise
+        data instance for the selected qubits by the user.
 
         Args:
-            dataframe (pandas.DataFrame): Dataframe from which the 
-                columns will be removed.
+            reference_key (str): Key that is used to access a specific 
+                noise datainstance from all of the currently available
+                ones.
+            qubits (int | list[int]): Either a single qubit number or 
+                a list of qubit numbers, for which the noise data will 
+                be retrieved and printed out so the user can see the 
+                specific data.
+        
+        Raises:
+            InputArgumentError: If nothing is passed as the argument 
+                `qubits`.
         """
-        for column in CONFIG["not_required_columns"]:
-            if column in dataframe.columns:
-                dataframe.pop(column)
+        msg.create_output(
+            OUTPUT_HEADINGS["retrieving_qubits"].format(
+                qubits=qubits,
+                reference_key=reference_key))
+        
+        try:
+            if not qubits:
+                raise InputArgumentError(ERRORS["no_qubits_numbers"])
+            
+            # Checks if noise data instance exists
+            check_instance_key(reference_key=reference_key,
+                               should_exist=True,
+                               instances=self.__noise_data,
+                               instance_type="noise data instance")
+            
+            if isinstance(qubits, int):
+                qubits = [qubits]
+            
+            dataframe = self.__noise_data[reference_key].dataframe
+            self.__check_qubit_input(dataframe, qubits)
+        except INSError:
+            msg.add_traceback()
+            return
+
+        msg.create_content_container(container_id="qubit-noise-data",
+                                         content_heading="Retrieved qubits")
+        for qubit in qubits:
+            msg.create_content_box(box_id="qubit-noise-content-box", 
+                                   parent_id="qubit-noise-data")
+            msg.add_table(container_id="qubit-noise-content-box")
+
+            qubit_str = msg.style_highlight(text=str(qubit))
+            msg.add_table_row(row_content=["Qubit number", qubit_str],
+                              row_type="td")
+            
+            for column in CSV_COLUMNS.values():
+                if column["csv_name"] in dataframe.columns:
+                    name = column["name"]
+                    value = dataframe.loc[qubit, 
+                                          column["csv_name"]]
+                    value_str = msg.style_highlight(text=str(value))
+                    msg.add_table_row(row_content=[name, value_str],
+                                      row_type="td")
+        
+        msg.add_message(MESSAGES["qubit_noise_data_retrieved"],
+                        reference_key=reference_key)
+        msg.end_output()
+
+
+    def __check_qubit_input(
+            self, 
+            dataframe: pandas.DataFrame, 
+            qubits: list[int]
+    ) -> None:
+        """Validates input qubit numbers for method 
+        `get_qubit_noise_information()`.
+
+        Helper method checks if the passed qubit numbers are above 0
+        and below the max index of qubits based on the selected dataframe.
+
+        Args:
+            datafrane (pandas.DataFrame): The dataframe, from which the 
+                information will be extracted from. Here it is only used 
+                to check the total number of qubits.
+            qubits (list[int]): Numbers of qubits that got passed as
+                arguments.
+
+        Raises:
+            InputArgumentError:
+                - If qubit number is lower than 0;
+                - If qubit number exceeds max qubit number.
+        """
+        qubit_count = len(dataframe) - 1
+        for qubit in qubits:
+            
+            if qubit < 0:
+                raise InputArgumentError(
+                    ERRORS["negative_qubit_number"].format(
+                        qubit=qubit))
+            
+            elif qubit > qubit_count:
+                raise InputArgumentError(ERRORS["large_qubit_number"].format(
+                    qubit=qubit,
+                    max_qubits=qubit_count))
+
+
+    # =========================================================================
+    # 5. Informative helper methods - for giving additional information to
+    #       the user.
+    # =========================================================================
+
+    def help_csv_columns(self) -> None:
+        """Prints out information about all dataframe columns."""
+        msg.create_output(OUTPUT_HEADINGS["csv_information"])
+        msg.modify_content_title("Calibration data attributes:")
+
+        for column in CSV_COLUMNS.values():
+            name = column["name"]
+            description = column["description"]
+            msg.add_message(f"{name}: {description}", [name])
+        
+        msg.end_output()
