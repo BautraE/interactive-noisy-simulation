@@ -17,6 +17,9 @@ class BlockedKeyError(INSError):
     """Raised when user specified new instance key is currently blocked and
     cannot be used for any new instance of a specific type."""
 
+class FileTypeError(INSError):
+    """Raised when an imported file is with of a wrong type."""
+
 class InputArgumentError(INSError):
     """Raised when error is related to user method argument input."""
 

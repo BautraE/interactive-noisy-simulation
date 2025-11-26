@@ -1,72 +1,34 @@
 # Standard library imports:
-import re
+import os, re
 
 # Local project imports:
-from ..exceptions import KeyExistanceError
+from ..exceptions import FileTypeError
 from ..messages._message_manager import message_manager as msg
 from ..data._data import (
     ERRORS, MESSAGES
 )
 
 
-def check_instance_key(
-        reference_key: str,
-        should_exist: bool,
-        instances: dict,
-        instance_type: str,
-        raise_error: bool = True 
-) -> bool:
-    """Checks if the given key is linked to an existing instance.
-
-    Args:
-        reference_key (str): The reference key that will be checked.
-        should_exist (bool): Should the reference key exist among the
-            current instances (switches between two modes of checking).
-        instances (dict): Data structure containing instances that need
-            to be checked based on the given `reference_key` (does that
-            instance exist or not).
-        instance_type (str): Message fragment that will be used in the
-            case of an exception. The error message is currently made so
-            that it can be reused in more than one scenario by replacing
-            placeholders with appropriate message fragments.
-        raise_error (bool): Should an error be raised (Default = True). 
-            If left set as `False`, the bool value `False` will be returned
-            instead of an exception.
-
-    Returns:
-        bool:
-            - `True` if an instance with the requested key exists.
-            - `False` if an instance with the requested key does not exist.
- 
-    Raises:
-        KeyExistanceError: If an instance with the requested key does not
-            exist and it was not specified to not raise an exception 
-            (instead of returning `False`, it will just raise an exception).
-    """
-    # If key should exist among current instances
-    if should_exist:
-        if reference_key in instances:
-            return True
-        
-        elif raise_error:
-            raise KeyExistanceError(
-                    ERRORS["no_key_instance"].format(
-                        instance_type=instance_type,
-                        reference_key=reference_key))
-        else:
-            return False
-    # If key should not exist among current instances    
-    else:
-        if not reference_key in instances:
-            return True
+def validate_file_type(
+        file_path: str,
+        expected_ext: tuple[str, ...]
+) -> None:
+    """Validates user input file types.
     
-        elif raise_error:
-            raise KeyExistanceError(
-                    ERRORS["instance_key_exists"].format(
-                        instance_type=instance_type,
-                        reference_key=reference_key))
-        else:
-            return False
+    Args:
+        file_path (str): Path to the selected file.
+        expected_ext (tuple[str, ...]): List of acceptable file
+            extensions in the form of a string tuple.
+    
+    Raises:
+        FileTypeError: if current file type does not match any of the 
+            required ones.
+    """
+    if not file_path.endswith(expected_ext):
+        _, current_ext = os.path.splitext(file_path)
+        raise FileTypeError(
+            ERRORS["incorrect_file_type"].format(current_ext=current_ext,
+                                                 expected_ext=expected_ext))
 
 
 def validate_instance_name(

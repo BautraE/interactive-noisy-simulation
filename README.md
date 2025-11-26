@@ -30,7 +30,8 @@ The rest of this `README.md` file will consist of changes and comments related t
     - `NoiseDataInstance`
     - `NoiseModelInstance`
     - `SimulatorInstance`
-
+- There is a new folder `helpers` within the folder `messages`. It contains python files with functions that were separated from `MessageManager`. Currently all functions related to applying certain styles to given text have been moved to a new file `text_styling.py`.
+- Slight function reorganizing has been done in the `utils` folder.
 
 ### Additional Comments:
 

@@ -5,13 +5,15 @@ from pathlib import Path
 import numpy, pandas
 
 # Local project imports:
-from .utils.key_availability import KeyAvailabilityManager
+from .utils.key_blocker import KeyBlocker
 from .data_structures.noise_data_instance import NoiseDataInstance
-from .exceptions import (
-    INSError, InputArgumentError
+from .exceptions import INSError
+from .messages.helpers.text_styling import (
+    style_file_path, style_highlight, style_italic
 )
+from .utils.checkers import check_instance_key
 from .utils.validators import (
-    check_instance_key, validate_instance_name
+    validate_file_type, validate_instance_name
 )
 from .messages._message_manager import message_manager as msg
 from .data._data import (
@@ -43,7 +45,7 @@ class NoiseDataManager:
         msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(
             class_name=self.__class__.__name__))
         
-        self.__key_manager = KeyAvailabilityManager()
+        self.__key_blocker = KeyBlocker()
         self.__noise_data: dict[str, NoiseDataInstance] = {}
 
         msg.add_message(MESSAGES["created_new_object"], 
@@ -57,8 +59,8 @@ class NoiseDataManager:
     # =========================================================================
 
     @property
-    def key_manager(self) -> KeyAvailabilityManager:
-        """Returns a reference to a `KeyAvailabilityManager` object
+    def key_blocker(self) -> KeyBlocker:
+        """Returns a reference to a `KeyBlocker` object
         
         A manager that will be used across all main manager
         classes to keep track of blocked keys:
@@ -66,7 +68,7 @@ class NoiseDataManager:
             - `NoiseCreator`
             - `SimulatorManager`
         """
-        return self.__key_manager
+        return self.__key_blocker
 
 
     @property    
@@ -112,8 +114,10 @@ class NoiseDataManager:
                                instances=self.__noise_data,
                                instance_type="noise data instance")
             # Is key being blocked by a noise model instance reference
-            self.__key_manager.check_blocked_key(key=reference_key,
+            self.__key_blocker.check_blocked_key(key=reference_key,
                                                  instance_type="noise_data")
+            # Makes sure that imported file is CSV type
+            validate_file_type(file_path, expected_ext=(".csv", ".CSV"))
         except INSError:
             msg.add_traceback()
             return
@@ -281,8 +285,8 @@ class NoiseDataManager:
                 row_type="th")
 
             for key, instance in self.__noise_data.items():
-                file_name = msg.style_italic(instance.file_name)
-                file_path = msg.style_file_path(instance.full_path)
+                file_name = style_italic(instance.file_name)
+                file_path = style_file_path(instance.full_path)
                 
                 msg.add_table_row(
                     row_content=[key, file_name, file_path],
@@ -333,7 +337,7 @@ class NoiseDataManager:
     def get_qubit_noise_information(
             self, 
             reference_key: str, 
-            qubits: int | list[int] = None
+            qubits: int | list[int]
     ) -> None:
         """Prints out noise data for certain qubits from a specific 
         data instance.
@@ -359,44 +363,34 @@ class NoiseDataManager:
                 qubits=qubits,
                 reference_key=reference_key))
         
+        if isinstance(qubits, int):
+            qubits = [qubits]
+        
         try:
-            if not qubits:
-                raise InputArgumentError(ERRORS["no_qubits_numbers"])
-            
             # Checks if noise data instance exists
             check_instance_key(reference_key=reference_key,
                                should_exist=True,
                                instances=self.__noise_data,
                                instance_type="noise data instance")
-            
-            if isinstance(qubits, int):
-                qubits = [qubits]
-            
-            dataframe = self.__noise_data[reference_key].dataframe
-            self.__check_qubit_input(dataframe, qubits)
+            instance = self.__noise_data[reference_key]
+            # Do the specified numbers refer to existing qubits in dataframe
+            self.__check_qubit_input(instance, qubits)
         except INSError:
             msg.add_traceback()
             return
 
         msg.create_content_container(container_id="qubit-noise-data",
-                                         content_heading="Retrieved qubits")
+                                     content_heading="Retrieved qubits")
         for qubit in qubits:
             msg.create_content_box(box_id="qubit-noise-content-box", 
                                    parent_id="qubit-noise-data")
             msg.add_table(container_id="qubit-noise-content-box")
 
-            qubit_str = msg.style_highlight(text=str(qubit))
-            msg.add_table_row(row_content=["Qubit number", qubit_str],
-                              row_type="td")
-            
-            for column in CSV_COLUMNS.values():
-                if column["csv_name"] in dataframe.columns:
-                    name = column["name"]
-                    value = dataframe.loc[qubit, 
-                                          column["csv_name"]]
-                    value_str = msg.style_highlight(text=str(value))
-                    msg.add_table_row(row_content=[name, value_str],
-                                      row_type="td")
+            qubit_data = instance.get_qubit_data(qubit)
+            for name, value in qubit_data.items():
+                value = style_highlight(text=str(value))
+                msg.add_table_row(row_content=[name, value],
+                                  row_type="td")
         
         msg.add_message(MESSAGES["qubit_noise_data_retrieved"],
                         reference_key=reference_key)
@@ -405,39 +399,20 @@ class NoiseDataManager:
 
     def __check_qubit_input(
             self, 
-            dataframe: pandas.DataFrame, 
+            data_instance: NoiseDataInstance, 
             qubits: list[int]
     ) -> None:
-        """Validates input qubit numbers for method 
-        `get_qubit_noise_information()`.
+        """Validates input qubit numbers for a specific noise data instance.
 
-        Helper method checks if the passed qubit numbers are above 0
-        and below the max index of qubits based on the selected dataframe.
+        Checking functionality comes from NoiseDataInstance class object.
 
         Args:
-            datafrane (pandas.DataFrame): The dataframe, from which the 
-                information will be extracted from. Here it is only used 
-                to check the total number of qubits.
-            qubits (list[int]): Numbers of qubits that got passed as
-                arguments.
-
-        Raises:
-            InputArgumentError:
-                - If qubit number is lower than 0;
-                - If qubit number exceeds max qubit number.
+            data_instance (NoiseDataInstance): Noise data instance that
+                will be checked.
+            qubits (list[int]): Qubit numbers that will be validated.
         """
-        qubit_count = len(dataframe) - 1
         for qubit in qubits:
-            
-            if qubit < 0:
-                raise InputArgumentError(
-                    ERRORS["negative_qubit_number"].format(
-                        qubit=qubit))
-            
-            elif qubit > qubit_count:
-                raise InputArgumentError(ERRORS["large_qubit_number"].format(
-                    qubit=qubit,
-                    max_qubits=qubit_count))
+            data_instance.validate_qubit_number(qubit)
 
 
     # =========================================================================

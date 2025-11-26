@@ -11,6 +11,7 @@ from pygments.formatters import HtmlFormatter
 # Local project imports:
 from .. import messages
 from ..exceptions import DeveloperError
+from .helpers.text_styling import style_highlight
 from ..data._data import (
     DEV_ERRORS, MESSAGES
 )
@@ -41,9 +42,7 @@ class MessageManager:
     # 6. Additional content container / box creation.
     # 7. Creating tables and table content.
     # 8. Modification of default message log content container / content box.
-    # 9. Text styling - methods used for applying certain styles to texts 
-    #       before sending them to be rendered in an output box.
-    # 10. Other miscelaneous methods - additional methods that provide extra
+    # 9. Other miscelaneous methods - additional methods that provide extra
     #       functionality, but can't be categorized under any other section.
     # =========================================================================
 
@@ -78,6 +77,8 @@ class MessageManager:
             heading (str): Text for the output box title (main title at 
                 the top of the container).
         """
+        self.__remove_element_ids()
+
         heading = self.__escape_text(heading)
         display(HTML(self.__content_block))
         display(Javascript(f"setOutputHeading('{heading}');"))
@@ -362,7 +363,7 @@ class MessageManager:
                 is_next_allowed = True
 
             if is_prev_allowed and is_next_allowed:
-                message = self.style_highlight(
+                message = style_highlight(
                     text=highlightable,
                     message=message,
                     start_position=start,
@@ -595,104 +596,7 @@ class MessageManager:
 
 
     # =========================================================================
-    # 9. Text styling - methods used for applying certain styles to texts 
-    #       before sending them to be rendered in an output box.
-    # =========================================================================
-
-    def style_availability_status(self, text: str) -> str:
-        """Adds according style to the availability status text.
-
-        In theory, any text can be passed here, but the style will
-        only be applied to specific texts.
-        
-        Args:
-            text (str): Text that needs style added to it.
-
-        Returns:
-            str: Modified text with added HTML style elements.
-        """
-        if text == "Available":
-            return f"<span class='available-instance'>{text}</span>"
-        else:
-            return f"<span class='removed-instance'>{text}</span>"
-        
-
-    def style_file_path(self, text: str) -> str:
-        """Adds specific custom style for file path text.
-
-        In theory, any text can be passed here, but the specific
-        separator symbols will be highlighted only if they are
-        present in the text.
-        
-        Args:
-            text (str): Text that needs style added to it.
-
-        Returns:
-            str: Modified text with added HTML style elements.
-        """
-        new_text = re.sub(
-            pattern=r'[\\/]', 
-            repl=lambda m: 
-                f"<span class='path-separators'>{m.group(0)}</span>",
-            string=text)
-        return f"<span class='path-texts'>{new_text}</span>"
-    
-    
-    def style_highlight(
-            self, 
-            text: str,
-            message: str = "", 
-            start_position: int = 0, 
-            end_position: int = 0
-    ) -> str:
-        """Adds highlight style to given text.
-
-        Accomplished by adding specific `span` *HTML* tags around
-        highlightable parts.
-
-        By default (if only the argument `text` is provided), this function
-        highlights the entire given text. 
-
-        If the other arguments are given, there will be a different result.
-        It will take the current message and add `span` *HTML* tags around 
-        the highlightable `message` fragment (argument `text`). This is 
-        accomplished with the start and end position of the highlightable 
-        part by creating a new message that consists of:
-            1. everything before the highlightable part;
-            2. the highlightable fragment with added HTML tags;
-            3. everything after the highlightable part.
-
-        Args:
-            text (str): Text that will be highlighted (highlightable).
-            message (str): Message that the `highlightable` text is part of.
-                (Default: `""`)
-            start_position (int): Start position of the highlightable
-                fragment inside of the entire message.(Default: `0`)
-            end_position (int): End position of the highlightable
-                fragment inside of the entire message.(Default: `0`)
-        
-        Returns:
-            str: Only the highlighted `text` or the entire message, where
-                `text` fragments are highlighted.
-        """
-        highlighted_text = f"<span class='highlighted-text'>{text}</span>"
-        return message[:start_position] + highlighted_text + message[end_position:]
-
-
-    def style_italic(self, text: str) -> str:
-        """Adds italic style to the given text.
-        
-        Args:
-            text (str): Text that needs style added to it.
-
-        Returns:
-            str: Modified text with added HTML style elements.
-        """
-        return f"<i>{text}</i>"
-
-
-    # =========================================================================
-    # 10. Other miscelaneous methods - additional methods that provide extra
+    # 9. Other miscelaneous methods - additional methods that provide extra
     #       functionality, but can't be categorized under any other section.
     # =========================================================================
 

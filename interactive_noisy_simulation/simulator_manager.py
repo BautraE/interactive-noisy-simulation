@@ -11,9 +11,10 @@ from .data_structures.simulator_instance import SimulatorInstance
 from .exceptions import (
     INSError, InputArgumentError, MissingLinkError
 )
-from .utils.validators import (
-    check_instance_key, validate_instance_name
+from .utils.checkers import (
+    check_instance_key, check_source_availability
 )
+from .utils.validators import validate_instance_name
 from .messages._message_manager import message_manager as msg
 from .data._data import (
     ERRORS, MESSAGES, OUTPUT_HEADINGS
@@ -21,7 +22,7 @@ from .data._data import (
 
 # Imports only used for type definition:
 from qiskit_aer.jobs.aerjob import AerJob
-from .utils.key_availability import KeyAvailabilityManager
+from .utils.key_blocker import KeyBlocker
 from .data_structures.noise_model_instance import NoiseModelInstance
 from qiskit import QuantumCircuit
 
@@ -46,7 +47,7 @@ class SimulatorManager:
         msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(
             class_name=self.__class__.__name__))
 
-        self.__key_manager: KeyAvailabilityManager = None
+        self.__key_blocker: KeyBlocker = None
         self.__simulators: dict[str, SimulatorInstance] = {}
         self.__noise_models: dict[str, NoiseModelInstance] = None
 
@@ -82,7 +83,7 @@ class SimulatorManager:
             this_class=self.__class__.__name__))
         
         self.__noise_models = noise_creator.noise_models
-        self.__key_manager = noise_creator.key_manager
+        self.__key_blocker = noise_creator.key_blocker
         
         msg.add_message(MESSAGES["linking_success"])
         msg.end_output()
@@ -148,7 +149,7 @@ class SimulatorManager:
 
         # Blocks noise model instance key until this simulator instance
         # gets deleted (simulator has reference to used noise model key)
-        self.__key_manager.block_key(key=noise_model_reference_key,
+        self.__key_blocker.block_key(key=noise_model_reference_key,
                                      instance_type="noise_models",
                                      blocker_key=simulator_reference_key)
         
@@ -191,23 +192,16 @@ class SimulatorManager:
 
             for simulator_key, instance in self.__simulators.items():
                 # Obtaining required information:
-                if check_instance_key(reference_key=instance.noise_model_source,
-                                      should_exist=True, 
-                                      instances=self.__noise_models,
-                                      instance_type="noise model instance",
-                                      raise_error=False):
-                    availability = "Available"
-                else: 
-                    availability = "Removed"
-                noise_model_availability = msg.style_availability_status(
-                    availability)
+                availability = check_source_availability(
+                    source_reference_key=instance.noise_model_source,
+                    source_instances=self.__noise_models)
                 # Adding row to table:
                 msg.add_table_row(
                     row_content=[simulator_key, 
                                  str(instance.get_qubit_count()), 
                                  instance.has_noise(),
                                  instance.noise_model_source, 
-                                 noise_model_availability],
+                                 availability],
                     row_type="td")
         
         # If no noise model instances exist
@@ -243,7 +237,7 @@ class SimulatorManager:
         # Unblocking referenced noise data key
         instance = self.__simulators[reference_key]
         noise_model_reference_key = instance.noise_model_source
-        self.__key_manager.unblock_key(key=noise_model_reference_key,
+        self.__key_blocker.unblock_key(key=noise_model_reference_key,
                                        instance_type="noise_models")
 
         del self.__simulators[reference_key]
@@ -291,7 +285,9 @@ class SimulatorManager:
             reference_key=simulator_reference_key))
         
         try:
+            # Is optimization level in the range 0-3
             self.__validate_optimization_level(optimization)
+            # Is there a simulator instance with the given reference key
             check_instance_key(reference_key=simulator_reference_key,
                                should_exist=True, 
                                instances=self.__simulators,

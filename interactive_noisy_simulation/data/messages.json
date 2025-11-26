@@ -8,15 +8,17 @@
     "errors": {
         "blocked_reference_key": "The provided reference key '{reference_key}' cannot be currently used for a new {instance_type} instance as it is being referenced by a {blocker_instance_type} instance with the reference key '{blocker}'!",
 
+        "incorrect_file_type": "The currently imported file type '{current_ext}' is unsupported for this action! The expected file types are: {expected_ext}!",
+
         "instance_key_exists": "There already exists a {instance_type} with the reference key '{reference_key}'! Either remove it first or use a different reference key!",
 
         "invalid_optimization_level": "The given optimization level '{optimization_level}' is invalid! Valid values are between 0 and 3 (inclusive)!",
         
+        "invalid_status": "The specified status '{invalid_status}' is not valid! Valid statuses are: {valid_statuses}",
+        
         "large_qubit_number": "There is no qubit with the number {qubit}. The largest number to access a qubit from this data is {max_qubits}!",
 
         "negative_qubit_number": "Qubit numbers cannot be lower than 0! The number {qubit} goes against this!",
-
-        "no_qubits_numbers": "At least one qubit number must be given in order to retrieve noise data!",
 
         "no_key_instance": "There is currently no available {instance_type} with the reference key '{reference_key}'!",
 

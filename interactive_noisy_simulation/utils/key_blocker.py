@@ -4,7 +4,7 @@ from ..data._data import (
     ERRORS
 )
 
-class KeyAvailabilityManager:
+class KeyBlocker:
 
     def __init__(self) -> None:
         """Constructor method."""
