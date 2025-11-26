@@ -1,4 +1,9 @@
 {
+    "qubit_number": {
+        "name": "Qubit",
+        "csv_name": "Qubit",
+        "description": "Number of the qubit."
+    },
     "neighboring_qubits": {
         "name": "Directionally connected qubits",
         "csv_name": "Neighboring qubits (directional to)",

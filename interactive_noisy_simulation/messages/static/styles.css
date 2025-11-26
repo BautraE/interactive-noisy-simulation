@@ -103,19 +103,13 @@ div.traceback-boxes pre {
     color: white;
 }
 
+
 /* ---------- STATUS MESSAGE */
 p.status-messages {
     text-align: right;
     text-transform: uppercase;
 }
 
-/* ---------- QUBIT NOISE DATA */
-/* Table cells */
-table.tables tr 
-td.qubit-noise-data-cells {
-    width: 50%;
-    text-align: left;
-}
 
 /* ---------- GENERAL TABLE STYLES */
 div table.tables {
@@ -188,7 +182,7 @@ tr.header-rows th div.cell-content{
     max-width: 200px;
 }
 
-/* CERTAIN TEXT PART STYLES */
+/* ---------- CERTAIN TEXT PART STYLES */
 
 .path-texts {
     color: #DFBFFF;
@@ -209,7 +203,6 @@ tr.header-rows th div.cell-content{
     color:#FF8A8A;
 }
 
-.highlighted-text,
-td.highlighted-text {
+.highlighted-text {
     color: #FFD173;
 }

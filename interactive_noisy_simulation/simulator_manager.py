@@ -6,39 +6,93 @@ from qiskit import transpile
 from qiskit_aer import AerSimulator
 
 # Local project imports:
-from .messages._message_manager import MessageManager
 from .noise_creator import NoiseCreator
-from .utils.validators import (
-    check_instance_key, validate_instance_name
+from .data_structures.simulator_instance import SimulatorInstance
+from .exceptions import (
+    INSError, InputArgumentError, MissingLinkError
 )
+from .utils.checkers import (
+    check_instance_key, check_source_availability
+)
+from .utils.validators import validate_instance_name
+from .messages._message_manager import message_manager as msg
 from .data._data import (
     ERRORS, MESSAGES, OUTPUT_HEADINGS
 )
 
 # Imports only used for type definition:
 from qiskit_aer.jobs.aerjob import AerJob
+from .utils.key_blocker import KeyBlocker
+from .data_structures.noise_model_instance import NoiseModelInstance
 from qiskit import QuantumCircuit
 
 
 class SimulatorManager:
+    # =========================================================================
+    # Table of Contents for NoiseCreator
+    # =========================================================================
+    # 1. Initialization (constructor method).
+    # 2. Object linking - methods related to object linking.
+    # 3. Simulator instance management - creating new instances, viewing and
+    #       deleting existing ones.
+    # 4. Running created simulator instances.
+    # =========================================================================
+
+    # =========================================================================
+    # 1. Initialization (constructor method).
+    # =========================================================================
 
     def __init__(self) -> None:
         """Constructor method."""
-        self.__key_manager = None
-        self.__message_manager: MessageManager = MessageManager()
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(
             class_name=self.__class__.__name__))
 
-        self.__simulators = {}
-        self.__noise_models = None
+        self.__key_blocker: KeyBlocker = None
+        self.__simulators: dict[str, SimulatorInstance] = {}
+        self.__noise_models: dict[str, NoiseModelInstance] = None
 
         msg.add_message(MESSAGES["created_new_object"], 
                         class_name=self.__class__.__name__)
         msg.end_output()
 
 
-    # Public class methods
+    # =========================================================================
+    # 2. Object linking - methods related to object linking.
+    # =========================================================================
+
+    def __check_noise_creator_link(self) -> None:
+        """Checks if a `NoiseCreator` class object is linked to this 
+        `SimulatorManager` object.
+
+        Raises:
+            RuntimeError: If `NoiseCreator` class object is not linked
+                to this `SimulatorManager` object.   
+        """
+        if self.__noise_models is None:
+            raise MissingLinkError(
+                ERRORS["not_linked"].format(
+                    class_name=NoiseCreator.__name__,
+                    method_name=self.link_noise_creator.__name__))
+        
+    
+    def link_noise_creator(self, noise_creator: NoiseCreator) -> None:
+        """Links a `NoiseCreator` class object to gain access to 
+        created noise models."""
+        msg.create_output(OUTPUT_HEADINGS["linking_object"].format(
+            linked_class=NoiseCreator.__name__,
+            this_class=self.__class__.__name__))
+        
+        self.__noise_models = noise_creator.noise_models
+        self.__key_blocker = noise_creator.key_blocker
+        
+        msg.add_message(MESSAGES["linking_success"])
+        msg.end_output()
+        
+    
+    # =========================================================================
+    # 3. Simulator instance management - creating new instances, viewing and
+    #       deleting existing ones.
+    # =========================================================================
     
     def create_simulator(
             self,
@@ -58,42 +112,44 @@ class SimulatorManager:
             simulator_reference_key (str): Reference key for the
                 created simulator that will be used to access it.
         """
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["creating_simulator"].format(
             reference_key=noise_model_reference_key))
         
+        simulator_reference_key = validate_instance_name(
+            simulator_reference_key)
+        
         try:
+            # Is NoiseCreator class object linked
             self.__check_noise_creator_link()
+            # Is there a usable noise model instance with the given key
             check_instance_key(reference_key=noise_model_reference_key,
                                should_exist=True, 
                                instances=self.__noise_models,
                                instance_type="noise model instance")
+            # Does key exist among created noise model instances
             check_instance_key(reference_key=simulator_reference_key,
                                should_exist=False, 
                                instances=self.__simulators,
                                instance_type="simulator instance")
-        except Exception:
+        except INSError:
             msg.add_traceback()
             return
-        
-        simulator_reference_key = validate_instance_name(
-            simulator_reference_key,
-            msg)
 
-        new_instance = {}
-        new_instance["noise_model_source"] = noise_model_reference_key
-
+        # Creating AerSimulator object:
         noise_model_instance = self.__noise_models[noise_model_reference_key]
+        simulator = AerSimulator(
+            coupling_map=noise_model_instance.coupling_map, 
+            noise_model=noise_model_instance.noise_model)
         
-        new_instance["simulator"] = AerSimulator(
-            coupling_map=noise_model_instance["coupling_map"], 
-            noise_model=noise_model_instance["noise_model"])
-        
+        # Defining new simulator instance:
+        new_instance = SimulatorInstance(
+            noise_model_source=noise_model_reference_key,
+            simulator=simulator)
         self.__simulators[simulator_reference_key] = new_instance
 
         # Blocks noise model instance key until this simulator instance
         # gets deleted (simulator has reference to used noise model key)
-        self.__key_manager.block_key(key=noise_model_reference_key,
+        self.__key_blocker.block_key(key=noise_model_reference_key,
                                      instance_type="noise_models",
                                      blocker_key=simulator_reference_key)
         
@@ -104,18 +160,55 @@ class SimulatorManager:
         msg.end_output()
 
 
-    def link_noise_creator(self, noise_creator: NoiseCreator) -> None:
-        """Links a `NoiseCreator` class object to gain access to 
-        created noise models."""
-        msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["linking_object"].format(
-            linked_class=NoiseCreator.__name__,
-            this_class=self.__class__.__name__))
+    def view_simulators(self) -> None:
+        """Displays all currently available simulator instances.
+
+        If no instances are available, method simply displays a
+        message that states this fact.
+        The visual output from this method is placed inside of the
+        default "message" content container.
+
+        Displayed information includes:
+        - Reference key for the current instance;
+        - Maximum circuit qubit count that the simulator instance 
+          supports;
+        - Reference key for the source noise model instance that was
+          used in the making of the current simulator instance;
+        - Availability of the source noise model instance (Available
+          or Removed).
+        """
+        msg.create_output(OUTPUT_HEADINGS["created_instances"].format(
+            instance_type="simulator instances"))
+        msg.modify_content_title("Simulator instances:")
+
+        # If at least one simulator instance exists
+        if self.__simulators:
+            msg.add_table(container_id="messages")
+            msg.add_table_row(
+                row_content=["Reference key", "Max qubit count",
+                             "Has noise", "Source noise model", 
+                             "Noise model availability"],
+                row_type="th")
+
+            for simulator_key, instance in self.__simulators.items():
+                # Obtaining required information:
+                availability = check_source_availability(
+                    source_reference_key=instance.noise_model_source,
+                    source_instances=self.__noise_models)
+                # Adding row to table:
+                msg.add_table_row(
+                    row_content=[simulator_key, 
+                                 str(instance.get_qubit_count()), 
+                                 instance.has_noise(),
+                                 instance.noise_model_source, 
+                                 availability],
+                    row_type="td")
         
-        self.__noise_models = noise_creator.noise_models
-        self.__key_manager = noise_creator.key_manager
+        # If no noise model instances exist
+        else:
+            msg.add_message(MESSAGES["no_instances"],
+                            instance_type="created simulator instances")
         
-        msg.add_message(MESSAGES["linking_success"])
         msg.end_output()
 
 
@@ -126,7 +219,6 @@ class SimulatorManager:
             reference_key (str): Key of the removable simulator
                 instance.
         """
-        msg = self.__message_manager
         msg.create_output(
             OUTPUT_HEADINGS["remove_instance"].format(
                 instance_type="simulator instance",
@@ -138,14 +230,14 @@ class SimulatorManager:
                                should_exist=True, 
                                instances=self.__simulators,
                                instance_type="simulator instance")
-        except Exception:
+        except INSError:
             msg.add_traceback()
             return
 
         # Unblocking referenced noise data key
         instance = self.__simulators[reference_key]
-        noise_model_reference_key = instance["noise_model_source"]
-        self.__key_manager.unblock_key(key=noise_model_reference_key,
+        noise_model_reference_key = instance.noise_model_source
+        self.__key_blocker.unblock_key(key=noise_model_reference_key,
                                        instance_type="noise_models")
 
         del self.__simulators[reference_key]
@@ -156,6 +248,10 @@ class SimulatorManager:
             reference_key=reference_key)
         msg.end_output()
 
+
+    # =========================================================================
+    # 4. Running created simulator instances.
+    # =========================================================================
 
     def run_simulator(
             self,
@@ -173,29 +269,30 @@ class SimulatorManager:
         Args:
             simulator_reference_key (str): Reference key for the selected
                 simulator instance to be used.
-            circuit (QuantumCircuit): the quantum circuit that will be 
+            circuit (QuantumCircuit): The quantum circuit that will be 
                 executed.
-            optimization (int): the optimization level that will be used
+            optimization (int): The optimization level that will be used
                 during the transpilation process of the given quantum 
                 circuit. Possible levels: 0-3
-            shots (int): the number of shots (circuit execution times).
+            shots (int): The number of shots (circuit execution times).
 
         Returns:
             AerJob: Job of the simulator execution, from which you can
                 extract the result counts and other data associated with the
                 completed job.
         """
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["execute_simulator"].format(
             reference_key=simulator_reference_key))
         
         try:
+            # Is optimization level in the range 0-3
             self.__validate_optimization_level(optimization)
+            # Is there a simulator instance with the given reference key
             check_instance_key(reference_key=simulator_reference_key,
                                should_exist=True, 
                                instances=self.__simulators,
                                instance_type="simulator instance")
-        except Exception:
+        except INSError:
             msg.add_traceback()
             return
 
@@ -215,7 +312,7 @@ class SimulatorManager:
             )
 
             instance = self.__simulators[simulator_reference_key]
-            simulator = instance["simulator"]
+            simulator = instance.simulator
 
             transpiled_circuit = transpile(
                 circuits=circuit, 
@@ -237,114 +334,22 @@ class SimulatorManager:
         return result_job
     
     
-    def view_simulators(self) -> None:
-        """Displays all currently available simulator instances.
-
-        If no instances are available, method simply displays a
-        message that states this fact.
-        The visual output from this method is placed inside of the
-        default "message" content container.
-
-        Displayed information includes:
-        - Reference key for the current instance;
-        - Maximum circuit qubit count that the simulator instance 
-          supports;
-        - Reference key for the source noise model instance that was
-          used in the making of the current simulator instance;
-        - Availability of the source noise model instance (Available
-          or Removed).
-        """
-        msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["created_instances"].format(
-            instance_type="simulator instances"))
-        msg.generic_content_container("Simulator instances:")
-
-        if self.__simulators:
-            
-            msg.add_generic_table()
-            msg.add_generic_table_row(
-                row_content=["Reference key", "Max qubit count",
-                             "Has noise", "Source noise model", 
-                             "Noise model availability"],
-                row_type="th")
-
-            for simulator_key, instance in self.__simulators.items():
-                
-                simulator = instance["simulator"]
-                has_noise = self.__has_noise(simulator)
-                # At some point some research would be good as for what
-                # exactly does this number mean, because it differs from
-                # the max amount of qubits in the noise model.
-                qubit_count = str(simulator.num_qubits)
-
-                noise_model_key = instance["noise_model_source"]
-
-                if check_instance_key(reference_key=noise_model_key,
-                                      should_exist=True, 
-                                      instances=self.__noise_models,
-                                      instance_type="noise model instance",
-                                      raise_error=False):
-                    availability = "Available"
-                else: 
-                    availability = "Removed"
-                noise_model_availability = msg.style_availability_status(
-                    availability)
-                
-                msg.add_generic_table_row(
-                    row_content=[simulator_key, qubit_count, has_noise,
-                                 noise_model_key, noise_model_availability],
-                    row_type="td")
-        else:
-            msg.add_message(MESSAGES["no_instances"],
-                            instance_type="created simulator instances")
-        
-        msg.end_output()
-
-
-    # Private class methods
-
-    def __check_noise_creator_link(self) -> None:
-        """Checks if a `NoiseCreator` class object is linked to this 
-        `SimulatorManager` object.
-
-        Raises:
-            RuntimeError: If `NoiseCreator` class object is not linked
-                to this `SimulatorManager` object.   
-        """
-        if self.__noise_models is None:
-            raise RuntimeError(
-                ERRORS["error_not_linked"].format(
-                    class_name=NoiseCreator.__name__,
-                    method_name=self.link_noise_creator.__name__))
-
-
-    def __has_noise(
-            self, 
-            simulator: AerSimulator
-    ) -> str:
-        """Checks if `AerSimulator` object has noise or is it noiseless.
-        
-        Args:
-            noise_model (NoiseModel): Noise model that will be checked.
-
-        Returns:
-            str: 
-                - "Yes" if it has noise.
-                - "No" if it is noiseless.
-        """
-        noise_model = simulator.options.noise_model
-        if noise_model.is_ideal():
-            return "No"
-        else:
-            return "Yes"
-    
-    
     def __validate_optimization_level(
             self, 
             optimization_level: int
     ) -> None:
         """Checks if the given transpilation optimization level 
-        is valid."""
+        is valid.
+        
+        Args:
+            optimization_level (int): Optimization level number provided
+                by the end-user.
+        
+        Raises:
+            InputArgumentError: When the given optimization level is not
+                within the allowed range.
+        """
         if optimization_level < 0 or optimization_level > 3:
-            raise ValueError(ERRORS["invalid_optimization_level"].format(
+            raise InputArgumentError(
+                ERRORS["invalid_optimization_level"].format(
                     optimization_level=optimization_level))

@@ -1,9 +1,10 @@
 # Local project imports:
+from ..exceptions import BlockedKeyError
 from ..data._data import (
     ERRORS
 )
 
-class KeyAvailabilityManager:
+class KeyBlocker:
 
     def __init__(self) -> None:
         """Constructor method."""
@@ -91,14 +92,14 @@ class KeyAvailabilityManager:
                 - 'noise_models' - noise model instances.
 
         Raises:
-            KeyError: If current key is blocked and is unable to be
+            BlockedKeyError: If current key is blocked and is unable to be
                 used for a new instance.
         """
         instance_info = self.key_availability[instance_type]
         blocked_keys = self.key_availability[instance_type]["blocked_keys"]
 
         if key in blocked_keys:
-            raise KeyError(
+            raise BlockedKeyError(
                 ERRORS["blocked_reference_key"].format(
                     reference_key=key,
                     instance_type=instance_info["self_type"],

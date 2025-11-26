@@ -9,41 +9,64 @@ from qiskit_aer.noise import (
 )
 
 # Local project imports:
-from .messages._message_manager import MessageManager
 from .noise_data_manager import NoiseDataManager
-from .utils.key_availability import KeyAvailabilityManager
-from .utils.validators import (
-    check_instance_key, validate_instance_name
+from .data_structures.noise_model_instance import NoiseModelInstance
+from .exceptions import (
+    INSError, MissingLinkError
 )
+from .utils.checkers import (
+    check_instance_key, check_source_availability
+)
+from .utils.validators import validate_instance_name
+from .messages._message_manager import message_manager as msg
 from .data._data import (
     CONFIG, CSV_COLUMNS, ERRORS, MESSAGES, OUTPUT_HEADINGS
 )
 
 # Imports only used for type definition:
+from .utils.key_blocker import KeyBlocker
+from .data_structures.noise_data_instance import NoiseDataInstance
 from pandas.core.series import Series
 
 
 class NoiseCreator:
 
+    # =========================================================================
+    # Table of Contents for NoiseCreator
+    # =========================================================================
+    # 1. Initialization (constructor method).
+    # 2. Class properties.
+    # 3. Object linking - methods related to object linking.
+    # 4. Creating noise model instances from noise data - main method along 
+    #       with used helper methods.
+    # 5. Noise model instance management - creating new instances, viewing and
+    #       deleting existing ones.
+    # =========================================================================
+
+    # =========================================================================
+    # 1. Initialization (constructor method).
+    # =========================================================================
+
     def __init__(self) -> None:
         """Constructor method."""
-        self.__key_manager = None
-        self.__message_manager: MessageManager = MessageManager()
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["creating_new_object"].format(
             class_name=self.__class__.__name__))
 
-        self.__noise_models = {}
-        self.__noise_data = None
+        self.__key_blocker: KeyBlocker = None
+        self.__noise_models: dict[str, NoiseModelInstance] = {}
+        self.__noise_data: dict[str, NoiseDataInstance] = None
 
         msg.add_message(MESSAGES["created_new_object"], 
                         class_name=self.__class__.__name__)
         msg.end_output()
 
 
-    # Class properties
+    # =========================================================================
+    # 2. Class properties.
+    # =========================================================================
+
     @property
-    def key_manager(self) -> KeyAvailabilityManager:
+    def key_blocker(self) -> KeyBlocker:
         """Returns a reference to a KeyAvailabilityManager
         
         A manager that will be used across all main manager
@@ -52,25 +75,63 @@ class NoiseCreator:
             - `NoiseCreator`
             - `SimulatorManager`
         """
-        return self.__key_manager
+        return self.__key_blocker
 
 
     @property
-    def noise_models(self) -> NoiseModel:
+    def noise_models(self) -> dict[str, NoiseModelInstance]:
         """Returns a reference to data structure containing noise model 
            instances."""
         return self.__noise_models
     
 
-    # Public class methods
-    
+    # =========================================================================
+    # 3. Object linking - methods related to object linking.
+    # =========================================================================
+
+    def __check_noise_data_manager_link(self) -> None:
+        """Checks if a `NoiseDataManager` class object is linked to this 
+        `NoiseCreator` object.
+           
+        Raises:
+            MissingLinkError: If `NoiseDataManager` class object is not linked to
+                `NoiseCreator` object.
+        """
+        if self.__noise_data is None:
+            raise MissingLinkError(
+                ERRORS["not_linked"].format(
+                    class_name=NoiseDataManager.__name__,
+                    method_name=self.link_noise_data_manager.__name__))
+
+
+    def link_noise_data_manager(
+            self, 
+            noise_data_manager: NoiseDataManager
+    ) -> None:
+        """Links a `NoiseDataManager` object to gain access to noise data."""
+        msg.create_output(OUTPUT_HEADINGS["linking_object"].format(
+            linked_class=NoiseDataManager.__name__, 
+            this_class=self.__class__.__name__))
+        
+        self.__noise_data = noise_data_manager.noise_data
+        self.__key_blocker = noise_data_manager.key_blocker
+
+        msg.add_message(MESSAGES["linking_success"])
+        msg.end_output()
+
+
+    # =========================================================================
+    # 4. Creating noise model instances from noise data - main method along 
+    #       with used helper methods.
+    # =========================================================================
+
     def create_noise_model(
             self,
             noise_model_reference_key: str, 
             data_reference_key: str,
             has_noise: bool = True
     ) -> None:
-        """Creates a new noise model.
+        """Creates a new noise model instance.
         
         Method creates a new noise model intance (new `NoiseModel`
         class object with errors based on proviced noise data from
@@ -84,12 +145,17 @@ class NoiseCreator:
             noise_model_reference_key (str): Reference key that will
                 allow the user to access the created noise model
                 afterwards.
+            has_noise (bool): Will the noise model contain noise, or
+                will it be a noiseless model (Default: `True`).
         """
-        msg = self.__message_manager
         msg.create_output(OUTPUT_HEADINGS["creating_noise_model"].format(
             reference_key=data_reference_key))
         
+        noise_model_reference_key = validate_instance_name(
+            noise_model_reference_key)
+        
         try:
+            # Is NoiseDataManager class object linked
             self.__check_noise_data_manager_link()
             # Is there a usable noise data instance with the given key
             check_instance_key(reference_key=data_reference_key,
@@ -102,44 +168,39 @@ class NoiseCreator:
                                instances=self.__noise_models,
                                instance_type="noise model instance")
             # Is key being blocked by a simulator instance reference
-            self.__key_manager.check_blocked_key(
+            self.__key_blocker.check_blocked_key(
                                 key=noise_model_reference_key,
                                 instance_type="noise_models")
-        except Exception:
+        except INSError:
             msg.add_traceback()
             return
         
-        noise_model_reference_key = validate_instance_name(
-            noise_model_reference_key,
-            msg)
+        noise_dataframe = self.__noise_data[data_reference_key].dataframe
 
-        new_instance = {}
-        new_instance["data_source"] = data_reference_key
-
-        noise_dataframe = self.__noise_data[data_reference_key]["dataframe"]
-        
+        # Creating qiskit_aer.noise NoiseModel object:
         noise_model = NoiseModel(self.__get_basis_gates(noise_dataframe))
-        
         if has_noise:
             msg.add_message(MESSAGES["adding_errors"])
             for qubit_nr, columns in noise_dataframe.iterrows():
                 self.__add_readout_error(qubit_nr, columns, noise_model)
                 self.__add_depolarizing_error(qubit_nr, columns, noise_model)
                 self.__add_thermal_error(qubit_nr, columns, 
-                                        noise_model, noise_dataframe)
+                                         noise_model, noise_dataframe)
         else:
             msg.add_message(MESSAGES["not_adding_errors"])
 
-        new_instance["noise_model"] = noise_model
+        coupling_map = self.__get_coupling_map(noise_dataframe)        
 
-        coupling_map = self.__get_coupling_map(noise_dataframe)
-        new_instance["coupling_map"] = coupling_map
-
+        # Defining new noise model instance
+        new_instance = NoiseModelInstance(
+            data_source=data_reference_key,
+            noise_model=noise_model,
+            coupling_map=coupling_map)
         self.__noise_models[noise_model_reference_key] = new_instance
 
         # Blocks noise data instance key until this noise model instance
         # gets deleted (noise model has reference to used noise data key)
-        self.__key_manager.block_key(key=data_reference_key,
+        self.__key_blocker.block_key(key=data_reference_key,
                                      instance_type="noise_data",
                                      blocker_key=noise_model_reference_key)
         
@@ -150,129 +211,39 @@ class NoiseCreator:
         msg.end_output()
 
 
-    def link_noise_data_manager(
+    def __add_readout_error(
             self, 
-            noise_data_manager: NoiseDataManager
+            qubit: int, 
+            columns: Series, 
+            noise_model: NoiseModel
     ) -> None:
-        """Links a `NoiseDataManager` object to gain access to noise data."""
-        msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["linking_object"].format(
-            linked_class=NoiseDataManager.__name__, 
-            this_class=self.__class__.__name__))
-        
-        self.__noise_data = noise_data_manager.noise_data
-        self.__key_manager = noise_data_manager.key_manager
+        """Helps create and add readout error to noise model.
 
-        msg.add_message(MESSAGES["linking_success"])
-        msg.end_output()
+        Helper method for the class method `create_noise_model`.
 
+        By using available noise data, method creates readout errors 
+        for every qubit and adds them to a class NoiseModel object. 
+        This code was written based on given examples by IBM on how to 
+        create such errors (a link to the web page is available 
+        further on).
 
-    def remove_noise_model_instance(self, reference_key: str) -> None:
-        """Removes existing noise model instance by reference key.
-        
+        Link to IBM documentation on the mention topic:
+        https://qiskit.github.io/qiskit-aer/tutorials/3_building_noise_models.html
+
         Args:
-            reference_key (str): Key of the removable noise model
-                instance.
+            qubit (int): The number of the current qubit.
+            columns (Series): Table data for the current qubit. Basically 
+                a row, however, to access a certain attribute, you must do 
+                as follows: `column["attribute_name"]`, where 
+                `"attribute_name"` is the column name in the dataframe.
+            noise_model (NoiseModel): The noise model object, to which
+                the newly created errors will be added.
         """
-        msg = self.__message_manager
-        msg.create_output(
-            OUTPUT_HEADINGS["remove_instance"].format(
-                instance_type="noise model instance",
-                reference_key=reference_key))
-        
-        try:
-            # Is there even an instance to delete with given key
-            check_instance_key(reference_key=reference_key,
-                               should_exist=True, 
-                               instances=self.__noise_models,
-                               instance_type="noise model instance")
-        except Exception:
-            msg.add_traceback()
-            return
+        m0p1 = columns[CSV_COLUMNS["m0p1"]["csv_name"]]
+        m1p0 = columns[CSV_COLUMNS["m1p0"]["csv_name"]]
+        readout_error = ReadoutError([[1-m0p1, m0p1], [m1p0, 1-m1p0]])
+        noise_model.add_readout_error(readout_error, [qubit])
 
-        # Unblocking referenced noise data key
-        instance = self.__noise_models[reference_key]
-        data_reference_key = instance["data_source"]
-        self.__key_manager.unblock_key(key=data_reference_key,
-                                       instance_type="noise_data")
-        
-        del self.__noise_models[reference_key]
-
-        msg.add_message(
-            MESSAGES["deleted_instance"],
-            instance_type="noise model instance",
-            reference_key=reference_key)
-        msg.end_output()
-
-    
-    def view_noise_models(self) -> None:
-        """Displays all currently available noise model instances.
-
-        If no instances are available, method simply displays a
-        message that states this fact.
-        The visual output from this method is placed inside of the
-        default "message" content container.
-
-        Displayed information includes:
-        - Reference key for the current instance;
-        - Noise model qubit count; 
-        - List of basis gates;
-        - Reference key for the source noise data instance that was
-          used in the making of the current instance;
-        - Availability of the source noise data instance (Available
-          or Removed).
-        """
-        msg = self.__message_manager
-        msg.create_output(OUTPUT_HEADINGS["created_instances"].format(
-            instance_type="noise models"))
-        msg.generic_content_container("Noise model instances:")
-
-        if self.__noise_models:
-
-            msg.add_generic_table()
-            msg.add_generic_table_row(
-                row_content=["Reference key", "Qubit count", 
-                             "Basis gates", "Has noise", 
-                             "Source noise data", 
-                             "Noise data availability"],
-                row_type="th")
-
-            for noise_model_key, instance in self.__noise_models.items():
-                
-                noise_model = instance["noise_model"]
-                coupling_map = instance["coupling_map"]
-
-                qubit_count = str(coupling_map.size())
-                basis_gates = "; ".join(noise_model.basis_gates)
-                has_noise = self.__has_noise(noise_model)
-                
-                data_reference_key = instance["data_source"]
-                
-                if check_instance_key(reference_key=data_reference_key,
-                                      should_exist=True,
-                                      instances=self.__noise_data,
-                                      instance_type="noise data instance",
-                                      raise_error=False):
-                    availability = "Available"
-                else: 
-                    availability = "Removed"
-                noise_data_availability = msg.style_availability_status(
-                    availability)
-                
-                msg.add_generic_table_row(
-                    row_content=[noise_model_key, qubit_count,
-                                 basis_gates, has_noise, 
-                                 data_reference_key,
-                                 noise_data_availability],
-                    row_type="td")
-        else:
-            msg.add_message(MESSAGES["no_instances"],
-                            instance_type="created noise models")
-        
-        msg.end_output()
-
-
-    # Private class methods
 
     def __add_depolarizing_error(
             self, 
@@ -338,41 +309,7 @@ class NoiseCreator:
                             instructions=two_qubit_gate["code_name"], 
                             qubits=[qubit, target_qubit],
                             warnings=False)
-    
-
-    def __add_readout_error(
-            self, 
-            qubit: int, 
-            columns: Series, 
-            noise_model: NoiseModel
-    ) -> None:
-        """Helps create and add readout error to noise model.
-
-        Helper method for the class method `create_noise_model`.
-
-        By using available noise data, method creates readout errors 
-        for every qubit and adds them to a class NoiseModel object. 
-        This code was written based on given examples by IBM on how to 
-        create such errors (a link to the web page is available 
-        further on).
-
-        Link to IBM documentation on the mention topic:
-        https://qiskit.github.io/qiskit-aer/tutorials/3_building_noise_models.html
-
-        Args:
-            qubit (int): The number of the current qubit.
-            columns (Series): Table data for the current qubit. Basically 
-                a row, however, to access a certain attribute, you must do 
-                as follows: `column["attribute_name"]`, where 
-                `"attribute_name"` is the column name in the dataframe.
-            noise_model (NoiseModel): The noise model object, to which
-                the newly created errors will be added.
-        """
-        m0p1 = columns[CSV_COLUMNS["m0p1"]["csv_name"]]
-        m1p0 = columns[CSV_COLUMNS["m1p0"]["csv_name"]]
-        readout_error = ReadoutError([[1-m0p1, m0p1], [m1p0, 1-m1p0]])
-        noise_model.add_readout_error(readout_error, [qubit])
-
+                        
 
     def __add_thermal_error(
             self, 
@@ -509,26 +446,11 @@ class NoiseCreator:
             time=0)
         noise_model.add_quantum_error(
             error=thermal_error_rz,
-            instructions="reset", 
+            instructions="rz", 
             qubits=[qubit],
             warnings=False)
-    
-    
-    def __check_noise_data_manager_link(self) -> None:
-        """Checks if a `NoiseDataManager` class object is linked to this 
-        `NoiseCreator` object.
-           
-        Raises:
-            RuntimeError: If `NoiseDataManager` class object is not linked to
-                `NoiseCreator` object.
-        """
-        if self.__noise_data is None:
-            raise RuntimeError(
-                ERRORS["error_not_linked"].format(
-                    class_name=NoiseDataManager.__name__,
-                    method_name=self.link_noise_data_manager.__name__))
+        
 
-    
     def __get_basis_gates(
             self, 
             noise_dataframe: pandas.DataFrame
@@ -556,7 +478,6 @@ class NoiseCreator:
             list[str]: A list of basis gate names in the form that they 
                 are accepted.For example: `["id", "ecr", "rz"]`
         """ 
-        msg = self.__message_manager
         msg.add_message(MESSAGES["retrieving_basis_gates"])
 
         basis_gate_list = CONFIG["non_gate_instructions"]
@@ -592,7 +513,6 @@ class NoiseCreator:
         Returns:
             CouplingMap: Representation of the created coupling map.
         """
-        msg = self.__message_manager
         msg.add_message(MESSAGES["retrieving_coupling_map"])
 
         coupled_qubits = []
@@ -605,23 +525,98 @@ class NoiseCreator:
                     coupled_qubits.append([qubit, paired_qubit])
 
         return CouplingMap(couplinglist=coupled_qubits)
-    
 
-    def __has_noise(
-            self, 
-            noise_model: NoiseModel
-    ) -> str:
-        """Checks if `NoiseModel` object has noise or is it noiseless.
+
+    # =========================================================================
+    # 5. Noise model instance management - creating new instances, viewing and
+    #       deleting existing ones.
+    # =========================================================================
+    
+    def view_noise_models(self) -> None:
+        """Displays all currently available noise model instances.
+
+        If no instances are available, method simply displays a
+        message that states this fact.
+        The visual output from this method is placed inside of the
+        default "message" content container.
+
+        Displayed information includes:
+        - Reference key for the current instance;
+        - Noise model qubit count; 
+        - List of basis gates;
+        - Reference key for the source noise data instance that was
+          used in the making of the current instance;
+        - Availability of the source noise data instance (Available
+          or Removed).
+        """
+        msg.create_output(OUTPUT_HEADINGS["created_instances"].format(
+            instance_type="noise models"))
+        msg.modify_content_title("Noise model instances:")
+
+        # If at least one noise model instance exists
+        if self.__noise_models:
+            msg.add_table(container_id="messages")
+            msg.add_table_row(
+                row_content=["Reference key", "Qubit count", 
+                             "Basis gates", "Has noise", 
+                             "Source noise data", 
+                             "Noise data availability"],
+                row_type="th")
+
+            for noise_model_key, instance in self.__noise_models.items():
+                # Obtaining required information
+                availability = check_source_availability(
+                    source_reference_key=instance.data_source,
+                    source_instances=self.__noise_data)
+                # Adding row to table
+                msg.add_table_row(
+                    row_content=[noise_model_key, 
+                                 str(instance.get_qubit_count()),
+                                 instance.get_basis_gates_str(), 
+                                 instance.has_noise(), 
+                                 instance.data_source,
+                                 availability],
+                    row_type="td")
+        
+        # If no noise model instances exist
+        else:
+            msg.add_message(MESSAGES["no_instances"],
+                            instance_type="created noise models")
+        
+        msg.end_output()
+
+
+    def remove_noise_model_instance(self, reference_key: str) -> None:
+        """Removes existing noise model instance by reference key.
         
         Args:
-            noise_model (NoiseModel): Noise model that will be checked.
-
-        Returns:
-            str: 
-                - "Yes" if it has noise.
-                - "No" if it is noiseless.
+            reference_key (str): Key of the removable noise model
+                instance.
         """
-        if noise_model.is_ideal():
-            return "No"
-        else:
-            return "Yes"
+        msg.create_output(
+            OUTPUT_HEADINGS["remove_instance"].format(
+                instance_type="noise model instance",
+                reference_key=reference_key))
+        
+        try:
+            # Is there even an instance to delete with given key
+            check_instance_key(reference_key=reference_key,
+                               should_exist=True, 
+                               instances=self.__noise_models,
+                               instance_type="noise model instance")
+        except INSError:
+            msg.add_traceback()
+            return
+
+        # Unblocking referenced noise data key
+        instance = self.__noise_models[reference_key]
+        self.__key_blocker.unblock_key(key=instance.data_source,
+                                       instance_type="noise_data")
+        
+        del self.__noise_models[reference_key]
+
+        msg.add_message(
+            MESSAGES["deleted_instance"],
+            instance_type="noise model instance",
+            reference_key=reference_key)
+        msg.end_output()
