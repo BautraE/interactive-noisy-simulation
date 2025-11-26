@@ -1,57 +1,146 @@
-# General Improvements Branch
+# Interactive Noisy Simulation Module
 
-This branch is used for **improvements** to the package that are **not related to** any specific **new feature**. It covers existing functionality with the goal of **implementing better solutions** or **cleaning up some mess** that hase been left from other updates.
+The module **Interactive Noisy Simulation** (further on referred to as **INS**) provides a more intuitive and interactive way of creating noise models and simulators, as well as executing circuits with the created simulators.
 
-The rest of this `README.md` file will consist of changes and comments related to a specific version, which will get updated over time.
+The module consists of custom classes and methods that provide the additional functionality, and it is currently usable in ***Python Notebook*** files (***.ipynb***).
 
-## v1.2.2
+## 1. Functionality overview
 
-### Changes:
+*INS* currently provides the ability to:
+- Import CSV calibration data files obtained from any of the available IBM Quantum Platform QPUs;
+- Look up noise data for a certain qubit;
+- Use the imported data to create a noise models and coupling maps;
+- Create a simulator instances with the custom noise models and coupling maps;
+- Run a user-provided citruit with the created simulator.
 
-#### For end user:
-- It is now possible to check the currently installed version with the help of the following command:
-    - `interactive_noisy_simulation [-v | --version]`
-- It is now possible to update the current version of INS automatically, if there is a newer version available. It can be done with the help of the following command:
-    - `interactive_noisy_simulation [-u | --update]`
+Other than this, there are also informative methods:
+- `help_csv_columns()` from `NoiseDataManager` will print out all relevant CSV columns (the ones that are used in the creation of noise models) along with explanations for them.
 
-#### For developers:
-- All new terminal command outputs have slight styling adjustments with [*Python Rich*](https://github.com/Textualize/rich). Though there is one exception - the *help* command, as it requires another package called *[rich-argparse](https://github.com/hamdanal/rich-argparse)*.
-- Methods / functions are now grouped based on their provided functionality, simplifying the process of implementing changes and navigating through relevant methods / functions in the code files. A table of contents is also added at the top to give an overview of all current groups of functionality. The following files have been reorganized:
-    - `noise_data_manager.py`
-    - `noise_creator.py`
-    - `simulator_manager.py` 
-    - `_message_manager.py`
-    - `scripts.js`
-- `MessageManager` class methods have been adjustes so that it is simpler to create new content containers, content boxes, tables, and table rows in a way that they can be simply reused for any new output, replacing the need to create a lot of things from scratch every time something new gets added.
-- The use of the `MessageManager` class has been altered - there is no more need to define an object of this class in every class that will be using it. Now there is an object already created inside of `_message_manager.py` called `message_manager` that just simply needs to be imported.
-- Created *HTML* element ID deletion is now automatically managed through `MessageManager` object, instead of relying on a static list of all deletable IDs in `scripts.js`.
-- New custom `Exception` project-specific classes have been created, which also replace the previously used default `Exception` classes from *Python*.
-- Noise data, noise model, and simulator instances now are represented and stored as custom `dataclass` objects. Along with this, they now contain methods of obtaining certain related data, which was previously accomplished elsewhere:
-    - `NoiseDataInstance`
-    - `NoiseModelInstance`
-    - `SimulatorInstance`
-- There is a new folder `helpers` within the folder `messages`. It contains python files with functions that were separated from `MessageManager`. Currently all functions related to applying certain styles to given text have been moved to a new file `text_styling.py`.
-- Slight function reorganizing has been done in the `utils` folder.
+## 2. Setup guide
 
-### Additional Comments:
+### 2.1. Versions & dependencies
 
-#### Automatic package updating with `interactive_noisy_simulation [-u | --update]`
+In order to install *INS*, the environment has to have the following Python version:
+- `Python >= 3.13`
 
-The **ability to check for new updates** to INS is added successfully, however, a **slight workaround** had to be implemented. Since there is no executable file currently, there is no way of safely deleting current files and replacing them with newer versions, because the old files are still being used as part of the current python executable instance.
+The module currently requires the following dependencies of third party packages / libraries:
+- `pandas >= 2.3.1`
+- `qiskit >= 2.1.1`
+- `qiskit-aer >= 0.17.1`
+- `requests >= 2.32.5`
+- `rich >= 14.2.0`
+- `rich-argparse >= 1.7.2`
 
-To overcome this, a new **separate process** begins after the original one closes - this 'unlocks' the current files and allows them to be removed. This causes the terminal to print out some unnecessary spaces, as well as the current path (again), but other than this, there is nothing wrong with it.
+If any of these dependencies are not set up prior to installing *INS*, they will be automatically downloaded and installed to the current environment.
 
-Example of the output:
+**Additional notes regarding *Python* and dependencies:** 
+- Some packages like Qiskit have not been tested with older versions than the ones mentioned in the dependencies. Therefore, even if they could work, the minimum version has been set to the one that was used during development. The same goes for *Python*.
+- There might be potential errors because of specific updates to the packages *INS* depends on. As well as issues might be caused by these packages not yet being adapted to a new *Python* version. In these cases, the exact versions mentioned in the list above should be installed. The project was developed with them, which means that everything should work.
 
-```console
-(py_environment) C:\some\path>interactive_noisy_simulation -u
-The current version is outdated.
-Updating from v1.2.0 to v1.2.1.
+### 2.2. Module setup
 
-(py_environment) C:\some\path>
-Interactive Noisy Simulation has been updated successfully!
-Press ENTER to continue.
+1. There are currently no plans of publishing *INS* to *PyPI*, which means that it is required to do either of the following:
+    - Get package link of latest release.
+    - Download a stable version from the releases.
 
+2. Based on the choice at step 1., use `pip` to install the package with one of the following ways:
+    ```
+    pip install relevant_version_link
+    pip install ./path/to/downloaded/file
+    ```
+3. After successfully installing *INS*, you can import the module as follows:
+    ```python
+    # For importing everything
+    from interactive_noisy_simulation import *
+    # For importing separate classes
+    from interactive_noisy_simulation import NoiseDataManager, NoiseCreator, SimulatorManager
+    ```
+
+## 3. Package updating & terminal commands
+
+#### IMPORTANT: Installed *INS* version must be at least 1.2.2 for this to be available.
+
+The package also includes functionality for a few terminal commands:
+- `interactive_noisy_simulation -h | --help`: The usual `help` command behavior.
+- `interactive_noisy_simulation -v | --version`: Retrieves the current version of INS.
+- `interactive_noisy_simulation -u | --update`: If a newer version exists, automatically updates the package to it.
+
+## 4. Use case example
+
+The following code example shows basic steps to complete a single cycle of all available functionality:
+
+```python
+# New classes:
+noise_data_manager = NoiseDataManager()
+noise_creator = NoiseCreator()
+simulator_manager = SimulatorManager()
+
+# NoiseDataManager functionality:
+noise_data_manager.import_csv_data(
+    reference_key="noise_data",
+    file_path="path/to/file.csv")
+# Looking up a single qubit - qubit with index 5
+noise_data_manager.get_qubit_noise_information(
+    reference_key="noise_data",
+    qubits=5)
+# Looking up multiple qubits - qubits with indexes 1, 10, and 20
+noise_data_manager.get_qubit_noise_information(
+    reference_key="noise_data",
+    qubits=[1, 10, 20])
+
+noise_data_manager.help_csv_columns()
+
+# NoiseCreator functionality:
+# Linking is required to access data from other class objects
+noise_creator.link_noise_data_manager(noise_data_manager)
+
+noise_creator.create_noise_model(
+    noise_model_reference_key="noise_model",
+    data_reference_key="noise_data",
+    has_noise=True ) # Default value is True. Use False for noiseless.
+
+# SimulatorManager functionality:
+simulator_manager.link_noise_creator(noise_creator)
+
+simulator_manager.create_simulator(
+    simulator_reference_key="simulator", 
+    noise_model_reference_key="noise_model")
+
+result_job = simulator_manager.run_simulator(
+    simulator_reference_key="simulator",
+    circuit=ciircuit, 
+    optimization=0, 
+    shots=1000)
 ```
 
-Since the package is not published anywhere, for example, on [PyPI](https://pypi.org/), **automatic version checking** has been implemented with the help of **manually created functions** that look through the *GitHub* repository for this project. No major issues have been encountered with this feature yet.
+There are also additional methods for managing created noise data, noise model and simulator instances:
+
+```python
+# View all created instances:
+noise_data_manager.view_noise_data_instances()
+noise_creator.view_noise_models()
+simulator_manager.view_simulators()
+
+# Remove created instance:
+noise_data_manager.remove_noise_data_instance(
+   reference_key="noise_data")
+noise_creator.remove_noise_model_instance(
+   reference_key="noise_model")
+simulator_manager.remove_simulator_instance(
+   reference_key="simulator")
+```
+
+## 5. Things to note & future plans
+
+While the functionality is currently working, it is highly dependent on [IBM Qiskit](https://github.com/Qiskit/qiskit) and other related things like the [IBM Quantum Platform](https://quantum.cloud.ibm.com/). Any significant changes to their code might break the current functionality of *INS*. 
+
+*(This is for other potential people joining in on the project)* To overcome this issue easier some actions have been / will be taken:
+- The code will be made in a way that is simpler to modify if any changes might occur (in the realms of possibility ofcourse), for example, by implementing a `config.json` file;
+- Some versions of *INS* might require certain versions of other libraries / modules (for example, *Qiskit*) if new updates significantly impact the current functionality of them. Though not all issues can be overcome by this, such as the format of the downloadable calibration data CSV files, which is not tied to any library / module version.
+
+The following points describe some additional functionality features that can be implemented over time in no specific order:
+- Add the **possibility to select certain noisy qubits**, while leaving others noiseless, when creating a noise model. This would provide the ability of creating a wider range of different noise models that can be experimented with;
+- Add the **possibility to modify imported data from CSV files manually**, as well as to create an empty data table and fill it with custom values. Again, this feature would provide even more flexibility to the user in terms of creating noise models;
+- Add **extra informative helper methods to each class** that show and explain all available methods to the user. Even though `help()` already exists in Python, the custom methods would have an improved visual output style that is easier to read for the user. 
+
+**Note:** This list of additional features is not final and new things may be added to it down the road.
