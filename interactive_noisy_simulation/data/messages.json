@@ -181,6 +181,8 @@
 
         "outdated_version": "The current version is outdated.\nAble to update from [highlight]v{current_version}[/highlight] to [highlight]v{latest_version}[/highlight].",
 
+        "starting_app": "Starting [name]Interactive Noisy Simulation (INS)[/name]",
+        
         "update_cancelled": "Cancelling update.",
 
         "update_failed": "Update failed:\n[failure]{error}[/failure]\nPress [command]ENTER[/command] to continue.",
@@ -195,6 +197,8 @@
     "terminal_command_descriptions": {
         "help": "Interactive Noisy Simulation package. Any functionality that is accessed through the terminal is only related to package management and not the functionality that it provides.",
 
+        "start": "Starts the Interactive Noisy Simulation application.",
+        
         "update": "Checks if a newer version is available. If yes, the package can be updated, based on choice of user (yes / no).",
 
         "version": "Prints current version of package and tells if there is a newer version."

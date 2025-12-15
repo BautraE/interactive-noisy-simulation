@@ -3,7 +3,8 @@ import argparse
 
 # Local project imports:
 from .terminal._console import RichHelpFormatter
-from .terminal.version_control import update_version, check_version
+from .terminal.app import start_app
+from .terminal.version_control import check_version, update_version
 from .data._data import TERMINAL_COMMAND_DESCRIPTION
 
 
@@ -12,6 +13,7 @@ def main() -> None:
     
     Currently supports the following commands:
     - `interactive_noisy_simulation [-h | --help]`
+    - `interactive_noisy_simulation [--start]`
     - `interactive_noisy_simulation [-u | --update]`
     - `interactive_noisy_simulation [-v | --version]`
     """
@@ -23,6 +25,12 @@ def main() -> None:
 
     # Possible arguments:
     group = parser.add_mutually_exclusive_group()
+
+    group.add_argument(
+        "--start",
+        action="store_true",
+        help=TERMINAL_COMMAND_DESCRIPTION["start"],
+    )
 
     group.add_argument(
         "-u", "--update",
@@ -38,7 +46,9 @@ def main() -> None:
 
     # Functionality access based on arguments
     args = parser.parse_args()
-    if args.update:
+    if args.start:
+        start_app()
+    elif args.update:
         update_version()
     elif args.version:
         check_version()
