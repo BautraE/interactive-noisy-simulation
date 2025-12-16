@@ -5,18 +5,18 @@ from pathlib import Path
 import numpy, pandas
 
 # Local project imports:
-from .utils.key_blocker import KeyBlocker
-from .data_structures.noise_data_instance import NoiseDataInstance
-from .exceptions import INSError
-from .messages.helpers.text_styling import (
+from ..utils.key_blocker import KeyBlocker
+from ..data_structures.noise_data_instance import NoiseDataInstance
+from ..exceptions import INSError
+from ..messages.helpers.text_styling import (
     style_file_path, style_highlight, style_italic
 )
-from .utils.checkers import check_instance_key
-from .utils.validators import (
+from ..utils.checkers import check_instance_key
+from ..utils.validators import (
     validate_file_type, validate_instance_name
 )
-from .messages._message_manager import message_manager as msg
-from .data._data import (
+from ..messages._message_manager import message_manager as msg
+from ...data._data import (
     CONFIG, CSV_COLUMNS, ERRORS, MESSAGES, OUTPUT_HEADINGS
 )
 

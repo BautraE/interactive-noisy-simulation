@@ -2,7 +2,7 @@
 from ..exceptions import KeyExistanceError
 from ..messages.helpers.text_styling import style_text_status
 from ..messages._message_manager import message_manager as msg
-from ..data._data import ERRORS
+from ...data._data import ERRORS
 
 # Imports only used for type definition:
 from typing import Any

@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 
 # Local project imports:
-from ..data._data import CSV_COLUMNS, ERRORS
+from ...data._data import CSV_COLUMNS, ERRORS
 from ..exceptions import InputArgumentError
 
 # Imports only used for type definition:

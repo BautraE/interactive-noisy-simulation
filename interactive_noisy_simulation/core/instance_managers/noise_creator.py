@@ -10,22 +10,22 @@ from qiskit_aer.noise import (
 
 # Local project imports:
 from .noise_data_manager import NoiseDataManager
-from .data_structures.noise_model_instance import NoiseModelInstance
-from .exceptions import (
+from ..data_structures.noise_model_instance import NoiseModelInstance
+from ..exceptions import (
     INSError, MissingLinkError
 )
-from .utils.checkers import (
+from ..utils.checkers import (
     check_instance_key, check_source_availability
 )
-from .utils.validators import validate_instance_name
-from .messages._message_manager import message_manager as msg
-from .data._data import (
+from ..utils.validators import validate_instance_name
+from ..messages._message_manager import message_manager as msg
+from ...data._data import (
     CONFIG, CSV_COLUMNS, ERRORS, MESSAGES, OUTPUT_HEADINGS
 )
 
 # Imports only used for type definition:
-from .utils.key_blocker import KeyBlocker
-from .data_structures.noise_data_instance import NoiseDataInstance
+from ..utils.key_blocker import KeyBlocker
+from ..data_structures.noise_data_instance import NoiseDataInstance
 from pandas.core.series import Series
 
 

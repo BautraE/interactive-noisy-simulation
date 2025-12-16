@@ -6,7 +6,7 @@ import re
 
 # Local project imports:
 from ...exceptions import DeveloperError
-from ...data._data import ERRORS
+from ....data._data import ERRORS
 
 
 def style_text_status(

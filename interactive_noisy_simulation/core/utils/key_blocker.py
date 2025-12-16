@@ -1,6 +1,6 @@
 # Local project imports:
 from ..exceptions import BlockedKeyError
-from ..data._data import (
+from ...data._data import (
     ERRORS
 )
 

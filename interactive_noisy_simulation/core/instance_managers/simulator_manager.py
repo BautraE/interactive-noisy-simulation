@@ -7,23 +7,23 @@ from qiskit_aer import AerSimulator
 
 # Local project imports:
 from .noise_creator import NoiseCreator
-from .data_structures.simulator_instance import SimulatorInstance
-from .exceptions import (
+from ..data_structures.simulator_instance import SimulatorInstance
+from ..exceptions import (
     INSError, InputArgumentError, MissingLinkError
 )
-from .utils.checkers import (
+from ..utils.checkers import (
     check_instance_key, check_source_availability
 )
-from .utils.validators import validate_instance_name
-from .messages._message_manager import message_manager as msg
-from .data._data import (
+from ..utils.validators import validate_instance_name
+from ..messages._message_manager import message_manager as msg
+from ...data._data import (
     ERRORS, MESSAGES, OUTPUT_HEADINGS
 )
 
 # Imports only used for type definition:
 from qiskit_aer.jobs.aerjob import AerJob
-from .utils.key_blocker import KeyBlocker
-from .data_structures.noise_model_instance import NoiseModelInstance
+from ..utils.key_blocker import KeyBlocker
+from ..data_structures.noise_model_instance import NoiseModelInstance
 from qiskit import QuantumCircuit
 
 

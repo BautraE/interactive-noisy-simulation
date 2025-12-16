@@ -4,7 +4,7 @@ import os, re
 # Local project imports:
 from ..exceptions import FileTypeError
 from ..messages._message_manager import message_manager as msg
-from ..data._data import (
+from ...data._data import (
     ERRORS, MESSAGES
 )
 

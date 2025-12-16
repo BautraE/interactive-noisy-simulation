@@ -1,7 +1,7 @@
 # Importing created classes and functions
-from .noise_creator import NoiseCreator
-from .noise_data_manager import NoiseDataManager
-from .simulator_manager import SimulatorManager
+from .core.instance_managers.noise_creator import NoiseCreator
+from .core.instance_managers.noise_data_manager import NoiseDataManager
+from .core.instance_managers.simulator_manager import SimulatorManager
 
 # If importing everything from package
 __all__ = [

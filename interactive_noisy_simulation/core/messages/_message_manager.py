@@ -12,7 +12,7 @@ from pygments.formatters import HtmlFormatter
 from .. import messages
 from ..exceptions import DeveloperError
 from .helpers.text_styling import style_highlight
-from ..data._data import (
+from ...data._data import (
     DEV_ERRORS, MESSAGES
 )
 
