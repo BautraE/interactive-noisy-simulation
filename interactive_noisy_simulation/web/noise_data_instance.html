@@ -16,19 +16,16 @@
                         <a href="">Noise Data</a>
                     </li>
                 </ul>
-            </nav>
+            </nav> 
             <div id="content-container">
-                <h1>Noise Data Instance Management</h1>
-                <p>Noise data instances:</p>
-                <input type="text" id="key_input" placeholder="Enter reference key">
-                <input type="text" id="path_input" placeholder="Enter file path">
-                <button onclick="importCSVCalibrationData()">Import Noise Data</button>
-                <button onclick="importTestData()">Test Data Import</button>
-                <div id="content-box"></div>
+                <a onclick="backToInstances()">> Noise Data Instances</a>
+                <h1>Specific Noise Data Instance</h1>
+                <p>Specific qubit data:</p>
+                <div id="qubit-data"></div>
             </div>
         </div>
         
         <script type="text/javascript" src="scripts/element_management.js"></script>
-        <script type="text/javascript" src="scripts/instance_management/noise_data_manager/all_instances.js"></script>
+        <script type="text/javascript" src="scripts/instance_management/noise_data_manager/single_instance.js"></script>
     </body>
 </html>

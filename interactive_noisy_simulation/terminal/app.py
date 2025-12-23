@@ -7,6 +7,8 @@ import eel
 # Project-related imports:
 from ._console import console
 from ..data._data import TERMINAL_MESSAGES
+# Files with exposed Python functions/methods:
+from ..app import exposed
 
 
 def start_app() -> None:
@@ -19,7 +21,7 @@ def start_app() -> None:
 
     # Starting INS
     port = __get_free_port()
-    eel.start('index.html', port=port, size=(800, 600))
+    eel.start('index.html', port=port, size=(1200, 800))
 
 
 def __get_free_port() -> int:
