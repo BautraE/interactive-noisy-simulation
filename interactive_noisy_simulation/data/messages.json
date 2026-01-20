@@ -52,6 +52,11 @@
             ]
         },
 
+        "empty_log": {
+            "text": "The {log_type} log is currently empty",
+            "highlightables": []
+        },
+
         "exception_occurred": {
             "text": "AN EXCEPTION HAS OCCURED. PLEASE VIEW THE ERROR LOG FOR MORE DETAILS!",
             "highlightables": [

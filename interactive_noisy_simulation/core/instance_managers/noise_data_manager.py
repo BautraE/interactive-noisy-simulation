@@ -1,10 +1,7 @@
-# Standard library imports:
-from pathlib import Path
-
 #Third party imports:
 import eel, numpy, pandas
 
-# Local project imports:
+# Project-related imports:
 from ..utils.key_blocker import KeyBlocker
 from ..data_structures.noise_data_instance import NoiseDataInstance
 from ..exceptions import INSError
@@ -23,9 +20,6 @@ from ..messages._message_manager import message_manager as msg
 from ...data._data import (
     CONFIG, CSV_COLUMNS, ERRORS, MESSAGES, OUTPUT_HEADINGS
 )
-
-
-from ...app.content_management import *
 
 class NoiseDataManager:
 
@@ -82,7 +76,8 @@ class NoiseDataManager:
     def import_csv_data(
         self, 
         reference_key: str,
-        file_path: str
+        # file_path: str,
+        file_info: dict
     ) -> None:
         reference_key = validate_instance_name(reference_key)
         
@@ -96,25 +91,21 @@ class NoiseDataManager:
             self.__key_blocker.check_blocked_key(key=reference_key,
                                                 instance_type="noise_data")
             # Makes sure that imported file is CSV type
-            validate_file_type(file_path, expected_ext=(".csv", ".CSV"))
+            # validate_file_type(file_path, expected_ext=(".csv", ".CSV"))
         except INSError:
             msg.add_traceback()
             return
 
-        csv_file = Path(file_path)
-        file_name = csv_file.name
-        full_path = str(csv_file.resolve())
-
         # Processing imported CSV file:
-        dataframe = pandas.read_csv(file_path)
+        dataframe = pandas.read_csv(file_info["file"])
         remove_unnecessary_collumns(dataframe)
         add_additional_columns(dataframe)
         modify_dataframe_data(dataframe)
         
         # Defining new noise data instance
         new_instance = NoiseDataInstance(
-            file_name=file_name,
-            full_path=full_path,
+            file_name=file_info["name"],
+            full_path=file_info["path"],
             dataframe=dataframe)
         self.__noise_data[reference_key] = new_instance
     

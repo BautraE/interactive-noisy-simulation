@@ -1,12 +1,8 @@
-// =====================================================================
-// NoiseDataManager exposed method usage
-// =====================================================================
-
-window.onload = function() {
+window.addEventListener('load', function() {
     setTimeout(function() {
         eel.view_noise_data_instances();
     }, 1);
-};
+});
 
 
 function importCSVCalibrationData() {

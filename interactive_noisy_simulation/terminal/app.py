@@ -8,7 +8,7 @@ import eel
 from ._console import console
 from ..data._data import TERMINAL_MESSAGES
 # Files with exposed Python functions/methods:
-from ..app import exposed
+from ..app import exposed, logs
 
 
 def start_app() -> None:

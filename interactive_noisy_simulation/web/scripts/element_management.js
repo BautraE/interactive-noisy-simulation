@@ -98,9 +98,10 @@ function addTableRow(tableId, rowContent, actions) {
  * 
  * @param {HTMLElement} appendableElement  - element to append to parent.
  */
-function _appendThroughId(id, appendableElement) {
+function _appendThroughId(id, appendableElement, placement="after") {
     let element = document.getElementById(id);
-    element.appendChild(appendableElement);
+    if (placement === "before") element.prepend(appendableElement);
+    else element.appendChild(appendableElement);
 }
 
 
