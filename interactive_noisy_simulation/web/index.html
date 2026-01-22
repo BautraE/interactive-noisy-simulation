@@ -5,10 +5,43 @@
         <title>INTERACTIVE NOISY SIMULATION vVERSION</title>
         <script type="text/javascript" src="/eel.js"></script>
         <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="icons.css">
     </head>
     <body>
+        <nav class="main-navbar">
+            <ul>
+                <li>
+                    <a href="">Instance Management</a>
+                </li>
+            </ul>
+        </nav>
         <!-- Part of page below main navigation bar -->
         <div class="page-content">
+            <!-- Log sidebar for messages and errors -->
+            <div id="log-sidebar" class="log-container hidden-log">
+                <div class="background-cover"></div>
+                <div class="log-sidebar">
+                    <div role="button" onclick="hideLogSidebar()" class="x-icon log-sidebar-x-icon"></div>
+                    <h1 class="content-block-heading">Message and Error Log</h1>
+                    <div class="content-box-header">
+                        <p>Messages:</p>
+                        <div role="button"
+                             onclick="eel.clear_all_messages()"
+                             class="button-a log-clear-button">
+                            Clear entire log
+                        </div>
+                    </div>
+                    <div id="messages" class="content-box log-content-box"></div>
+                    <div class="content-box-header">
+                        <p>Errors:</p>
+                        <div role="button"
+                             class="button-a log-clear-button">
+                            Clear entire log
+                        </div>
+                    </div>
+                    <div id="errors" class="content-box log-content-box"></div>
+                </div>
+            </div>
             <!-- Instance type navigation -->
             <nav class="side-navbar">
                 <h1>Instance Types</h1>
@@ -24,21 +57,18 @@
                 <p>Noise data instances:</p>
                 <input type="text" id="key_input" placeholder="Enter reference key">
                 <input type="text" id="path_input" placeholder="Enter file path">
-                <button onclick="importCSVCalibrationData()">Import Noise Data</button>
-                <button onclick="importTestData()">Test Data Import</button>
+                <button onclick="importCSVCalibrationData()">
+                    Import Noise Data
+                </button>
                 <div id="content-box"></div>
             </div>
         </div>
-        <!-- Log sidebar for messages and errors -->
-        <div class="log-sidebar">
-            <h1>Message and Error Log</h1>
-            <p>Messages:</p>
-            <button onclick="eel.clear_all_messages()">Clear entire log</button>
-            <div id="messages"></div>
-            <p>Errors:</p>
-            <div id="errors"></div>
+        <div role="button" 
+             onclick="showLogSidebar()"
+             class="log-sidebar-open-button">
+            Message & error log
         </div>
-        
+        <!-- Script imports -->
         <script type="text/javascript" src="scripts/element_management.js"></script>
         <script type="text/javascript" src="scripts/instance_management/noise_data_manager/all_instances.js"></script>
         <script type="text/javascript" src="scripts/logs.js"></script>

@@ -1,4 +1,232 @@
+/* 
+=================================================================
+General styles
+=================================================================
+*/
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
 body {
-    background-color: #3B3F52;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    
+    font-family: 'Nunito';
     color: white;
+
+    background-color: black;
+}
+
+.main-navbar {
+    height: 35px;
+    width: 100%;
+
+    background-color: #2B2E3C;
+}
+
+.page-content {
+    position: relative;
+    
+    display: flex;
+    flex: 1;
+
+    background-color: #3B3F52;
+}
+
+.content-box-header {
+    display: flex;
+    align-items: center;
+}
+
+.content-box {
+    width: auto;
+    margin-left: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius:8px;
+
+    background-color: #1D2331;
+}
+
+.content-block-heading {
+    text-align: center;
+
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 18pt;
+    filter: drop-shadow(0px 3px 4px #141414);
+}
+
+.button-a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    height: fit-content;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-radius: 4px;
+
+    cursor: pointer;
+
+    background-color: #1F2746;
+    filter: drop-shadow(0px 3px 4px #141414);
+
+    transition: background-color 0.5s ease;
+}
+
+.button-a:hover {
+    background-color: #4E63B4;
+    transition-duration: 0.3s;
+}
+
+.button-a:active {
+    background-color: #192B73;
+    transition-duration: 0.1s;
+}
+
+/* 
+=================================================================
+Log sidebar-related styles
+=================================================================
+*/
+/* Button element for opening side log panel */
+.log-sidebar-open-button {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-top-left-radius: 4px;
+    background-color: #2B2E3C;
+
+    cursor: pointer;
+
+    font-size: 18px;
+
+    transition: background-color 0.5s ease;
+}
+
+.log-sidebar-open-button:hover {
+    background-color: #4E63B4;
+    transition-duration: 0.3s;
+}
+
+.log-sidebar-open-button:active {
+    background-color: #192B73;
+    transition-duration: 0.1s;
+}
+
+/* Opening and closing log sidebar */
+.visible-log {
+    display: flex;
+}
+
+.hidden-log {
+    display: none;
+}
+
+/* Main div containers that make the log panel */
+.log-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+
+    width: 100%;
+    height: 100%;
+}
+
+.background-cover {
+    width: 50%;
+
+    background-color: black;
+    opacity: 65%;
+}
+
+.log-sidebar {
+    width: 50%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow-y: auto;
+
+    background-color: #3B3F52;
+}
+
+/* "X" icon for closing side panel */
+.log-sidebar-x-icon {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+/* Button in content box header */
+.log-clear-button {
+    margin-right: 0;
+    margin-left: auto;
+}
+
+/* Each log message instance that is made visible in the content box */
+.log-content-box {
+    flex: 0 0 auto;
+    max-height: 65vh;
+    
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+.log-instance {
+    display:flex;
+}
+
+.log-instance-action-box {
+    margin-right: 20px;
+}
+
+.log-clear-action {
+    cursor: pointer;
+    
+    color: #FF8A8A;
+    text-decoration: underline;
+
+    transition: color 0.5s ease;
+}
+
+.log-clear-action:hover {
+    color: #FFC4C6;
+    transition-duration: 0.3s;
+}
+
+.log-clear-action:active {
+    color: #DF3030;
+    transition-duration: 0.1s;
+}
+
+.log-instance-content-box {
+    word-break: break-word;
+}
+
+.log-timestamp {
+    color: #CDCDCD;
+    margin: 0;
+}
+
+.log-instance-content-box p:last-child {
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+
+/*  */
+
+.side-navbar {
+    background-color: #222222;
 }
