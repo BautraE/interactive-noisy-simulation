@@ -13,15 +13,7 @@ function importCSVCalibrationData() {
 }
 
 
-function removeNoiseDataInstance(referenceKey) {
-    eel.remove_noise_data_instance(referenceKey);
-}
-
-
-function viewSpecificNoiseData(referenceKey) {
-    window.location.href = `noise_data_instance.html?id=${referenceKey}`;
-}
-
+// Action handling
 
 function handleAction(actionType, rowId) {
     switch (actionType) {
@@ -32,4 +24,14 @@ function handleAction(actionType, rowId) {
             viewSpecificNoiseData(rowId);
             break;
     }
+}
+
+
+function removeNoiseDataInstance(referenceKey) {
+    eel.remove_noise_data_instance(referenceKey);
+}
+
+
+function viewSpecificNoiseData(referenceKey) {
+    window.location.href = `noise_data_instance.html?id=${referenceKey}`;
 }

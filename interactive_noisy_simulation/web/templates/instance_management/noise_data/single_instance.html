@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Instance type navigation -->
+<nav class="side-navbar">
+    <h1>Instance Types</h1>
+    <ul>
+        <li>
+            <a href="">Noise Data</a>
+        </li>
+    </ul>
+</nav>
+<!-- Current page content -->
+<div id="content-container">
+    <a onclick="backToInstances()">> Noise Data Instances</a>
+    <h1>Specific Noise Data Instance</h1>
+    <p>Specific qubit data:</p>
+    <div id="qubit-data"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="../scripts/instance_management/noise_data_manager/single_instance.js"></script>
+{% endblock %}
