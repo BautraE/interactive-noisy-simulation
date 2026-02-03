@@ -1,0 +1,211 @@
+/* 
+=================================================================
+General content styles that are used by all pages of INS
+=================================================================
+File contents list:
+1. Specific element styling / default style overwriting.
+2. Table styling.
+3. Main navbar styling.
+4. Main page content container and common element styles
+   (div containers and content boxes, headings, etc.)
+5. Situation-specific styles - hiding / showing elements, 
+   disabling scrolling, etc.
+-----------------------------------------------------------------
+
+--------------------------------------------------------------
+1. Specific element styling / default style overwriting.
+-------------------------------------------------------------- 
+*/ 
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    
+    font-family: 'Nunito';
+    font-size: 16px;
+    color: white;
+
+    background-color: black;
+}
+
+p, h1, h2 {
+    margin: 0;
+}
+
+
+/*
+--------------------------------------------------------------
+2. Table styling
+-------------------------------------------------------------- 
+*/ 
+table {
+    border-spacing: 0;
+}
+
+th {
+    text-align: left;
+    vertical-align: top;
+    text-transform: uppercase;
+    font-style: italic;
+    font-weight: normal;
+    color: #FFD173;
+
+    border-radius: 8px;
+}
+
+td {
+    text-wrap: balance;
+    text-align: left;
+    vertical-align: top;
+    word-break: break-word;
+}
+
+td, th {
+    padding: 10px;
+}
+
+tr:nth-child(even) {
+    background-color: #222C42;
+}
+
+tr td:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+tr td:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.action-container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px;
+}
+
+
+/*
+--------------------------------------------------------------
+3. Main navbar styling.
+-------------------------------------------------------------- 
+*/ 
+.main-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+
+    height: 35px;
+    width: 100%;
+
+    background-color: #2B2E3C;
+}
+
+
+/*
+--------------------------------------------------------------
+4. Main page content container and common element styles
+   (div containers and content boxes, headings, etc.)
+-------------------------------------------------------------- 
+*/ 
+/* Main page content container. It encapsulates all content of the
+   page after the main navigation bar */
+.page-content {
+    display: flex;
+    flex: 1;
+    max-height: var(--max-page-content-height);
+
+    background-color: #3B3F52;
+}
+
+/* Content container - div element that will contain specific content
+   (headings, content boxes, clickables, text, etc.) */
+.content-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding-top: 35px;
+    padding-bottom: 80px;
+    padding-left: 35px;
+    padding-right: 35px;
+}
+
+/* Main heading elements */
+.content-container-heading {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 30px;
+
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 24px;
+    filter: drop-shadow(0px 3px 4px #141414);
+}
+
+/* -------------------------------------------------------- */
+/* Content box styles: */
+
+/* Header usually containing minimal text and various clickables */
+.content-box-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+/* Element placement in content box headers */
+.content-box-header .left, .content-box-header .right {
+    display: flex;
+    column-gap: 20px;
+}
+.content-box-header .right {
+    margin-left: auto;
+}
+
+/* Darker containers that have readable / visible content
+   (instances or any information about them, data tables, etc.) */
+.content-box {
+    width: auto;
+    margin-left: 20px;
+    padding: 10px;
+    border-radius: 8px;
+
+    background-color: #1D2331;
+    scrollbar-color: #6176A8 #1D2331;
+}
+
+/* Text that appears if there are no instances to display at a
+   given moment */
+.no-instances-text {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 30px;
+
+    font-size: 20px;
+    color: #CDCDCD;
+}
+
+
+/* 
+--------------------------------------------------------------
+5. Situation-specific styles
+--------------------------------------------------------------
+*/
+/* Something that gets added to elements to hide them */
+.hidden-element {
+    display: none;
+}
+
+/* Style that gets put on body to prevent scrolling whenever
+   either a sidebar or an on-screen pop-up is open. */
+.no-scroll {
+    overflow: hidden;
+}
+
+
+/* ------------------------------------------------------- 
+   To be put somewhere later: */
+.side-navbar {
+    background-color: #222222;
+}

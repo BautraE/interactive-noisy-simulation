@@ -72,13 +72,19 @@ function addTableRow(tableId, rowContent, actions) {
 
     if (actions.length !== 0) {
         let tableCell = document.createElement("td");
+        let actionDiv = document.createElement("div");
+        actionDiv.classList.add("action-container");
         for(let action of actions) {
-            let actionButton = document.createElement("button");
-            actionButton.innerText = action.name
-            actionButton.onclick = () => handleAction(action.type, rowContent[0])
-            tableCell.appendChild(actionButton)
+            let actionElement = document.createElement("a");
+            actionElement.role = "button";
+            actionElement.innerText = action.name;
+            actionElement.classList.add("clickable", "action", `${action.type}-action`);
+            actionElement.onclick = () => handleAction(action.type, rowContent[0]);
+
+            actionDiv.appendChild(actionElement);
         }
-        row.appendChild(tableCell)
+        tableCell.appendChild(actionDiv);
+        row.appendChild(tableCell);
     }
 
     _appendThroughId(tableId, row);

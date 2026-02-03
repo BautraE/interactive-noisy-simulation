@@ -1,0 +1,199 @@
+/*
+=================================================================
+Clickable element styles (buttons, actions, icons)
+=================================================================
+File contents list:
+1. Common features - style properties that are expected.
+   across all elements that are clickable (buttons, links and
+   actions in the form of text, icons, etc.).
+2. Actions - text that can be clicked.
+3. Buttons - div elements in the form of buttons.
+4. Icons - clickable icons made purely through of CSS.
+-----------------------------------------------------------------
+
+-------------------------------------------------------------- 
+1. Common features
+--------------------------------------------------------------
+*/ 
+
+/* Class "clickable" that must be added to all elements that
+   are supposed to be clicked. */
+.clickable {
+    cursor: pointer;
+
+    transition: color 0.5s ease,
+    background-color 0.5s ease;
+}
+.clickable:hover {
+    transition-duration: 0.3s;
+}
+.clickable:active {
+    transition-duration: 0.1s;
+}
+/* For icons made through CSS */
+.x-icon::before,
+.x-icon::after {
+    transition: background-color 0.5s ease;
+}
+.x-icon:hover::before,
+.x-icon:hover::after {
+    transition-duration: 0.3s;
+}
+.x-icon:active::before,
+.x-icon:active::after {
+    transition-duration: 0.1s;
+}
+
+
+/* 
+-------------------------------------------------------------- 
+2. Actions
+-------------------------------------------------------------- 
+*/
+
+/* Class that must be added to clickable actions */
+.action {
+    text-decoration: underline;
+}
+
+/* -------------------------------------------------------- */
+/* Different colors for actions: */
+
+/* Action for deleting / removing stuff */
+.delete-action {
+    color: #FF8A8A;
+}
+.delete-action:hover {
+    color: #FFC4C6;
+}
+.delete-action:active {
+    color: #DF3030;
+}
+
+/* Action for viewing more details */
+.view-action {
+    color: #00FFFF;
+}
+.view-action:hover {
+    color: #98FFFF;
+}
+.view-action:active {
+    color: #00DCBB;
+}
+
+
+/* 
+-------------------------------------------------------------- 
+3. Buttons
+-------------------------------------------------------------- 
+*/
+
+/* -------------------------------------------------------- */
+/* Types of buttons */
+
+.button-a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    height: fit-content;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-radius: 4px;
+
+    filter: drop-shadow(0px 3px 4px #141414);
+}
+
+/* -------------------------------------------------------- */
+/* Different colors for buttons: */
+
+/* button color schemes */
+.dark-button {
+    background-color: #1F2746;
+}
+.dark-button:hover {
+    background-color: #4E63B4;
+}
+.dark-button:active {
+    background-color: #192B73;
+}
+
+.light-button {
+    background-color: #3F5177;
+}
+.light-button:hover {
+    background-color: #4E63B4;
+}
+.light-button:active {
+    background-color: #192B73;
+}
+
+
+/* 
+--------------------------------------------------------------
+4. Icons
+--------------------------------------------------------------
+*/
+
+/* -------------------------------------------------------- */
+/* Types of icons */
+
+/* X icon for closing windows and sidebars */
+.x-icon {
+    position: relative;
+    width: 20px;
+    height: 20px;
+
+    filter: drop-shadow(0px 3px 4px #141414);
+}
+.x-icon::before,
+.x-icon::after {
+    content: "";
+
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 20px;
+    height: 3px;
+
+    background-color: #989DB6;
+    border-radius: 4px;
+    
+    transform-origin: center;
+
+    transition: background-color 0.5s ease;
+}
+.x-icon::before {
+    transform: translateY(-50%) rotate(45deg);
+}
+.x-icon::after {
+    transform: translateY(-50%) rotate(-45deg);
+}
+.x-icon:hover::before,
+.x-icon:hover::after {
+    background-color: #D0D8FF;
+}
+.x-icon:active::before,
+.x-icon:active::after {
+    background-color: #5B77FF;
+}
+
+
+/* -------------------------------------------------------- */
+/* Different colors for icons */
+
+/* "icon-red" for a red icon */
+.icon-red::before,
+.icon-red::after {
+    background-color: #FF8A8A;
+}
+.icon-red:hover::before,
+.icon-red:hover::after {
+    background-color: #FFC4C6;
+}
+.icon-red:active::before,
+.icon-red:active::after {
+    background-color: #DF3030;
+}

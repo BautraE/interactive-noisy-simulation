@@ -1,5 +1,16 @@
+# Tkinter blurry UI fix for Windows:
+import sys
+
+if sys.platform == "win32":
+    try:
+        import ctypes
+        ctypes.windll.shcore.SetProcessDpiAwareness(1)
+    except Exception:
+        pass
+
 # Standard library imports:
 from pathlib import Path
+from tkinter import Tk, filedialog
 
 # Third party imports:
 import eel
@@ -9,6 +20,7 @@ from ..core.instance_managers.noise_data_manager import NoiseDataManager
 from .content_management import *
 from .logs import add_log_message
 from ..data._data import MESSAGES
+from ..project_variables import PACKAGE_ROOT
 
 
 # Manager class objects:
@@ -46,9 +58,9 @@ def view_noise_data_instances() -> None:
                           actions=actions)
     # If not, adds message stating this
     else:
-        add_message(container_id="content-box",
-                    message=MESSAGES["no_instances"],
-                    instance_type="imported noise data instances")
+        message_text = MESSAGES["no_instances"]["text"].format(
+            instance_type="imported noise data instances")
+        eel.addNoInstanceMessage(message_text, "content-box")
 
 
 @eel.expose
@@ -73,6 +85,25 @@ def import_csv_calibration_data(
     
     # Reload instance table after adding new instance:
     view_noise_data_instances()
+
+
+@eel.expose
+def select_csv() -> None:
+    root = Tk()
+    root.withdraw()
+    root.attributes("-topmost", True)
+
+    file_path = filedialog.askopenfilename(
+        title="Select CSV file",
+        filetypes=[("CSV files", "*.csv")]
+    )
+
+    root.destroy()
+
+    if file_path:
+        path_object = Path(file_path)
+        file_name = path_object.name
+        eel.setSelectedCSVFile(file_name, file_path)
 
 
 @eel.expose
@@ -107,3 +138,10 @@ def view_qubit_data(
             row_content = [name, str(value)]
             add_table_row(table_id=f"qubit-table-{qubit}",
                           row_content=row_content)
+            
+
+# Pop-up related functions:
+@eel.expose
+def get_popup(file_name: str) -> str:
+    path = PACKAGE_ROOT / f"web/html/popups/{file_name}.html"
+    return path.read_text(encoding="utf-8")

@@ -1,0 +1,127 @@
+/* 
+=================================================================
+Log sidebar-related styles
+=================================================================
+File contents list:
+1. Button element for opening log side panel - located outside
+   of side panel, at the bottom-right corner of the active page.
+2. Main div containers that make the log panel
+3. Content of the log side panel
+-----------------------------------------------------------------
+
+-------------------------------------------------------------- 
+1. Button element for opening log side panel
+-------------------------------------------------------------- 
+*/ 
+.log-sidebar-open-button {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-top-left-radius: 4px;
+    background-color: #2B2E3C;
+
+    cursor: pointer;
+
+    font-size: 18px;
+}
+.log-sidebar-open-button:hover {
+    background-color: #4E63B4;
+}
+.log-sidebar-open-button:active {
+    background-color: #192B73;
+}
+
+/*
+--------------------------------------------------------------
+2. Main div containers that make the log panel
+-------------------------------------------------------------- 
+*/
+/* Container for two main sub-containers */
+.log-container {
+    display: flex;
+    position: fixed;
+    top: 35px;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    height: var(--max-page-content-height);
+}
+/* Sub-containers */
+.background-cover {
+    width: 50%;
+
+    background-color: black;
+    opacity: 65%;
+}
+
+.log-sidebar {
+    width: 50%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow-y: auto;
+
+    background-color: #3B3F52;
+    scrollbar-color: #8792C8 #3B3F52;
+}
+
+
+/*
+--------------------------------------------------------------
+3. Content of the log side panel
+-------------------------------------------------------------- 
+*/
+/* "X" icon for closing side panel */
+.log-sidebar-x-icon {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+/* Content box for log messages and errors */
+.log-content-box {
+    flex: 0 0 auto;
+    max-height: 65vh;
+    margin-bottom: 20px;
+    
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+/* -------------------------------------------------------- */
+/* Message part of log */
+
+/* Each log message instance that is made visible in the content box */
+.log-instance {
+    display: flex;
+}
+
+/* Message log instance container for action (ex. "Clear") */
+.log-instance-action-box {
+    margin-right: 20px;
+}
+
+/* Message log instance container for timestamp and
+   message text */
+.log-instance-content-box {
+    word-break: break-word;
+}
+
+/* Timestamp text */
+.log-timestamp {
+    color: #CDCDCD;
+    margin: 0;
+}
+
+/* Message text of log instance */
+.log-instance-content-box p:last-child {
+    margin-top: 5px;
+    margin-bottom: 0;
+}

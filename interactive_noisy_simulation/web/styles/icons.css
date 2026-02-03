@@ -1,54 +1,19 @@
 /* 
 =================================================================
-Icons used in the project that are made through CSS
+Static icons based on images (non-clickable)
 =================================================================
 */
 
-/* X icon for closing windows and sidebars */
-.x-icon {
-    position: relative;
-    width: 20px;
-    height: 20px;
+/* Icon of a file */
+.file-icon-image {
+    height: 25px;
+    width: 25px;
 
-    cursor: pointer;
+    mask-image: url("../assets/file_icon.svg");
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
 
-    filter: drop-shadow(0px 3px 4px #141414);
-}
-
-.x-icon::before,
-.x-icon::after {
-    content: "";
-
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 20px;
-    height: 3px;
-
-    background-color: #989DB6;
-    border-radius: 4px;
-    
-    transform-origin: center;
-
-    transition: background-color 0.5s ease;
-}
-
-.x-icon::before {
-    transform: translateY(-50%) rotate(45deg);
-}
-
-.x-icon::after {
-    transform: translateY(-50%) rotate(-45deg);
-}
-
-.x-icon:hover::before,
-.x-icon:hover::after {
-    background-color: #D0D8FF;
-    transition-duration: 0.3s;
-}
-
-.x-icon:active::before,
-.x-icon:active::after {
-    background-color: #5B77FF;
-    transition-duration: 0.1s
+    /* Overlay color: */
+    background-color: #FFD173;
 }

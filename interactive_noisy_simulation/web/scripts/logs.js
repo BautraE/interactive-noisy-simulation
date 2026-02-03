@@ -1,37 +1,61 @@
-// =========================================================
+// =================================================================
 // Functionality related to message and error log
-// =========================================================
+// =================================================================
 
-// Loading existing messages into log content box
+// Loading existing messages and errors into log content box
 window.addEventListener('load', function() {
     setTimeout(function() {
         eel.show_log_messages();
+        eel.show_log_errors();
     }, 1);
 });
 
 
+// --------------------------------------------------------------
 // Showing / hiding log sidebar
+// --------------------------------------------------------------
+
+/**
+ * Makes log sidebar / side panel visible.
+ */
 function showLogSidebar() {
     let sidebar = document.getElementById("log-sidebar");
-    sidebar.classList.remove('hidden-log');
-    sidebar.classList.add('visible-log');
+    // Prevent scrolling in body of currently open page
+    document.body.classList.add("no-scroll");
+    sidebar.classList.remove('hidden-element');
 }
 
 
+/**
+ * Makes log sidebar / side panel hidden.
+ */
 function hideLogSidebar() {
     let sidebar = document.getElementById("log-sidebar");
-    sidebar.classList.remove('visible-log');
-    sidebar.classList.add('hidden-log');
+    sidebar.classList.add('hidden-element');
+    // Allow scrolling in body of currently open page
+    document.body.classList.remove("no-scroll");
 }
 
 
+// --------------------------------------------------------------
+// Loading and rendering current messages and errors into log
+// --------------------------------------------------------------
+
 eel.expose(loadLogMessage)
+/**
+ * Loads message into log.
+ * 
+ * @param {string} id - id of the message (used for specific log
+ * instance clearing functionality).
+ * @param {string} timestamp - time at which the message was generated.
+ * @param {string} messageText - log message text.
+ */
 function loadLogMessage(id, timestamp, messageText) {
     // Message part with delete action
     let aDelete = document.createElement("a");
     aDelete.innerHTML = "Clear";
     aDelete.role = "button";
-    aDelete.classList.add("log-clear-action");
+    aDelete.classList.add("clickable", "action", "delete-action");
     aDelete.onclick = () => eel.clear_message(id);
 
     let deleteContainer = document.createElement("div");
@@ -57,5 +81,6 @@ function loadLogMessage(id, timestamp, messageText) {
     messageContainer.appendChild(deleteContainer);
     messageContainer.appendChild(messageContentContainer);
 
+    // Append everything to the log message content box
     _appendThroughId("messages", messageContainer, "before");
 }

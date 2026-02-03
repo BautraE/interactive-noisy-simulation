@@ -1,0 +1,150 @@
+/*
+=================================================================
+Dialog / pop-up window styles (as well as form input styles)
+=================================================================
+File contents list:
+1. Dialog window content.
+2. Input field-related styles.
+-----------------------------------------------------------------
+
+-------------------------------------------------------------- 
+1. Dialog window content
+--------------------------------------------------------------
+*/ 
+/* Main container for all pop-ups that may appear in the middle
+   of the screen */
+.pop-up-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 2;
+
+    background-color: rgba(0, 0, 0, 50%);
+}
+
+/* Pop-up window container */
+.pop-up {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    border-radius: 8px;
+    
+    background-color: #3B3F52;
+    filter: drop-shadow(0px 3px 4px #141414);
+}
+
+/* Header of pop-up window that contains title
+   of the pop-up */
+.pop-up-title-bar {
+    max-width: 100%;
+    padding: 10px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    word-break: break-word;
+
+    background-color: #2B2E3C;
+}
+
+/* Title for pop-up window */
+.pop-up-title {
+    text-align: center;
+    margin: 0;
+
+    text-transform: uppercase;
+    font-size: 16px;
+    filter: drop-shadow(0px 3px 4px #141414);
+}
+
+/* Form element that acts as a container for encapsulating
+   various input fields */
+.pop-up-form {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    padding: 20px;
+}
+
+/* Container for a single input (this includes the label,
+   input field itself that may also be a button, as well
+   as other elements that may be required) */
+.form-input-group {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+}
+/* Last input is a container with buttons for either cancelling
+   or finishing a specific action. */
+.form-input-group:last-child {
+    flex-direction: row;
+    column-gap: 20px;
+    justify-content: flex-end;
+}
+
+/* 
+-------------------------------------------------------------- 
+2. Input field-related styles
+-------------------------------------------------------------- 
+*/
+
+/* -------------------------------------------------------- */
+/* File input: */
+
+/* Container for file input */
+.file-input-box {
+    display: flex;
+    row-gap: 10px;
+    column-gap: 10px;
+    align-items: center;
+}
+/* Button for selecting file */
+.file-input-box .button-light {
+    width: 110px;
+}
+/* X-icon for removing selected calibration data file */
+.file-input-box .x-icon {
+    margin-right: 0;
+    margin-left: auto;
+}
+/* Text that represents selected files in cases where it is
+   possible to import something. */
+.selected-file {
+    max-width: 70%;
+    word-break: break-word;
+    margin: 0;
+
+    color: #CDCDCD;
+}
+
+/* -------------------------------------------------------- */
+/* Text input: */
+
+input[type="text"] {
+    width: 170px;
+    height: 25px;
+    
+    font-family: 'Nunito';
+    font-size: 16px;
+
+    outline: none;
+    border: none;
+    border-radius: 4px;
+    background-color:#D9D9D9;
+    filter: drop-shadow(0px 3px 4px #141414);
+}
+input[type="text"]:focus {
+    outline-width: 5px;
+    outline-color: #4644C2;
+    outline-style: inset;
+}
+
+/* -------------------------------------------------------- */
+/* Error highlighting styles: */
+
+input.error-outline,
+.error-outline {
+    outline: 5px solid #DF3030;
+}

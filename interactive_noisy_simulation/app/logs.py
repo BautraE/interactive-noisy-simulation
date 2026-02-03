@@ -46,6 +46,15 @@ def show_log_messages() -> None:
                                message["timestamp"],
                                message["message_text"])
     else:
-        add_message(container_id="messages",
-                    message=MESSAGES["empty_log"],
-                    log_type="message")
+        message_text = MESSAGES["empty_log"]["text"].format(
+            log_type="message")
+        eel.addNoInstanceMessage(message_text, "messages")
+
+
+@eel.expose
+def show_log_errors() -> None:
+    remove_container_content("errors")
+
+    message_text = MESSAGES["empty_log"]["text"].format(
+            log_type="error")
+    eel.addNoInstanceMessage(message_text, "errors")

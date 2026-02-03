@@ -1,7 +1,7 @@
 # Ignoring specific directories:
 build/
 interactive_noisy_simulation.egg-info/
-/interactive_noisy_simulation/web/html/
+/interactive_noisy_simulation/web/generated_html/
 __pycache__/
 
 # Ignoring specific files:
