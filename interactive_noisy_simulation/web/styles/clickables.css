@@ -22,7 +22,8 @@ File contents list:
     cursor: pointer;
 
     transition: color 0.5s ease,
-    background-color 0.5s ease;
+    background-color 0.5s ease,
+    text-shadow 0.5s ease;
 }
 .clickable:hover {
     transition-duration: 0.3s;
@@ -31,16 +32,16 @@ File contents list:
     transition-duration: 0.1s;
 }
 /* For icons made through CSS */
-.x-icon::before,
-.x-icon::after {
+.clickable::before,
+.clickable::after {
     transition: background-color 0.5s ease;
 }
-.x-icon:hover::before,
-.x-icon:hover::after {
+.clickable:hover::before,
+.clickable:hover::after {
     transition-duration: 0.3s;
 }
-.x-icon:active::before,
-.x-icon:active::after {
+.clickable:active::before,
+.clickable:active::after {
     transition-duration: 0.1s;
 }
 

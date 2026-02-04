@@ -1,0 +1,26 @@
+<!-- Instance type navigation -->
+<nav class="side-navbar">
+    <h1 class="content-container-heading">Instance Types</h1>
+    <ul>
+        <li>
+            <a class="clickable {{ 'active' if active_instance_page == 'noise_data' }}"
+               href="">Noise Data</a>
+        </li>
+        <li>
+            <a class="clickable {{ 'active' if active_instance_page == 'noise_models' }}" 
+               href="">Noise Models</a>
+        </li>
+        <li>
+            <a class="clickable {{ 'active' if active_instance_page == 'simulators' }}" 
+               href="">Simulators</a>
+        </li>
+        <li>
+            <a class="clickable {{ 'active' if active_instance_page == 'circuits' }}" 
+               href="">Circuits</a>
+        </li>
+        <li>
+            <a class="clickable {{ 'active' if active_instance_page == 'results' }}"
+               href="">Results</a>
+        </li>
+    </ul>
+</nav>

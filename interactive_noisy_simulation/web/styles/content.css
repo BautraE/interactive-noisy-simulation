@@ -31,7 +31,7 @@ body {
     background-color: black;
 }
 
-p, h1, h2 {
+p, h1, h2, ul {
     margin: 0;
 }
 
@@ -97,11 +97,42 @@ tr td:last-child {
     position: sticky;
     top: 0;
     z-index: 3;
-
     height: 35px;
     width: 100%;
+    box-sizing: border-box;
+    padding-left: 35px;
 
     background-color: #2B2E3C;
+}
+.main-navbar ul {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+    column-gap: 35px;
+    padding: 0;
+    align-items: center;
+}
+.main-navbar ul li {
+    height: fit-content;
+}
+/* Navbar link styles: */
+.main-navbar ul li a {
+    text-decoration: none;
+    color: #CDCDCD;
+    font-size: 16px;
+}
+.main-navbar ul li a:hover {
+    text-shadow: #d5adff 0px 0 13px;
+    color: white;
+}
+.main-navbar ul li a:active {
+    text-shadow: #d5adff 0px 0 15px;
+    color: #9C9AFF;
+}
+/* For current page link */
+.main-navbar ul li a.active {
+    color: #9C9AFF;
 }
 
 
@@ -201,11 +232,4 @@ tr td:last-child {
    either a sidebar or an on-screen pop-up is open. */
 .no-scroll {
     overflow: hidden;
-}
-
-
-/* ------------------------------------------------------- 
-   To be put somewhere later: */
-.side-navbar {
-    background-color: #222222;
 }

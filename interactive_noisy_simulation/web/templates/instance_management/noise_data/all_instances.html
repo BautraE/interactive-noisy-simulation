@@ -1,20 +1,17 @@
 {% extends "base.html" %}
 
+{% set active_main_page = "instance_management" %}
+{% set active_instance_page = "noise_data" %}
+
 {% block css %}
 <link rel="stylesheet" 
       href="../styles/page_specific/instance_management/noise_data/all_instances.css">
+<link rel="stylesheet" 
+      href="../styles/page_specific/instance_management/common.css">
 {% endblock %}
 
 {% block content %}
-<!-- Instance type navigation -->
-<nav class="side-navbar">
-    <h1>Instance Types</h1>
-    <ul>
-        <li>
-            <a href="">Noise Data</a>
-        </li>
-    </ul>
-</nav>
+{% include "instance_management/side_navbar.html" %}
 <!-- Current page content -->
 <div class="content-container">
     <h1 class="content-container-heading">Noise Data Instance Management</h1>
