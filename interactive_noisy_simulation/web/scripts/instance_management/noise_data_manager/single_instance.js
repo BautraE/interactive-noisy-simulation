@@ -5,14 +5,46 @@
 
 let referenceKey
 
-window.onload = function() {
+window.addEventListener('load', function() {
     setTimeout(function() {
+        // Loads params from URL
         const urlParams = new URLSearchParams(window.location.search);
         referenceKey = urlParams.get('id');
+        // Loads data on page
+        setSpecificInstanceName(referenceKey);
         eel.view_qubit_data(referenceKey);
     }, 1);
-};
+});
 
+
+// --------------------------------------------------------------
+// Content management
+// --------------------------------------------------------------
+
+/**
+ * Adds name of the specific instance being viewed to the main
+ * content container title.
+ * 
+ * @param {string} instanceName - name of instance being viewed.
+ */
+function setSpecificInstanceName(instanceName) {
+    let span = document.getElementById("instance-name");
+    span.innerText = instanceName;
+}
+
+
+// --------------------------------------------------------------
+// Link handling
+// --------------------------------------------------------------
+
+/**
+ * Returns user to the previous page (which in this case should)
+ * only be the page for managing all noise data instances.
+ */
 function backToInstances() {
-    window.location.href = `index.html`;
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = 'index.html';
+    }
 }

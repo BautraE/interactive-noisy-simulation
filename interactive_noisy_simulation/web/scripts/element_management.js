@@ -130,7 +130,7 @@ function _appendThroughId(id, appendableElement, placement="after") {
 eel.expose(createContentBox)
 function createContentBox(containerId, boxId) { 
     let contentBox = document.createElement("div");
-    contentBox.classList.add("content-boxes");
+    contentBox.classList.add("content-box");
     contentBox.id = boxId;
 
     _appendThroughId(containerId, contentBox);

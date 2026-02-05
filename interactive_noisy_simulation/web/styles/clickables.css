@@ -9,6 +9,8 @@ File contents list:
 2. Actions - text that can be clicked.
 3. Buttons - div elements in the form of buttons.
 4. Icons - clickable icons made purely through of CSS.
+5. Links - text that represents a link for going back to the
+   previous page / pages.
 -----------------------------------------------------------------
 
 -------------------------------------------------------------- 
@@ -54,6 +56,8 @@ File contents list:
 
 /* Class that must be added to clickable actions */
 .action {
+    width: fit-content;
+
     text-decoration: underline;
 }
 
@@ -197,4 +201,26 @@ File contents list:
 .icon-red:active::before,
 .icon-red:active::after {
     background-color: #DF3030;
+}
+
+
+/* 
+-------------------------------------------------------------- 
+5. Links
+-------------------------------------------------------------- 
+*/
+
+.link-previous {
+    width: fit-content;
+    margin-bottom: 10px;
+
+    font-size: 16px;
+    color: #9C9AFF;
+    text-decoration: underline;
+}
+.link-previous:hover {
+    color: #D1C1FF;
+}
+.link-previous:active {
+    color: #BF71FF;
 }

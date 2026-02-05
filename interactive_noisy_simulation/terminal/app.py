@@ -34,7 +34,9 @@ def start_app() -> None:
 
     # Starting INS
     port = _get_free_port()
-    eel.start('generated_html/index.html', port=port, size=(1200, 800))
+    eel.start('generated_html/index.html', 
+              port=port, 
+              size=(1200, 800))
 
 
 def _get_free_port() -> int:

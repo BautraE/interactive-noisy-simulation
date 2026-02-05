@@ -1,0 +1,31 @@
+/* 
+=================================================================
+Page specific styles for page showing specific noise data 
+instance information.
+=================================================================
+File contents list:
+1. Page content styles - any page specific styles affecting the
+   main page content.
+-----------------------------------------------------------------
+
+--------------------------------------------------------------
+1. Page content styles
+-------------------------------------------------------------- 
+*/
+
+/* Slightly adjusted table styles */
+td:first-child {
+    width: 50%;
+}
+td:nth-child(even) {
+    color: #FFD173;
+}
+
+
+/* Content box spacing adjustments */
+.qubit-data .content-box {
+    margin-bottom: 35px;
+}
+.qubit-data .content-box:last-child {
+    margin-bottom: 0;
+}
