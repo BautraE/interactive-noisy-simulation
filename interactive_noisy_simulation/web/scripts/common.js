@@ -2,9 +2,15 @@
 // Minor miscellaneous functions that are common across almost all
 // pages.
 // =================================================================
+// File contents list:
+// 1. Pop-up functionality.
+// 2. General content-related functions
+// 3. Container management
+// 4. Data table creation
+// -----------------------------------------------------------------
 
 // --------------------------------------------------------------
-// Pop-up functionality
+// 1. Pop-up functionality
 // --------------------------------------------------------------
 
 /**
@@ -35,8 +41,9 @@ async function showPopUpWindow(popupName) {
 
 
 // --------------------------------------------------------------
-// General content-related functions
+// 2. General content-related functions
 // --------------------------------------------------------------
+
 eel.expose(addNoInstanceMessage);
 /**
  * Adds specific message that notifies about there not being any
@@ -53,4 +60,136 @@ function addNoInstanceMessage(messageText, parentElementId) {
     messageElement.innerHTML = messageText;
 
     _appendThroughId(parentElementId, messageElement);
+}
+
+
+// --------------------------------------------------------------
+// 3. Container management
+// --------------------------------------------------------------
+
+/**
+ * Creates a content box element & inserts it into a parent content
+ * container element through its ID.
+ * 
+ * Content boxes are div containers that will contain printable content
+ * for the user, for example, qubit CSV noise data, created instances etc.
+ * 
+ * @param {string} containerId - ID of parent content container.
+ * @param {string} boxId - ID of created content box.
+ */
+eel.expose(createContentBox)
+function createContentBox(containerId, boxId) { 
+    let contentBox = document.createElement("div");
+    contentBox.classList.add("content-box");
+    contentBox.id = boxId;
+
+    _appendThroughId(containerId, contentBox);
+}
+
+
+/**
+ * Clears (deletes) all child elements from a parent element based on
+ * its ID.
+ * 
+ * @param {string} containerId - ID of container whose child elements will
+ * be deleted.
+ */
+eel.expose(removeContainerContent)
+function removeContainerContent(containerId) {
+    let container = document.getElementById(containerId)
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
+}
+
+
+// --------------------------------------------------------------
+// 4. Data table creation
+// --------------------------------------------------------------
+
+
+eel.expose(addTable);
+/**
+ * Adds table inside specific container for the purpose of displaying
+ * some kind of data.
+ * 
+ * @param {string} containerId - ID of the container element where the
+ *  newly created table will be placed.
+ * @param {string} tableId - ID attribute value that will be set for 
+ * the table so that it can be accessed further on.
+ * @param {string[]} columns - List of column names that will be 
+ * set in the header row of the table. If none are given, no table 
+ * header row is created (`Default = []`).
+ * @param {boolean} hasActions - Boolean flag value for whether 
+ * or not the table should contain an additional column - Actions
+ * (`Default = false`).
+ */
+function addTable(containerId, tableId, columns=[], hasActions=false) {
+    let table = document.createElement("table");
+    table.id = tableId;
+
+    if (columns.length !== 0) {
+        if (hasActions) columns.push("Actions");
+
+        let row = document.createElement("tr");
+
+        for(let cellContent of columns) {
+            let tableCell = document.createElement("th");
+            tableCell.innerHTML = cellContent;
+            row.appendChild(tableCell);
+        }
+        
+        table.appendChild(row);
+    }
+
+    _appendThroughId(containerId, table);
+}
+
+
+eel.expose(addTableRow);
+/**
+ * Creates new row with given data and adds it to the table with the 
+ * specified ID.
+ * 
+ * Note: There is no validation intended to check whether data row 
+ * cell count exceeds the cell count of the tables header row.
+ * 
+ * @param {string} tableId - ID of table, to which the new row shall 
+ * be added.
+ * @param {string[]} rowContent - List of row table cell content.
+ * @param {string[]} actions - List of action strings that serve as 
+ * both visible action link names and action type identifiers.
+ * (`Default = []`)
+ */
+function addTableRow(tableId, rowContent, actions=[]) {
+    let row = document.createElement("tr");
+
+    // Adds row cell content
+    for(let cellContent of rowContent) {
+        let tableCell = document.createElement("td");
+        tableCell.innerHTML = cellContent;
+        row.appendChild(tableCell);
+    }
+    // If given, adds actions to row
+    if (actions.length !== 0) {
+        let tableCell = document.createElement("td");
+        
+        let actionDiv = document.createElement("div");
+        actionDiv.classList.add("action-container");
+        
+        for(let action of actions) {
+            let actionElement = document.createElement("a");
+            actionElement.role = "button";
+            actionElement.innerText = action;
+            actionElement.classList.add("clickable", "action", `${action}-action`);
+            actionElement.onclick = () => handleAction(action, rowContent[0]);
+
+            actionDiv.appendChild(actionElement);
+        }
+
+        tableCell.appendChild(actionDiv);
+        row.appendChild(tableCell);
+    }
+
+    _appendThroughId(tableId, row);
 }

@@ -73,7 +73,7 @@ eel.expose(setSelectedCSVFile);
  * @param {string} fileName - name of selected file that will
  * be displayed to the user for informative purposes.
  * @param {string} path - full file path that will be set
- * as the input field's value.
+ * as the file input field's value.
  */
 function setSelectedCSVFile(fileName, path) {
     // Hides button for selecting file

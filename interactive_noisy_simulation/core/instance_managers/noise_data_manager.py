@@ -1,25 +1,15 @@
 #Third party imports:
-import eel, numpy, pandas
+import pandas
 
 # Project-related imports:
-from ..utils.key_blocker import KeyBlocker
+from ..data_structures.file import File
 from ..data_structures.noise_data_instance import NoiseDataInstance
-from ..exceptions import INSError
+from ..data_structures.instance_data import InstanceData
 from .helpers.csv_modification import (
     add_additional_columns, modify_dataframe_data,
     remove_unnecessary_collumns
 )
-from ..messages.helpers.text_styling import (
-    style_file_path, style_highlight, style_italic
-)
-from ..utils.checkers import check_instance_key
-from ..utils.validators import (
-    validate_file_type, validate_instance_name
-)
-from ..messages._message_manager import message_manager as msg
-from ...data._data import (
-    CONFIG, CSV_COLUMNS, ERRORS, MESSAGES, OUTPUT_HEADINGS
-)
+
 
 class NoiseDataManager:
 
@@ -40,26 +30,12 @@ class NoiseDataManager:
 
     def __init__(self) -> None:
         """Constructor method """
-        self.__key_blocker = KeyBlocker()
         self.__noise_data: dict[str, NoiseDataInstance] = {}  
 
     
     # =========================================================================
     # 2. Class properties.
     # =========================================================================
-
-    @property
-    def key_blocker(self) -> KeyBlocker:
-        """Returns a reference to a `KeyBlocker` object
-        
-        A manager that will be used across all main manager
-        classes to keep track of blocked keys:
-            - `NoiseDataManager`
-            - `NoiseCreator`
-            - `SimulatorManager`
-        """
-        return self.__key_blocker
-
 
     @property    
     def noise_data(self) -> pandas.DataFrame:
@@ -69,117 +45,102 @@ class NoiseDataManager:
     
 
     # =========================================================================
-    # 3. Noise data instance management - creating new instances, viewing and
-    #       deleting existing ones.
+    # 3. Noise data instance management
     # =========================================================================
     
     def import_csv_data(
         self, 
         reference_key: str,
-        # file_path: str,
-        file_info: dict
+        source_file: File,
     ) -> None:
-        reference_key = validate_instance_name(reference_key)
-        
-        try:
-            # Does key exist among created noise data instances
-            check_instance_key(reference_key=reference_key,
-                            should_exist=False,
-                            instances=self.__noise_data,
-                            instance_type="noise data instance")
-            # Is key being blocked by a noise model instance reference
-            self.__key_blocker.check_blocked_key(key=reference_key,
-                                                instance_type="noise_data")
-            # Makes sure that imported file is CSV type
-            # validate_file_type(file_path, expected_ext=(".csv", ".CSV"))
-        except INSError:
-            msg.add_traceback()
-            return
+        """Creates new noise data instance from imported files containing
+        supported calibration data.
 
+        This method currently only fully works with the following data files:
+        - CSV format calibration data files from the IBM Quantum platform.
+
+        Args:
+            reference_key (str): Reference key that will be set for the newly
+                created instance.
+            source_file (File): Imported calibration data file used to create 
+                this instance.
+        """
         # Processing imported CSV file:
-        dataframe = pandas.read_csv(file_info["file"])
+        dataframe = pandas.read_csv(source_file.path)
         remove_unnecessary_collumns(dataframe)
         add_additional_columns(dataframe)
         modify_dataframe_data(dataframe)
-        
-        # Defining new noise data instance
+
+        # Creating new instance:
         new_instance = NoiseDataInstance(
-            file_name=file_info["name"],
-            full_path=file_info["path"],
+            source_file=source_file,
             dataframe=dataframe)
         self.__noise_data[reference_key] = new_instance
-    
+  
 
-    def get_instance_data(self) -> dict:
-        instance_data = {
-            "has_data": False,
-            "columns": [],
-            "rows": []
-        }
-        
+    def get_instance_data(self) -> InstanceData | None:
+        """Returns data about currently created noise data instances.
+
+        Returns:
+            InstanceData: Dataclasss for displayable instance data.
+                If there is no data to be displayed, the function returns
+                nothing (`None`).
+        """
         if self.__noise_data:
-            instance_data["columns"] = ["Reference key", "Source file", 
-                                        "Source file path on device"]
-
-            for key, instance in self.__noise_data.items():
-                row = [key, instance.file_name, instance.full_path]
-                instance_data["rows"].append(row)
-            
-            instance_data["has_data"] = True
+            columns = [
+                "Reference key", "Source file", 
+                "Source file path on device"
+            ]
+            rows = [
+                [key, instance.source_file.name, 
+                 instance.source_file.full_path]
+                for key, instance in self.__noise_data.items()
+            ]
+            actions = ["delete", "view"]
         
-        return instance_data
-    
+            return InstanceData(columns=columns,
+                                rows=rows,
+                                actions=actions)
 
-    def remove_noise_data_instance(self, reference_key: str) -> None:
-        try:
-            # Is there even an instance to delete with given key
-            check_instance_key(reference_key=reference_key,
-                               should_exist=True,
-                               instances=self.__noise_data,
-                               instance_type="noise data instance")
-        except INSError:
-            msg.add_traceback()
-            return
 
+    def remove_noise_data_instance(
+            self, 
+            reference_key: str
+    ) -> None:
+        """Removes existing noise data instance based on its reference key.
+
+        Args:
+            reference_key (str): Reference key of existing deletable noise 
+                data instance.
+        """
         del self.__noise_data[reference_key]
 
 
     # =========================================================================
-    # 4. Retrieving qubit noise information - showing user noise data for
-    #       requested qubits.
+    # 4. Retrieving qubit noise information
     # =========================================================================
 
     def get_qubit_noise_data(
             self, 
-            reference_key: str, 
-            qubits: int = None
+            reference_key: str
     ) -> dict:
+        """Obtains and returns specific qubit noise data from a specified 
+        noise data instance.
+
+        Args:
+            referemce_key (str): Reference key of the specified noise
+                data instance, from which the qubit data will be retrieved.
+
+        Returns:
+            dict: Retrieved data in the form of a dictionary, where the key
+                is the qubit number, and the value is another dictionary
+                containing calibration data attribute names and values as
+                key and value pairs respectively.
+        """
         instance = self.__noise_data[reference_key]
-        
         qubit_noise_data = {}
 
-        if not qubits:
-            qubits = instance.get_qubit_count()
-
-        for qubit in range(qubits):
+        for qubit in range(instance.get_qubit_count()):
             qubit_noise_data[qubit] = instance.get_qubit_data(qubit)
 
         return qubit_noise_data
-
-
-    def __check_qubit_input(
-            self, 
-            data_instance: NoiseDataInstance, 
-            qubits: list[int]
-    ) -> None:
-        """Validates input qubit numbers for a specific noise data instance.
-
-        Checking functionality comes from NoiseDataInstance class object.
-
-        Args:
-            data_instance (NoiseDataInstance): Noise data instance that
-                will be checked.
-            qubits (list[int]): Qubit numbers that will be validated.
-        """
-        for qubit in qubits:
-            data_instance.validate_qubit_number(qubit)

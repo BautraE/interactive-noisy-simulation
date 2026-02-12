@@ -26,6 +26,11 @@
     },
 
     "messages": {
+        "new_noise_data_instance": {
+            "text": "New noise data instance has been created successfully. It can now be accessed with the following reference key: {reference_key}. Source file location: {full_path}",
+            "highlightables": []
+        },
+        
         "adding_errors": {
             "text": "Creating and adding depolarizing, thermal relaxation, and readout errors.",
             "highlightables": []

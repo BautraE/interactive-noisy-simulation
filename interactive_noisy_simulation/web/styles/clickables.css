@@ -59,6 +59,7 @@ File contents list:
     width: fit-content;
 
     text-decoration: underline;
+    text-transform: capitalize;
 }
 
 /* -------------------------------------------------------- */

@@ -10,8 +10,19 @@ from ._console import console
 from ..data._data import TERMINAL_MESSAGES
 from ..VERSION import __version__
 
-# Files with exposed Python functions/methods:
-from ..app import exposed, logs
+# Exposed Python functions/methods to Eel:
+from ..app import exposed
+
+
+# Tkinter blurry UI fix for Windows:
+import sys
+
+if sys.platform == "win32":
+    try:
+        import ctypes
+        ctypes.windll.shcore.SetProcessDpiAwareness(1)
+    except Exception:
+        pass
 
 
 # Path to web folder of the INS app
@@ -70,7 +81,7 @@ def _build_pages() -> None:
     }
     
     with (
-        resources.as_file(PATH_APP_WEB / "templates") as path_templates,
+        resources.as_file(PATH_APP_WEB / "html/templates") as path_templates,
         resources.as_file(PATH_APP_WEB / "generated_html") as path_html
     ):
         env = Environment(loader=FileSystemLoader(path_templates))

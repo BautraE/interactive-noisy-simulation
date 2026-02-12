@@ -2,34 +2,29 @@
 from dataclasses import dataclass
 
 # Local project imports:
-from ...data._data import CSV_COLUMNS, ERRORS
-from ..exceptions import InputArgumentError
+from ...data._data import CSV_COLUMNS
 
 # Imports only used for type definition:
 from pandas import DataFrame
 from typing import Any
+from .file import File
+
 
 @dataclass
 class NoiseDataInstance:
     """Class for storing a noise data instance.
     
     Attributes:
-        file_name (str): Name of *CSV* file that calibration data was imported
-            from.
-        full_path (str): Full local file path to the imported *CSV* file. 
-            It is used purely for infomative purposes for the end-user - the
-            data is only stored locally on the user's device.
+        source_file (File): Imported calibration data file used to create 
+            this instance.
         dataframe (Dataframe): `Pandas` dataframe that contains all relevant
             calibration data for noise model creation.
     """
-    file_name: str
-    full_path: str
+    source_file: File
     dataframe: DataFrame
 
 
-    def get_qubit_count(
-            self
-    ) -> int:
+    def get_qubit_count(self) -> int:
         """Retrieves qubit count in current dataframe.
         
         Returns:
@@ -37,7 +32,7 @@ class NoiseDataInstance:
         """
         return len(self.dataframe)
 
-    
+
     def get_qubit_data(
             self, 
             qubit_nr: int
@@ -65,34 +60,3 @@ class NoiseDataInstance:
                 qubit_data[name] = value
         
         return qubit_data
-    
-
-    def validate_qubit_number(
-            self, 
-            qubit_nr: int
-    ) -> None:
-        """Validates if the specified qubit number refers to a valid
-        qubit within the dataframe.
-
-        Method checks if the passed qubit number is above 0 and below 
-        the max index of qubits in the current dataframe.
-
-        Args:
-            qubit_nr (int): Qubit number that will get checked.
-
-        Raises:
-            InputArgumentError:
-                - If qubit number is lower than 0;
-                - If qubit number exceeds max qubit number.
-        """
-        qubit_count = self.get_qubit_count() - 1
-            
-        if qubit_nr < 0:
-            raise InputArgumentError(
-                ERRORS["negative_qubit_number"].format(
-                    qubit=qubit_nr))
-        
-        elif qubit_nr > qubit_count:
-            raise InputArgumentError(ERRORS["large_qubit_number"].format(
-                qubit=qubit_nr,
-                max_qubits=qubit_count))
