@@ -10,6 +10,7 @@ File contents list:
    (div containers and content boxes, headings, etc.)
 5. Situation-specific styles - hiding / showing elements, 
    disabling scrolling, etc.
+6. Progress bar styles.
 -----------------------------------------------------------------
 
 --------------------------------------------------------------
@@ -235,4 +236,39 @@ tr td:last-child {
    either a sidebar or an on-screen pop-up is open. */
 .no-scroll {
     overflow: hidden;
+}
+
+
+/*
+--------------------------------------------------------------
+6. Progress bar styles.
+-------------------------------------------------------------- 
+*/
+/* Progress line container */
+.progress-bar {
+    height: 15px;
+    width: 100%;
+    padding: 5px;
+
+    background-color: #222534;
+    border-radius: 8px;
+}
+/* Progress line with percentage text */
+.current-progress {
+    /* Styles for line */
+    height: 100%;
+    width: 0%;
+
+    background-color: #2bc76f;
+    border-radius: 8px;
+    
+    /* Styles for percentage text */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
 }

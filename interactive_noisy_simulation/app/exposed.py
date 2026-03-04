@@ -18,6 +18,14 @@ from .instance_managers.noise_data import (
     view_qubit_data
 )
 
+from .instance_managers.noise_models import (
+    # Managing all instances
+    view_noise_model_instances,
+    create_noise_model_instance,
+    remove_noise_model_instance,
+    get_noise_data_references,
+)
+
 from .logs.logs import (
     clear_message,
     clear_all_messages,

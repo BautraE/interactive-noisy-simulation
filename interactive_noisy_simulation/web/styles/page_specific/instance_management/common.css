@@ -5,6 +5,11 @@ Common style rules across all instance management pages
 File contents list:
 1. Side navigation panel - navigation panel for going between
    pages for different instance types.
+2. Miscellaneous content element styling - various specific
+   element styles that only apply in specific pages.
+3. Instance data table content styling - specific value-related
+   styles that get added to some data cells, for example,
+   related instance availability.
 -----------------------------------------------------------------
 
 --------------------------------------------------------------
@@ -61,4 +66,40 @@ File contents list:
     border-bottom-right-radius: 0;
 
     background-color: #4644C2;
+
+    pointer-events: none;
+}
+
+
+/* 
+-------------------------------------------------------------- 
+2. Miscellaneous content element styling
+-------------------------------------------------------------- 
+*/
+/* Content box for displayable existing instance data 
+   Makes the content box stretched initially. */
+.instances-content-box {
+    flex: 1;
+    
+    overflow-y: auto;
+}
+
+/* New instance creation form reference key input field. */
+.reference-key-input {
+    margin-left: 20px;
+    margin-right: auto;
+}
+
+
+/* 
+-------------------------------------------------------------- 
+3. Instance data table content styling
+-------------------------------------------------------------- 
+*/
+
+td.green-text {
+    color: #37FF8D;
+}
+td.red-text {
+    color: #FF8A8A;
 }

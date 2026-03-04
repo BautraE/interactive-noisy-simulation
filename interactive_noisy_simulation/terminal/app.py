@@ -45,7 +45,7 @@ def start_app() -> None:
 
     # Starting INS
     port = _get_free_port()
-    eel.start('generated_html/index.html', 
+    eel.start('generated_html/noise_data_instances.html', 
               port=port, 
               size=(1200, 800))
 
@@ -73,11 +73,12 @@ def _get_free_port() -> int:
 def _build_pages() -> None:
     """Creates final HTML files from templates."""
     RENDERABLE_PAGES = {
-        # "noise_data_instances.html":
-        "index.html":
+        "noise_data_instances.html":
         "instance_management/noise_data/all_instances.html",
         "noise_data_instance.html": 
-        "instance_management/noise_data/single_instance.html"
+        "instance_management/noise_data/single_instance.html",
+        "noise_model_instances.html":
+        "instance_management/noise_models/all_instances.html",
     }
     
     with (

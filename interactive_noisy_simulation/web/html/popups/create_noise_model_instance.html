@@ -1,0 +1,42 @@
+<div class="pop-up">
+    <div class="pop-up-title-bar">
+        <h2 class="pop-up-title">New noise model instance</h2>
+    </div>
+    <form class="pop-up-form"
+          id="pop-up-form">
+        <!-- Reference key input -->
+        <div class="form-input-group">
+            <label for="reference-key">Reference key:</label>
+            <input type="text"
+                   class="reference-key-input" 
+                   id="reference-key" 
+                   name="reference-key"  
+                   placeholder="Enter reference key">
+        </div>
+        <!-- Noise data source selection -->
+        <div class="form-input-group">
+            <label>Noise data source:</label>
+            <div class="content-box radio-select-box"
+                 id="noise-source-container">
+            </div>
+        </div>
+        <!-- Create / Cancel buttons -->
+        <div class="form-input-group last-in-form"
+             id="action-buttons">
+            <div role="button"
+                 class="clickable button-a dark-button"
+                 onclick="hidePopUpWindow()">Cancel</div>
+            <div role="button"
+                 class="clickable button-a dark-button"
+                 onclick="createNoiseModelInstance()">Create instance</div>
+        </div>
+        <!-- New noise model creation progress bar -->
+        <div class="form-input-group last-in-form hidden-element"
+             id="progress-bar">
+            <div class="progress-bar">
+                <div class="current-progress"
+                     id="current-progress"></div>
+            </div>
+        </div>
+    </form>
+</div>

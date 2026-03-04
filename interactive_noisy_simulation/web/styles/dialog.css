@@ -78,10 +78,11 @@ File contents list:
 }
 /* Last input is a container with buttons for either cancelling
    or finishing a specific action. */
-.form-input-group:last-child {
+.form-input-group.last-in-form {
     flex-direction: row;
     column-gap: 20px;
     justify-content: flex-end;
+    margin-top: 15px;
 }
 
 /* 
@@ -140,6 +141,90 @@ input[type="text"]:focus {
     outline-color: #4644C2;
     outline-style: inset;
 }
+
+
+/* -------------------------------------------------------- */
+/* Radio input type: */
+
+/* Container for radio options */
+.radio-select-box {
+    max-height: 150px;
+    overflow-y: auto;
+}
+.radio-select-box > * {
+    padding: 10px;
+    border-radius: 8px;
+}
+.radio-select-box > *:nth-child(even) {
+    background-color: #222C42;
+}
+
+/* Label element that acts as a container for other specific
+   radtio option-related elements */
+.radio-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+/* Actual input field that gets selected when clicking on label */
+.radio-option input {
+    display: none;
+}
+/* When form is disabled */
+.radio-option:has(input:disabled) {
+    cursor: not-allowed;
+}
+
+/* Custom outer circle for radio input field */
+.custom-radio {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    position: relative;
+
+    border: 2px solid #666;
+    border-radius: 50%;
+
+    transition: 0.3s ease;
+}
+/* Outer circle changing color once selected */
+.radio-option input:checked + .custom-radio {
+    border-color: #FFD173;
+}
+/* Inner dot that appears, when selected */
+.radio-option input:checked + .custom-radio::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    transform: translate(-50%, -50%);
+    
+    background: #FFD173;
+    border-radius: 50%;
+}
+/* When form is disabled */
+.radio-option input:disabled + .custom-radio {
+    opacity: 0.6;
+}
+
+/* Text styling */
+.radio-text {
+    color: #ccc;
+    transition: 0.3s ease;
+}
+/* Selected text */
+.radio-option input:checked + .custom-radio + .radio-text {
+    color: #ffffff;
+    font-weight: 500;
+}
+/* When form is disabled */
+.radio-option input:disabled:not(:checked) ~ .radio-text {
+    opacity: 0.6;
+}
+
 
 /* -------------------------------------------------------- */
 /* Error highlighting styles: */

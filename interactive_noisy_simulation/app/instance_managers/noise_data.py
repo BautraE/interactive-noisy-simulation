@@ -5,7 +5,6 @@ from tkinter import Tk, filedialog
 import eel
 
 # Project-related imports:
-from ...core.instance_managers.noise_data_manager import NoiseDataManager
 from ...core.data_structures.file import File
 from .js_noise_data_wrappers import set_selected_file
 from ..js_common_wrappers import (
@@ -17,9 +16,8 @@ from ..js_common_wrappers import (
 from ..logs.logs import add_log_message
 from ...data._data import MESSAGES
 
-
 # Manager class object:
-ndm = NoiseDataManager()
+from ...project_variables import noise_data_manager as ndm
 
 
 # --------------------------------------------------------------

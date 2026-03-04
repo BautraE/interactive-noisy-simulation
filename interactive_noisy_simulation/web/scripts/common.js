@@ -3,15 +3,18 @@
 // pages.
 // =================================================================
 // File contents list:
-// 1. Pop-up functionality.
+// 1. Pop-up and form functionality.
 // 2. General content-related functions
 // 3. Container management
 // 4. Data table creation
 // -----------------------------------------------------------------
 
 // --------------------------------------------------------------
-// 1. Pop-up functionality
+// 1. Pop-up and form functionality
 // --------------------------------------------------------------
+/**
+ * @typedef {() => (Promise<void>|void)} PopupInitializerFunction
+ */
 
 /**
  * Hides pop-up / dialog window and removes it from currently active
@@ -31,12 +34,33 @@ function hidePopUpWindow() {
  * @param {string} popupName - name of pop-up, based on which the
  * HTML code will be retrieved (matches HTML popup code fie name
  * without the exension).
+ * @param {PopupInitializerFunction} initializer - reference to additional function
+ * that should be executed upon showing a specifc pop-up.
+ * `[Default = null]`
  */
-async function showPopUpWindow(popupName) {
+async function showPopUpWindow(popupName, initializer=null) {
     let popupContainer = document.getElementById("pop-up-container");
     let popupCode = await eel.get_popup(popupName)();
     popupContainer.innerHTML = popupCode;
     popupContainer.classList.remove("hidden-element");
+
+    if(initializer) await initializer();
+}
+
+
+/**
+ * Disables specific form with the given ID.
+ * 
+ * @param {string} formId - ID of the form HTML element that needs all of
+ * its input fields to be disabled.
+ */
+function disableForm(formId) {
+    const form = document.getElementById(formId);
+    const elements = form.querySelectorAll("input");
+
+    for(const el of elements) {
+        el.disabled = true;
+    }
 }
 
 
@@ -107,7 +131,6 @@ function removeContainerContent(containerId) {
 // 4. Data table creation
 // --------------------------------------------------------------
 
-
 eel.expose(addTable);
 /**
  * Adds table inside specific container for the purpose of displaying
@@ -167,6 +190,7 @@ function addTableRow(tableId, rowContent, actions=[]) {
     // Adds row cell content
     for(let cellContent of rowContent) {
         let tableCell = document.createElement("td");
+        addDynamicContentStyle(cellContent, tableCell);
         tableCell.innerHTML = cellContent;
         row.appendChild(tableCell);
     }
@@ -192,4 +216,31 @@ function addTableRow(tableId, rowContent, actions=[]) {
     }
 
     _appendThroughId(tableId, row);
+}
+
+
+/**
+ * Adds specific style to table data cell element based on its content
+ * 
+ * This fumction currently provides a solution for dynamically applying
+ * styles to specific content, for example, boolean-related data.
+ * 
+ * @param {string} cellContent - Table cell content, based on which a
+ * specific style will be applied to the data cell element.
+ * @param {HTMLElement} element - Table data cell element that will
+ * have a specifc CSS class with style added to it.
+ */
+function addDynamicContentStyle(cellContent, element) {
+    switch (cellContent) {
+        case "Available":
+            element.classList.add("green-text");
+            break;
+
+        case "Removed":
+            element.classList.add("red-text");
+            break;
+
+        default:
+            break;
+    }
 }

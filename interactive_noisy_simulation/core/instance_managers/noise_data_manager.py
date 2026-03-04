@@ -38,9 +38,14 @@ class NoiseDataManager:
     # =========================================================================
 
     @property    
-    def noise_data(self) -> pandas.DataFrame:
+    def noise_data(self) -> dict[str, NoiseDataInstance]:
         """Returns a reference to data structure containing noise 
-           data instances."""
+        data instances.
+        
+        Returns:
+            dict[str, NoiseDataInstance] - dictionary with reference key and 
+                instance.
+        """
         return self.__noise_data
     
 
@@ -73,6 +78,7 @@ class NoiseDataManager:
 
         # Creating new instance:
         new_instance = NoiseDataInstance(
+            reference_key=reference_key,
             source_file=source_file,
             dataframe=dataframe)
         self.__noise_data[reference_key] = new_instance
@@ -80,6 +86,11 @@ class NoiseDataManager:
 
     def get_instance_data(self) -> InstanceData | None:
         """Returns data about currently created noise data instances.
+
+        Returned information includes:
+        - Reference key for the current instance;
+        - Name of the source data file;
+        - Full path of source data file on user's device.
 
         Returns:
             InstanceData: Dataclasss for displayable instance data.
@@ -92,9 +103,9 @@ class NoiseDataManager:
                 "Source file path on device"
             ]
             rows = [
-                [key, instance.source_file.name, 
+                [instance.reference_key, instance.source_file.name, 
                  instance.source_file.full_path]
-                for key, instance in self.__noise_data.items()
+                for instance in self.__noise_data.values()
             ]
             actions = ["delete", "view"]
         

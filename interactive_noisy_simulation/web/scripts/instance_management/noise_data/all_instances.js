@@ -2,6 +2,10 @@
 // Functionality related to a specific page - viewing and managing
 // all noise data instances.
 // =================================================================
+// File contents list:
+// 1. Action handling
+// 2. New NoiseDataInstance creation form functionality
+// -----------------------------------------------------------------
 
 // Loading existing noise data instances
 window.addEventListener('load', function() {
@@ -12,7 +16,7 @@ window.addEventListener('load', function() {
 
 
 // --------------------------------------------------------------
-// Action handling
+// 1. Action handling
 // --------------------------------------------------------------
 
 /**
@@ -61,7 +65,7 @@ function viewSpecificNoiseData(referenceKey) {
 
 
 // --------------------------------------------------------------
-// New NoiseDataInstance creation form functionality
+// 2. New NoiseDataInstance creation form functionality
 // --------------------------------------------------------------
 
 eel.expose(setSelectedCSVFile);
@@ -117,8 +121,8 @@ function removeSelectedCSVFile() {
  * instance.
  */
 function importCSVCalibrationData() {
-    var referenceKey = document.getElementById("reference-key").value;
-    var filePath = document.getElementById("file-path").value;
+    let referenceKey = document.getElementById("reference-key").value;
+    let filePath = document.getElementById("file-path").value;
 
     if (!validateInstanceForm(referenceKey, filePath)) {
         eel.import_csv_calibration_data(referenceKey, filePath);

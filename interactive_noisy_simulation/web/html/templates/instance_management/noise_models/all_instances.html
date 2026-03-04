@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% set active_main_page = "instance_management" %}
-{% set active_instance_page = "noise_data" %}
+{% set active_instance_page = "noise_models" %}
 
 {% block css %}
 <link rel="stylesheet" 
@@ -12,15 +12,16 @@
 {% include "instance_management/side_navbar.html" %}
 <!-- Current page content -->
 <div class="content-container">
-    <h1 class="content-container-heading">Noise Data Instance Management</h1>
+    <h1 class="content-container-heading">Noise Model Instance Management</h1>
     <div class="content-box-header">
         <div class="left">
-            <p>Noise data instances:</p>
+            <p>Noise model instances:</p>
         </div>
         <div class="right">
             <div role="button"
                  class="clickable button-a dark-button"
-                 onclick="showPopUpWindow('create_noise_data_instance')">Create new instance</div>
+                 onclick="showPopUpWindow('create_noise_model_instance', loadAvailableNoiseData)">
+                 Create new instance</div>
         </div>
     </div>
     <div id="content-box" 
@@ -30,5 +31,5 @@
 
 {% block scripts %}
 <script type="text/javascript" 
-        src="../scripts/instance_management/noise_data/all_instances.js"></script>
+        src="../scripts/instance_management/noise_models/all_instances.js"></script>
 {% endblock %}

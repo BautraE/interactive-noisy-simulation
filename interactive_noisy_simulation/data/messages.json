@@ -44,7 +44,7 @@
         },
 
         "created_instance": {
-            "text": "{instance_type} has been created successfully! It can now be accessed with the following reference key: {reference_key}.",
+            "text": "New {instance_type} instance has been created successfully! It can now be accessed with the following reference key: {reference_key}.",
             "highlightables": [
                 "{reference_key}"
             ]

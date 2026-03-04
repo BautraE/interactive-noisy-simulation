@@ -18,4 +18,21 @@ class InstanceData():
     """
     columns: list[str]
     rows: list[list[str]]
-    actions: str = field(default_factory=list)
+    actions: list[str] = field(default_factory=list)
+
+
+    def add_collumn(
+            self,
+            name: str,
+            content: list[str]
+    ) -> None:
+        """Adds new column with content to retrieved instance data.
+
+        Args:
+            name (str): Name of column.
+            comtemts (list[str]): List of content for new column.
+        """
+        self.columns.append(name)
+        for row, data in zip(self.rows, content):
+            row.append(data)
+        

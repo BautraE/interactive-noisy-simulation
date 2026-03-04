@@ -2,15 +2,14 @@
 import eel
 
 # Project-related imports:
-from ...core.logs.log_manager import LogManager
 from .js_logs_wrappers import load_log_message
 from ..js_common_wrappers import (
     remove_container_content,
     inform_no_instances)
 from ...data._data import MESSAGES
 
-
-log = LogManager()
+# Log manager class object:
+from ...project_variables import log_manager as log
 
 
 # Regular functions (not exposed):

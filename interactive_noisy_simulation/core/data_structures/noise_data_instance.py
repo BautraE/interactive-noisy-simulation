@@ -15,11 +15,14 @@ class NoiseDataInstance:
     """Class for storing a noise data instance.
     
     Attributes:
+        reference_key (str): Key by which the specific object is accessed 
+            in other places of the INS app.
         source_file (File): Imported calibration data file used to create 
             this instance.
         dataframe (Dataframe): `Pandas` dataframe that contains all relevant
             calibration data for noise model creation.
     """
+    reference_key: str
     source_file: File
     dataframe: DataFrame
 
