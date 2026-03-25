@@ -2,11 +2,10 @@
 import eel
 
 # Project-related imports:
+from ..general import inform_empty_container
 from .js_logs_wrappers import load_log_message
-from ..js_common_wrappers import (
-    remove_container_content,
-    inform_no_instances)
-from ...data._data import MESSAGES
+from ..js_common_wrappers import remove_container_content
+from ...data._data import EMPTY_CONTAINER_MESSAGES
 
 # Log manager class object:
 from ...project_variables import log_manager as log
@@ -15,8 +14,8 @@ from ...project_variables import log_manager as log
 # Regular functions (not exposed):
 
 def add_log_message(
-        message: str | dict,
-        **placeholder_strings: str
+        message: dict,
+        **placeholder_replacements: str
 ) -> None:
     """Adds a new message log instance.
 
@@ -24,12 +23,12 @@ def add_log_message(
     content is requested to reflect the changes.
 
     Args:
-        message (str | dict): Message text
+        message (dict): Message text
         **placeholder_replacements (str): Keyword arguments that align with
             placeholder variable names. Their values will be replacing the
             placeholders.
     """
-    log.add_message(message, **placeholder_strings)
+    log.add_message(message, **placeholder_replacements)
     show_log_messages()
 
 
@@ -74,14 +73,12 @@ def show_log_messages() -> None:
 
     if log_messages:
         for id, message in log_messages:
-            load_log_message(id,
-                             message["timestamp"],
-                             message["message_text"])
+            load_log_message(message_id=id,
+                             message=message)
     else:
-        message_text = MESSAGES["empty_log"]["text"].format(
-            log_type="message")
-        inform_no_instances(message_text, 
-                            container_id="messages")
+        inform_empty_container(EMPTY_CONTAINER_MESSAGES["empty_log"],
+                               log_type="message",
+                               container_id="messages")
 
 
 @eel.expose
@@ -92,8 +89,6 @@ def show_log_errors() -> None:
     added instead.
     """
     remove_container_content(container_id="errors")
-
-    message_text = MESSAGES["empty_log"]["text"].format(
-            log_type="error")
-    inform_no_instances(message_text, 
-                        container_id="errors")
+    inform_empty_container(EMPTY_CONTAINER_MESSAGES["empty_log"],
+                           log_type="error",
+                           container_id="errors")

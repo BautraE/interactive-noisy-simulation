@@ -4,7 +4,7 @@ import sys
 
 # Local project imports:
 from ._console import console
-from ..data._data import TERMINAL_MESSAGES
+from ..project_variables import TERMINAL_MESSAGES
 
 
 def main() -> None:

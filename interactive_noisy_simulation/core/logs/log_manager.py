@@ -17,15 +17,15 @@ class LogManager:
 
     def add_message(
             self,
-            message_text: str | dict,
+            message: dict,
             **placeholder_replacements: str
     ) -> None:
         """Creates new message instance for log.
 
         Args:
-            message_text (str | dict): Readable message text. Can either
-                be a simple string, or a dictionary in the case of 
-                project-related message templates from `messages.json`.
+            message (dict): Readable message text. Must be a dictionary
+                based on the format seen inside of `messages.json`, under
+                the key "log" (required for highlighting functionality).
             **placeholder_replacements (str): Keyword arguments that will
                 replace any placeholders in message templates.
         """
@@ -33,14 +33,17 @@ class LogManager:
         timestamp = time.strftime("%Y/%m/%d %H:%M:%S")
         key = time.strftime("%Y%m%d_%H%M%S%f")
 
-        if isinstance(message_text, dict):
-            message_text = message_text["text"]
+        message_text = message["text"]
+        highlightables = message["highlightables"]
         if placeholder_replacements:
             message_text = message_text.format(**placeholder_replacements)
+            highlightables = [
+                hl.format(**placeholder_replacements) for hl in highlightables]
 
         new_message = {}
         new_message["timestamp"] = f"[{timestamp}]"
         new_message["message_text"] = message_text
+        new_message["highlightables"] = highlightables
         
         self.messages[key] = new_message
 

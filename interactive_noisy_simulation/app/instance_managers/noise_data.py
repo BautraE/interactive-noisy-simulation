@@ -6,15 +6,18 @@ import eel
 
 # Project-related imports:
 from ...core.data_structures.file import File
+from ..general import inform_empty_container
 from .js_noise_data_wrappers import set_selected_file
 from ..js_common_wrappers import (
     add_table, add_table_row,
     add_content_box,
-    inform_no_instances,
     remove_container_content
 )
 from ..logs.logs import add_log_message
-from ...data._data import MESSAGES
+from ...project_variables import (
+    EMPTY_CONTAINER_MESSAGES, 
+    LOG_MESSAGES
+)
 
 # Manager class object:
 from ...project_variables import noise_data_manager as ndm
@@ -50,9 +53,9 @@ def view_noise_data_instances() -> None:
                           actions=instance_data.actions)
     # If not, adds message stating this
     else:
-        message_text = MESSAGES["no_instances"]["text"].format(
-            instance_type="imported noise data instances")
-        inform_no_instances(message_text, container_id="content-box")
+        inform_empty_container(message=EMPTY_CONTAINER_MESSAGES["no_instances"],
+                               instance_type="imported noise data",
+                               container_id="content-box")
 
 
 @eel.expose
@@ -76,7 +79,7 @@ def import_csv_calibration_data(
     ndm.import_csv_data(reference_key, source_file)
     
     new_instance = ndm.noise_data[reference_key]
-    add_log_message(MESSAGES["new_noise_data_instance"],
+    add_log_message(message=LOG_MESSAGES["new_noise_data_instance"],
                     reference_key=reference_key,
                     full_path=new_instance.source_file.full_path)
     
@@ -100,8 +103,8 @@ def remove_noise_data_instance(
     # Remove existing noise data instance:
     ndm.remove_noise_data_instance(reference_key)
 
-    add_log_message(MESSAGES["deleted_instance"],
-                    instance_type="noise data instance",
+    add_log_message(message=LOG_MESSAGES["deleted_instance"],
+                    instance_type="noise data",
                     reference_key=reference_key)
 
     # Reload instance table data after adding new instance:

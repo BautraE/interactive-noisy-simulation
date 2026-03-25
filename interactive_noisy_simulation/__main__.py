@@ -5,7 +5,7 @@ import argparse
 from .terminal._console import RichHelpFormatter
 from .terminal.app import start_app
 from .terminal.version_control import check_version, update_version
-from .data._data import TERMINAL_COMMAND_DESCRIPTION
+from .project_variables import TERMINAL_COMMAND_DESCRIPTION
 
 
 def main() -> None:

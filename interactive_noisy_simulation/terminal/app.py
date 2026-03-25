@@ -7,7 +7,7 @@ from jinja2 import Environment, FileSystemLoader
 
 # Project-related imports:
 from ._console import console
-from ..data._data import TERMINAL_MESSAGES
+from ..project_variables import TERMINAL_MESSAGES
 from ..VERSION import __version__
 
 # Exposed Python functions/methods to Eel:

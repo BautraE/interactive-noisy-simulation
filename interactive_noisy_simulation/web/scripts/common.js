@@ -68,19 +68,19 @@ function disableForm(formId) {
 // 2. General content-related functions
 // --------------------------------------------------------------
 
-eel.expose(addNoInstanceMessage);
+eel.expose(addEmptyContainerMessage);
 /**
- * Adds specific message that notifies about there not being any
- * instances or messages to display.
+ * Adds specific message that notifies that there is nothing to 
+ * currently display in a specific container.
  * 
  * @param {string} messageText - text of the message that will
  * be shown.
- * @param {string} parentElementId - id of the element where the
- * message will be added to.
+ * @param {string} parentElementId - ID of the HTML element to 
+ * which the message will be added to.
  */
-function addNoInstanceMessage(messageText, parentElementId) {
+function addEmptyContainerMessage(messageText, parentElementId) {
     let messageElement = document.createElement("p");
-    messageElement.classList.add("no-instances-text");
+    messageElement.classList.add("empty-container-text");
     messageElement.innerHTML = messageText;
 
     _appendThroughId(parentElementId, messageElement);

@@ -100,18 +100,19 @@ def add_table_row(
 # General content-related functions
 # --------------------------------------------------------------
 
-def inform_no_instances(
-        message_text: str, 
+def add_empty_container_message(
+        message: str, 
         container_id: str
 ) -> None:
-    """Adds specific message that notifies about there not being any 
-    instances or messages to display.
+    """Calls JS function to display specific message that notifies 
+    that there is nothing to currently display in a specific 
+    container.
 
     Wrapper function for `Python Eel` JS function call.
 
     Args:
-        message_text (str): Text of the message that will be shown.
-        container_id (str): Id of the element where the message will 
-            be added to.
+        message (str): Text of the message that will be shown.
+        container_id (str): ID of the HTML element to which the message 
+            will be added to.
     """
-    eel.addNoInstanceMessage(message_text, container_id)
+    eel.addEmptyContainerMessage(message, container_id)

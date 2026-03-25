@@ -9,8 +9,7 @@ import eel
 
 def load_log_message(
         message_id: str, 
-        timestamp: str, 
-        message_text: str
+        message: dict
 ) -> None:
     """Loads message into log.
 
@@ -19,7 +18,8 @@ def load_log_message(
     Args:
         message_id (str): id of the message (used for specific log instance
             clearing functionality).
-        timestamp (str): time at which the message was generated.
-        message_text (str): log message text.
+        message (dict): message dictionary containing all required information
+            about displayable message (message text, highlightables, 
+            timestamp).
     """
-    eel.loadLogMessage(message_id, timestamp, message_text)
+    eel.loadLogMessage(message_id, message)

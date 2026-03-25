@@ -5,8 +5,9 @@ Log sidebar-related styles
 File contents list:
 1. Button element for opening log side panel - located outside
    of side panel, at the bottom-right corner of the active page.
-2. Main div containers that make the log panel
-3. Content of the log side panel
+2. Main div containers that make the log panel.
+3. Content of the log side panel.
+4. Message fragment highlighting styles.
 -----------------------------------------------------------------
 
 -------------------------------------------------------------- 
@@ -95,6 +96,13 @@ File contents list:
     row-gap: 20px;
 }
 
+/* Text that appears if there is no content to currently display
+   within a specific container. */
+.log-content-box > .empty-container-text {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
 /* -------------------------------------------------------- */
 /* Message part of log */
 
@@ -124,4 +132,14 @@ File contents list:
 .log-instance-content-box p:last-child {
     margin-top: 5px;
     margin-bottom: 0;
+}
+
+
+/*
+--------------------------------------------------------------
+4. Message fragment highlighting styles.
+-------------------------------------------------------------- 
+*/
+span.highlight {
+    color: #FFD173;
 }

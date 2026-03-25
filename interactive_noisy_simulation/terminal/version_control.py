@@ -8,7 +8,7 @@ import requests
 # Local project imports:
 from ._console import console
 from ..VERSION import __version__
-from ..data._data import TERMINAL_MESSAGES
+from ..project_variables import TERMINAL_MESSAGES
 
 
 REPOSITORY_URL = "https://github.com/BautraE/interactive-noisy-simulation"

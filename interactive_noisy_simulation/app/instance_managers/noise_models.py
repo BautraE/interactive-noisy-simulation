@@ -2,13 +2,15 @@
 import eel
 
 # Project-related imports:
+from ..general import inform_empty_container
 from ..logs.logs import add_log_message
 from ..js_common_wrappers import (
     add_table, add_table_row,
-    inform_no_instances,
     remove_container_content
 )
-from ...data._data import MESSAGES
+from ...project_variables import (
+    EMPTY_CONTAINER_MESSAGES, LOG_MESSAGES
+)
 
 # Imports only used for type definition:
 from ...core.data_structures.instance_data import InstanceData
@@ -47,9 +49,9 @@ def view_noise_model_instances() -> None:
                           actions=instance_data.actions)
     # If not, adds message stating this
     else:
-        message_text = MESSAGES["no_instances"]["text"].format(
-            instance_type="created noise model instances")
-        inform_no_instances(message_text, container_id="content-box")
+        inform_empty_container(message=EMPTY_CONTAINER_MESSAGES["no_instances"],
+                               instance_type="created noise model",
+                               container_id="content-box")
 
 
 @eel.expose
@@ -73,7 +75,7 @@ def create_noise_model_instance(
                           noise_data=noise_data,
                           progress_callback=update_progress)
     
-    add_log_message(message=MESSAGES["created_instance"],
+    add_log_message(message=LOG_MESSAGES["created_instance"],
                     instance_type="noise model",
                     reference_key=reference_key)
     
@@ -96,8 +98,8 @@ def remove_noise_model_instance(
     # Remove existing noise model instance:
     nc.remove_noise_model_instance(reference_key)
 
-    add_log_message(message=MESSAGES["deleted_instance"],
-                    instance_type="noise model instance",
+    add_log_message(message=LOG_MESSAGES["deleted_instance"],
+                    instance_type="noise model",
                     reference_key=reference_key)
     
     # Reload instance table data after adding new instance:
@@ -120,10 +122,14 @@ def get_noise_data_references() -> list[str]:
         instance.reference_key for instance in instances.values()
     ]
 
+    if not reference_keys:
+        inform_empty_container(message=EMPTY_CONTAINER_MESSAGES["no_noise_data_sources"],
+                               container_id="noise-source-container")
+
     return reference_keys
 
 
-# Non-exposed helper methods:
+# Non-exposed methods:
 
 def add_source_data_availability(
         instance_data: InstanceData

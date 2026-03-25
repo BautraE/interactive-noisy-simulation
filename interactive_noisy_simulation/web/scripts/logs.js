@@ -40,6 +40,14 @@ function hideLogSidebar() {
 // --------------------------------------------------------------
 // Loading and rendering current messages and errors into log
 // --------------------------------------------------------------
+/**
+ * @typedef {Object} Message
+ * @property {string} message_text - log message text.
+ * @property {string[]} highlightables - message text fragments
+ * that need to be highlighted.
+ * @property {string} timestamp - time at which the message was 
+ * generated.
+ */
 
 eel.expose(loadLogMessage)
 /**
@@ -47,10 +55,12 @@ eel.expose(loadLogMessage)
  * 
  * @param {string} id - id of the message (used for specific log
  * instance clearing functionality).
- * @param {string} timestamp - time at which the message was generated.
- * @param {string} messageText - log message text.
+ * @param {Message} message - object of message that needs to be
+ * displayed.
  */
-function loadLogMessage(id, timestamp, messageText) {
+function loadLogMessage(id, message) {
+    addHighlights(message);
+    
     // Message part with delete action
     let aDelete = document.createElement("a");
     aDelete.innerHTML = "Clear";
@@ -65,9 +75,9 @@ function loadLogMessage(id, timestamp, messageText) {
     // Message part with timestamp and text
     let pTimestamp = document.createElement("p");
     pTimestamp.classList.add("log-timestamp");
-    pTimestamp.innerHTML = timestamp;
+    pTimestamp.innerHTML = message.timestamp;
     let pMessage = document.createElement("p");
-    pMessage.innerHTML = messageText;
+    pMessage.innerHTML = message.message_text;
 
     let messageContentContainer = document.createElement("div");
     messageContentContainer.classList.add("log-instance-content-box");
@@ -83,4 +93,30 @@ function loadLogMessage(id, timestamp, messageText) {
 
     // Append everything to the log message content box
     _appendThroughId("messages", messageContainer, "before");
+}
+
+
+/**
+ * Adds highlighting style to defined message fragments, based
+ * on `message.highlightables` array.
+ * 
+ * @param {Message} message - Object of message that needs its fragments
+ * to be highlighted.
+ */
+function addHighlights(message) {
+    const escaped = message.highlightables
+        // longest first (avoids issue with highlighting substrings)
+        .sort((a, b) => b.length - a.length)
+        .map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+
+    const pattern = escaped.join('|');
+
+    const regex = new RegExp(
+        `(^|\\s)(${pattern})(?=$|[\\s!?,.:])`,
+        'g'
+    );
+
+    message.message_text = message.message_text.replace(regex, (match, before, word) => {
+        return `${before}<span class="highlight">${word}</span>`;
+    });
 }
