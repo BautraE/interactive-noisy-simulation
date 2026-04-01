@@ -11,7 +11,7 @@ from importlib import resources
 PACKAGE_ROOT = resources.files("interactive_noisy_simulation")
 
 
-# Sharable manager class objects:
+# Sharable class objects:
 # - Specific instance managers:
 from .core.instance_managers.noise_data_manager import NoiseDataManager
 noise_data_manager = NoiseDataManager()
@@ -22,6 +22,10 @@ noise_creator = NoiseCreator()
 # - Log manager:
 from .core.logs.log_manager import LogManager
 log_manager = LogManager()
+
+# - Key blocker:
+from .core.key_blocker import KeyBlocker
+key_blocker = KeyBlocker()
 
 
 # Static project data:

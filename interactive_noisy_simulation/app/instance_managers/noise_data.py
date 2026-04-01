@@ -14,6 +14,7 @@ from ..js_common_wrappers import (
     remove_container_content
 )
 from ..logs.logs import add_log_message
+from ...project_variables import key_blocker
 from ...project_variables import (
     EMPTY_CONTAINER_MESSAGES, 
     LOG_MESSAGES
@@ -131,6 +132,48 @@ def select_csv() -> None:
     if file_path:
         file = File(file_path)
         set_selected_file(file.name, file.full_path)
+
+
+@eel.expose
+def is_noise_data_key_unique(
+    reference_key: str
+) -> bool:
+    """Checks if the new reference key is already in use for a different
+    noise data instance.
+
+    Exposed function to `Python Eel` for use with JavaScript.
+
+    Args:
+        reference_key (str): Selected reference key for a new noise data
+            instance.
+
+    Returns:
+        bool: Is the new key unique (not in use by another instance of
+            the same type).
+    """
+    all_keys = ndm.noise_data.keys()
+    return reference_key not in all_keys
+
+
+@eel.expose
+def check_noise_data_key_block(
+    reference_key: str
+) -> list[str] | None:
+    """Checks if a noise data instance key is currently being blocked.
+
+    Exposed function to `Python Eel` for use with JavaScript.
+
+    Args:
+        reference_key (str): Noise data instance reference key that needs
+            to be checked for blocks.
+
+    Returns:
+        list[str] | None: List of noise model reference keys that are 
+            blocking the specific noise data instance reference key.
+            If it is not being blocked, nothing is returned.
+    """
+    return key_blocker.check_key_block(key=reference_key,
+                                       instance_type="noise_data")
 
 
 # --------------------------------------------------------------

@@ -1,45 +1,56 @@
 <div class="pop-up">
-    <div class="pop-up-title-bar">
-        <h2 class="pop-up-title">New noise data instance</h2>
-    </div>
-    <form class="pop-up-form">
-        <!-- Reference key input -->
-        <div class="form-input-group">
-            <label for="reference-key">Reference key:</label>
-            <input type="text"
-                   class="reference-key-input" 
-                   id="reference-key" 
-                   name="reference-key"  
-                   placeholder="Enter reference key">
-        </div>
-        <!-- Calibration data file input -->
-        <div class="form-input-group">
-            <label for="calibration-data-file">Calibration data file:</label>
-            <div class="content-box file-input-box">
-                <div class="file-icon-image"></div>
-                <div role="button"
-                     id="chose-file-button"
-                     class="clickable button-a light-button"
-                     onclick="eel.select_csv()">Choose file</div>
-                <p id="selected-file" 
-                   class="selected-file hidden-element"></p>
-                <div role="button"
-                     id="remove-selected-file-icon"
-                     class="clickable x-icon icon-red hidden-element"
-                     onclick="removeSelectedCSVFile()"></div>
-                <input type="hidden" 
-                       id="file-path" 
-                       name="file-path">
-            </div>
-        </div>
-        <!-- Create / Cancel buttons -->
-        <div class="form-input-group last-in-form">
-            <div role="button"
-                 class="clickable button-a dark-button"
-                 onclick="hidePopUpWindow()">Cancel</div>
-            <div role="button"
-                 class="clickable button-a dark-button"
-                 onclick="importCSVCalibrationData()">Create instance</div>
-        </div>
-    </form>
+     <div class="pop-up-title-bar">
+          <h2 class="pop-up-title">New noise data instance</h2>
+     </div>
+     <form class="pop-up-form">
+          <!-- Reference key input -->
+          <div class="form-input-group">
+               <label for="reference-key">Reference key:</label>
+               <div class="hidden-element input-error-message"
+                    id="reference-key-input-message"></div>
+               <div class="input-with-tracker">
+                    <input type="text" 
+                         id="reference-key" 
+                         name="reference-key"  
+                         placeholder="Enter reference key">
+                    <div class="reference-key-input-length">
+                         <span id="reference-key-input-length">0</span>
+                         /
+                         <span id="reference-key-input-max-length"></span>
+                    </div>
+               </div>
+          </div>
+          <!-- Calibration data file input -->
+          <div class="form-input-group">
+               <label for="calibration-data-file">Calibration data file:</label>
+               <div class="hidden-element input-error-message"
+                    id="csv-file-input-message"></div>
+               <div class="content-box file-input-box"
+                    id="csv-file-input">
+                    <div class="file-icon-image"></div>
+                    <div role="button"
+                         id="chose-file-button"
+                         class="clickable button-a light-button"
+                         onclick="eel.select_csv()">Choose file</div>
+                    <p id="selected-file" 
+                    class="selected-file hidden-element"></p>
+                    <div role="button"
+                         id="remove-selected-file-icon"
+                         class="clickable x-icon icon-red hidden-element"
+                         onclick="removeSelectedCSVFile()"></div>
+                    <input type="hidden" 
+                         id="file-path" 
+                         name="file-path">
+               </div>
+          </div>
+          <!-- Create / Cancel buttons -->
+          <div class="form-input-group last-in-form">
+               <div role="button"
+                    class="clickable button-a dark-button"
+                    onclick="hidePopUpWindow()">Cancel</div>
+               <div role="button"
+                    class="clickable button-a dark-button"
+                    onclick="importCSVCalibrationData()">Create instance</div>
+          </div>
+     </form>
 </div>

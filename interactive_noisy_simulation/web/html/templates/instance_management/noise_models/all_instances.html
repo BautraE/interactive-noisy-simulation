@@ -20,7 +20,7 @@
         <div class="right">
             <div role="button"
                  class="clickable button-a dark-button"
-                 onclick="showPopUpWindow('create_noise_model_instance', loadAvailableNoiseData)">
+                 onclick="showPopUpWindow('create_noise_model_instance', initNoiseDataForm)">
                  Create new instance</div>
         </div>
     </div>
@@ -32,4 +32,6 @@
 {% block scripts %}
 <script type="text/javascript" 
         src="../scripts/instance_management/noise_models/all_instances.js"></script>
+<script type="text/javascript" 
+        src="../scripts/instance_management/common.js"></script>
 {% endblock %}

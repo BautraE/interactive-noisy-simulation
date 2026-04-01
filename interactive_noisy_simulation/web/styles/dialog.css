@@ -76,6 +76,9 @@ File contents list:
     flex-direction: column;
     row-gap: 10px;
 }
+.form-input-group > :not(label) {
+    margin-left: 20px;
+}
 /* Last input is a container with buttons for either cancelling
    or finishing a specific action. */
 .form-input-group.last-in-form {
@@ -83,6 +86,18 @@ File contents list:
     column-gap: 20px;
     justify-content: flex-end;
     margin-top: 15px;
+}
+
+/* Styles for fields with trackers, for example, length tracker
+   in the form of currentLength/maxLength */
+.input-with-tracker {
+    width: max-content;
+}
+.reference-key-input-length {
+    text-align: right;
+    margin-top: 7px;
+
+    color: #CDCDCD;
 }
 
 /* 
@@ -229,7 +244,24 @@ input[type="text"]:focus {
 /* -------------------------------------------------------- */
 /* Error highlighting styles: */
 
-input.error-outline,
-.error-outline {
-    outline: 5px solid #DF3030;
+/* Input-related element that will have an outline around it
+   whenever there is something wrong with the input value. */
+input.input-error,
+.input-error {
+    outline: 4px inset #FF8A8A;
+}
+
+/* Validation-related color mode styles (yellow for warning,
+   red for incorrect). */
+.input-warning {
+    color: #FFD96F;
+}
+.input-error-message,
+.incorrect-input {
+    color: #FF8A8A;
+}
+
+/* Error message text that appears above input fields. */
+.input-error-message {
+    font-size: 14px;
 }

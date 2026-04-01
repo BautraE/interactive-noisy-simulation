@@ -42,6 +42,49 @@ function handleAction(actionType, rowId) {
 // --------------------------------------------------------------
 
 /**
+ * Runs additional functionality-related initialization steps for the noise model
+ * instance creation form.
+ */
+async function initNoiseDataForm() {
+    // Adding missing dynamic values and elements
+    await loadAvailableNoiseData();
+
+    const maxLengthSpan = document.getElementById("reference-key-input-max-length");
+    maxLengthSpan.textContent = MAX_REFERENCE_KEY_LENGTH;
+
+    // Adding required event listeners for reference key input field
+    const referenceKeyInput = document.getElementById("reference-key");
+    referenceKeyInput.addEventListener('change', () =>
+        removeInputErrorStyles({
+            outlinedElementId: "reference-key", 
+            messageElementId: "reference-key-input-message"
+        })
+    );
+    referenceKeyInput.addEventListener('input', () =>
+        referenceKeyInput.value = adjustReferenceKey(referenceKeyInput.value)
+    );
+    referenceKeyInput.addEventListener('input', () =>
+        updateTextContentLength({
+            textContent: referenceKeyInput.value,
+            maxLength: MAX_REFERENCE_KEY_LENGTH,
+            lengthDisplayElementId: "reference-key-input-length",
+        })
+    );
+
+    // Adding required event listeners for noise data source input field
+    const container = document.getElementById("noise-source-container");
+    container.addEventListener("change", (event) => {
+        if (event.target.name === "noise-data-source") {
+            removeInputErrorStyles({
+                outlinedElementId: "noise-source-container",
+                messageElementId: "source-data-input-message"
+            });
+        }
+    });
+}
+
+
+/**
  * Creates radio input fields for each existing noise data instance.
  * 
  * Used in the pop-up form for creating new noise model instances.
@@ -75,23 +118,31 @@ async function loadAvailableNoiseData() {
  * instance.
  * 
  * Right before creation process begins, action buttons are replaced
- * by a progress bar.
+ * by a progress bar, and all form elements get disabled.
  */
 async function createNoiseModelInstance() {
-    // Hides actions and shows progress bar
-    const actions = document.getElementById("action-buttons");
-    const progressBar = document.getElementById("progress-bar");
-    progressBar.classList.remove("hidden-element");
-    actions.classList.add("hidden-element");
     // Retrieves form input data
     const referenceKey = document.getElementById("reference-key");
     const noiseDataSource = document.querySelector(
         'input[name="noise-data-source"]:checked'
     );
-        
-    disableForm("pop-up-form");
-    await eel.create_noise_model_instance(referenceKey.value, noiseDataSource.value)();
-    hidePopUpWindow();
+    
+    const isValid = await validateForm([
+        {value: referenceKey.value, validator: validateReferenceKey},
+        {value: noiseDataSource?.value, validator: validateSourceData}
+    ]);
+
+    if (isValid) {
+        // Hides actions and shows progress bar
+        const actions = document.getElementById("action-buttons");
+        const progressBar = document.getElementById("progress-bar");
+        progressBar.classList.remove("hidden-element");
+        actions.classList.add("hidden-element");
+
+        disableForm("pop-up-form");
+        await eel.create_noise_model_instance(referenceKey.value, noiseDataSource.value)();
+        hidePopUpWindow();
+    }
 }
 
 
@@ -106,4 +157,83 @@ function updateInstanceProgress(percentage) {
     const progressBar = document.getElementById("current-progress");
     progressBar.style.width = `${percentage}%`;
     progressBar.innerText = `${percentage}%`;
+}
+
+
+// --------------------------------------------------------------
+// Input validation
+
+/**
+ * Reference key input value validation function.
+ * 
+ * The function uses the provided reference key value and goes through
+ * all required validation steps.
+ * 
+ * @param {string} referenceKey - Reference key value that will be
+ * validated.
+ */
+async function validateReferenceKey(referenceKey) {
+    const outlinedElementId = "reference-key";
+    const messageElementId = "reference-key-input-message";
+
+    // If reference key field is empty
+    if (!referenceKey) {
+        addInputErrorStyles({
+            outlinedElementId: outlinedElementId,
+            messageElementId: messageElementId,
+            errorMessageText: "Reference key is mandatory!"
+        });
+        return false;
+    }
+    // If reference key exceeds maximum length
+    if (referenceKey.length > MAX_REFERENCE_KEY_LENGTH) {
+        addInputErrorStyles({
+            outlinedElementId: outlinedElementId,
+            messageElementId: messageElementId,
+            errorMessageText: `The reference key is too long! Max length is 
+            ${MAX_REFERENCE_KEY_LENGTH} characters!`
+        });
+        return false;
+    }
+    // If reference key is already used by same type of instance
+    const isUnique = await eel.is_noise_model_key_unique(referenceKey)();
+    if (!isUnique) {
+        addInputErrorStyles({
+            outlinedElementId: outlinedElementId,
+            messageElementId: messageElementId,
+            errorMessageText: "This reference key is already used by another noise model instance!"
+        });
+        return false;
+    }
+
+    // Input field is valid
+    return true;
+}
+
+
+/**
+ * Source data input value validation function.
+ * 
+ * The function uses the selected source data reference and goes through
+ * all required validation steps.
+ * 
+ * @param {string} sourceData - Reference key for the source data that
+ * needs to be validated.
+ */
+function validateSourceData(sourceData) {
+    const outlinedElementId = "noise-source-container";
+    const messageElementId = "source-data-input-message";
+
+    // If source data is not selected
+    if (!sourceData) {
+        addInputErrorStyles({
+            outlinedElementId: outlinedElementId,
+            messageElementId: messageElementId,
+            errorMessageText: "Noise data sourcce must be selected!"
+        });
+        return false;
+    }
+
+    // Input field is valid
+    return true;
 }

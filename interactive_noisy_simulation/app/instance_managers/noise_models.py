@@ -8,6 +8,7 @@ from ..js_common_wrappers import (
     add_table, add_table_row,
     remove_container_content
 )
+from ...project_variables import key_blocker
 from ...project_variables import (
     EMPTY_CONTAINER_MESSAGES, LOG_MESSAGES
 )
@@ -75,6 +76,11 @@ def create_noise_model_instance(
                           noise_data=noise_data,
                           progress_callback=update_progress)
     
+    # Adds key blocking constraint for the used noise data source.
+    key_blocker.block_key(key=noise_data_reference, 
+                          instance_type="noise_data", 
+                          blocker_key=reference_key)
+    
     add_log_message(message=LOG_MESSAGES["created_instance"],
                     instance_type="noise model",
                     reference_key=reference_key)
@@ -95,6 +101,13 @@ def remove_noise_model_instance(
         reference_key (str): Reference key of deletable noise model
             instance.
     """
+    # Removes key blocking cconstraints caused by the deletable noise
+    # model instance.
+    data_source_key = nc.noise_models[reference_key].data_source
+    key_blocker.unblock_key(key=data_source_key,
+                            instance_type="noise_data",
+                            blocker_key=reference_key)
+
     # Remove existing noise model instance:
     nc.remove_noise_model_instance(reference_key)
 
@@ -127,6 +140,27 @@ def get_noise_data_references() -> list[str]:
                                container_id="noise-source-container")
 
     return reference_keys
+
+
+@eel.expose
+def is_noise_model_key_unique(
+    reference_key: str
+) -> bool:
+    """Checks if the new reference key is already in use for a different
+    noise model instance.
+
+    Exposed function to `Python Eel` for use with JavaScript.
+
+    Args:
+        reference_key (str): Selected reference key for a new noise model
+            instance.
+
+    Returns:
+        bool: Is the new key unique (not in use by another instance of
+            the same type).
+    """
+    all_keys = nc.noise_models.keys()
+    return reference_key not in all_keys
 
 
 # Non-exposed methods:
