@@ -1,7 +1,7 @@
 #Third party imports:
 from qiskit_aer.noise import NoiseModel
 
-# Local project imports:
+# Project-related imports:
 from ..data_structures.instance_data import InstanceData
 from ..data_structures.noise_model_instance import NoiseModelInstance
 from .helpers.noise_model_creation import (

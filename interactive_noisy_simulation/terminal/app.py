@@ -79,6 +79,8 @@ def _build_pages() -> None:
         "instance_management/noise_data/single_instance.html",
         "noise_model_instances.html":
         "instance_management/noise_models/all_instances.html",
+        "circuit_instances.html":
+        "instance_management/circuits/all_instances.html",
     }
     
     with (

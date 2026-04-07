@@ -19,6 +19,9 @@ noise_data_manager = NoiseDataManager()
 from .core.instance_managers.noise_creator import NoiseCreator
 noise_creator = NoiseCreator()
 
+from .core.instance_managers.circuit_manager import CircuitManager
+circuit_manager = CircuitManager()
+
 # - Log manager:
 from .core.logs.log_manager import LogManager
 log_manager = LogManager()

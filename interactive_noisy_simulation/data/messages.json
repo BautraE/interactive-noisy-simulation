@@ -8,17 +8,17 @@
     },
     
     "log": {
-        "new_noise_data_instance": {
-            "text": "New noise data instance has been created successfully. It can now be accessed with the following reference key: {reference_key}. Source file location: {full_path}",
-            "highlightables": [
-                "{reference_key}", "{full_path}"
-            ]
-        },
-
         "created_instance": {
             "text": "New {instance_type} instance has been created successfully! It can now be accessed with the following reference key: {reference_key}.",
             "highlightables": [
                 "{reference_key}"
+            ]
+        },
+
+        "created_instance_from_file": {
+            "text": "New {instance_type} instance has been created successfully. It can now be accessed with the following reference key: {reference_key}. Source file location: {full_path}",
+            "highlightables": [
+                "{reference_key}", "{full_path}"
             ]
         },
 

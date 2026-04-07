@@ -1,16 +1,16 @@
 // =================================================================
 // Functionality related to a specific page - viewing and managing
-// all noise data instances.
+// all circuit instances.
 // =================================================================
 // File contents list:
 // 1. Action handling
-// 2. New NoiseDataInstance creation form functionality
+// 2. New CircuitInstance creation form functionality
 // -----------------------------------------------------------------
 
 // Loading existing noise data instances
 window.addEventListener('load', function() {
     setTimeout(function() {
-        eel.view_noise_data_instances();
+        eel.view_circuit_instances();
     }, 1);
 });
 
@@ -26,56 +26,25 @@ window.addEventListener('load', function() {
  * @param {string} actionType - type of action expressed as a
  * string ("delete" or "view").
  * @param {string} referenceKey - reference key of the current 
- * noise data instance for which the action must be performed.
+ * circuit instance for which the action must be performed.
  */
 function handleAction(actionType, rowId) {
     switch (actionType) {
         case "delete":
-            removeNoiseDataInstance(rowId);
-            break;
-        case "view":
-            viewSpecificNoiseData(rowId);
+            eel.remove_circuit_instance(rowId);
             break;
     }
 }
 
 
-/**
- * Calls Python function to remove the specified noise data
- * instance.
- * 
- * @param {string} referenceKey - reference key of the noise 
- * data instance.
- */
-function removeNoiseDataInstance(referenceKey) {
-    eel.remove_noise_data_instance(referenceKey);
-}
-
-
-/**
- * Redirects to page for viewing detailed information about
- * the specified noise data instance.
- * 
- * @param {string} referenceKey - reference key of the noise 
- * data instance.
- */
-function viewSpecificNoiseData(referenceKey) {
-    window.location.href = `noise_data_instance.html?id=${referenceKey}`;
-}
-
-
-// --------------------------------------------------------------
-// 2. New NoiseDataInstance creation form functionality
-// --------------------------------------------------------------
-
 // --------------------------------------------------------------
 // Initializer function
 
 /**
- * Runs additional functionality-related initialization steps for the noise data
+ * Runs additional functionality-related initialization steps for the circuit
  * instance creation form.
  */
-async function initNoiseDataForm() {
+function initNewInstanceForm() {
     // Adding missing dynamic values
     const maxLengthSpan = document.getElementById("reference-key-input-max-length");
     maxLengthSpan.textContent = MAX_REFERENCE_KEY_LENGTH;
@@ -135,8 +104,8 @@ function setSelectedFile(fileName, path) {
 
     // Removes any previous input error-related style
     removeInputErrorStyles({
-        outlinedElementId: "csv-file-input", 
-        messageElementId: "csv-file-input-message"
+        outlinedElementId: "circuit-file-input", 
+        messageElementId: "circuit-file-input-message"
     });
 }
 
@@ -145,7 +114,7 @@ function setSelectedFile(fileName, path) {
  * Changes appearance of custom file input form field and
  * unsets value of hidden input field to being empty.
  */
-function removeSelectedCSVFile() {
+function removeSelectedFile() {
     // Hides text with selected file name
     let pFileName = document.getElementById("selected-file");
     pFileName.classList.add("hidden-element");
@@ -162,10 +131,10 @@ function removeSelectedCSVFile() {
 
 
 /**
- * Takes input field values and attempts to create a new noise data
+ * Takes input field values and attempts to create a new circuit
  * instance.
  */
-async function importCSVCalibrationData() {
+async function createInstance() {
     const referenceKey = document.getElementById("reference-key").value;
     const filePath = document.getElementById("file-path").value;
 
@@ -175,7 +144,7 @@ async function importCSVCalibrationData() {
     ]);
 
     if (isValid) {
-        eel.import_csv_calibration_data(referenceKey, filePath);
+        eel.create_circuit_instance(referenceKey, filePath);
         hidePopUpWindow();
     }
 }
@@ -217,25 +186,12 @@ async function validateReferenceKey(referenceKey) {
         return false;
     }
     // If reference key is already used by same type of instance
-    const isUnique = await eel.is_noise_data_key_unique(referenceKey)();
+    const isUnique = await eel.is_circuit_key_unique(referenceKey)();
     if (!isUnique) {
         addInputErrorStyles({
             outlinedElementId: outlinedElementId,
             messageElementId: messageElementId,
-            errorMessageText: "This reference key is already used by another noise data instance!"
-        });
-        return false;
-    }
-    // If reference key is being blocked by another instance
-    const blockers = await eel.check_noise_data_key_block(referenceKey)()
-    if (blockers) {
-        const formattedBlockers = blockers.map(k => `"${k}"`).join("; ");
-        addInputErrorStyles({
-            outlinedElementId: outlinedElementId,
-            messageElementId: messageElementId,
-            errorMessageText: `This reference key is currently being blocked 
-            by the following noise model instances: ${formattedBlockers}! 
-            The key will be unblocked after they are deleted.`
+            errorMessageText: "This reference key is already used by another circuit instance!"
         });
         return false;
     }
@@ -246,32 +202,32 @@ async function validateReferenceKey(referenceKey) {
 
 
 /**
- * CSV file path value validation function.
+ * QPY file path value validation function.
  * 
- * The function uses the provided file path to the selected CSV calibration
- * data file and goes through all required validation steps for it.
+ * The function uses the provided file path to the selected file and goes 
+ * through all required validation steps for it.
  * 
  * @param {string} filePath - File path that will be validated.
  */
 function validateFileInput(filePath) {
-    const outlinedElementId = "csv-file-input";
-    const messageElementId = "csv-file-input-message";
+    const outlinedElementId = "circuit-file-input";
+    const messageElementId = "circuit-file-input-message";
 
     // If no file is selected
     if (!filePath) {
         addInputErrorStyles({
             outlinedElementId: outlinedElementId,
             messageElementId: messageElementId,
-            errorMessageText: "No CSV calibration data file selected!"
+            errorMessageText: "No QPY circuit file selected!"
         });
         return false;
     }
-    // If file type is not CSV
-    if (!filePath.toLowerCase().endsWith(".csv")) {
+    // If file type is not QPY
+    if (!filePath.toLowerCase().endsWith(".qpy")) {
         addInputErrorStyles({
             outlinedElementId: outlinedElementId,
             messageElementId: messageElementId,
-            errorMessageText: "Invalid file type! Only CSV (.csv) files are supported!"
+            errorMessageText: "Invalid file type! Only QPY (.qpy) files are supported!"
         });
         return false;
     }

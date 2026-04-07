@@ -7,11 +7,11 @@ import eel
 # Project-related imports:
 from ...core.data_structures.file import File
 from ..general import inform_empty_container
-from .js_noise_data_wrappers import set_selected_file
 from ..js_common_wrappers import (
     add_table, add_table_row,
     add_content_box,
-    remove_container_content
+    remove_container_content,
+    set_selected_file
 )
 from ..logs.logs import add_log_message
 from ...project_variables import key_blocker
@@ -80,7 +80,8 @@ def import_csv_calibration_data(
     ndm.import_csv_data(reference_key, source_file)
     
     new_instance = ndm.noise_data[reference_key]
-    add_log_message(message=LOG_MESSAGES["new_noise_data_instance"],
+    add_log_message(message=LOG_MESSAGES["created_instance_from_file"],
+                    instance_type="noise data",
                     reference_key=reference_key,
                     full_path=new_instance.source_file.full_path)
     

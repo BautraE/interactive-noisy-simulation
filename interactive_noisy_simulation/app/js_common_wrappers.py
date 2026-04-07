@@ -97,7 +97,7 @@ def add_table_row(
 
 
 # --------------------------------------------------------------
-# General content-related functions
+# Miscellaneous content-related functions
 # --------------------------------------------------------------
 
 def add_empty_container_message(
@@ -116,3 +116,22 @@ def add_empty_container_message(
             will be added to.
     """
     eel.addEmptyContainerMessage(message, container_id)
+
+
+def set_selected_file(
+        file_name: str,
+        full_path: str
+) -> None:
+    """Changes appearance of custom file input form field and sets value of 
+    hidden input field to the selected file path on device so that Python 
+    can use it after submission.
+    
+    Wrapper function for `Python Eel` JS function call.
+
+    Args:
+        file_name (str): name of selected file that will be displayed 
+            to the user for informative purposes.
+        full_path (str): full file path that will be set as the file 
+            input field's value.
+    """
+    eel.setSelectedFile(file_name, full_path)
