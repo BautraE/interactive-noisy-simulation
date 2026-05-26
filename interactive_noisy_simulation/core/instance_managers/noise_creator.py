@@ -97,6 +97,7 @@ class NoiseCreator:
 
         # Defining new noise model instance
         new_instance = NoiseModelInstance(
+            reference_key=reference_key,
             data_source=noise_data.reference_key,
             noise_model=noise_model,
             coupling_map=coupling_map)

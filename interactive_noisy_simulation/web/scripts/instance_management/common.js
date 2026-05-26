@@ -4,18 +4,125 @@
 // =================================================================
 // File contents list:
 // 1. Global page-specific variables
-// 2. Form input validation
+// 2. Data loading
+// 3. Form input validation
 // -----------------------------------------------------------------
 
 // --------------------------------------------------------------
 // 1. Global page-specific variables
 // --------------------------------------------------------------
 
+/**
+ * Restriction limit for reference key length. Used for reference
+ * key input fields.
+ * @type {int}
+ */
 const MAX_REFERENCE_KEY_LENGTH = 50;
+/**
+ * HTML element of currently displayed popup element container.
+ * If no popup is displayed, value will be `null`.
+ * Primarily used for height adjustmend animation through JS due 
+ * to existing restrictions with CSS functionality.
+ * @type {?HTMLElement}
+ */
+let activePopupElement = null;
+/**
+ * Dictionary containing potential functions related to any 
+ * modifications of instance data while it is being rendered.
+ * @type {Object}
+ */
+let instanceDataModifications = {};
 
 
 // --------------------------------------------------------------
-// 2. Form input validation
+// 2. Data loading
+// --------------------------------------------------------------
+
+/**
+ * Loads available radio input options based on retrieved data.
+ * 
+ * @param {{
+ * containerId: string,
+ * inputId: string,
+ * dataRetrievalFunction: function(): string[]
+ * }} args - Group of indexed arguments in the form of a dictionary.
+ * 
+ * @param {string} args.containerId - ID of the container element where the
+ * loaded radio input options will be placed.
+ * @param {string} args.inputId - Value for `id` and `name` attributes for 
+ * all radio input options of a radio input field.
+ * @param {function(): string[]} args.dataRetrievalFunction - List of radio 
+ * input option texts. If no options are available to be added, an empty
+ * list (array in JS) is returned.
+ * 
+ * @returns {void}
+ */
+async function loadRadioInputOptions({
+    containerId,
+    inputId,
+    dataRetrievalFunction
+}) {
+    let options = await dataRetrievalFunction()();
+
+    const container = document.getElementById(containerId);
+
+    for(let option of options) {
+        //  Clicking anywhere on label element ensures input activation.
+        const label = document.createElement("label");
+        label.classList.add("radio-option");
+
+        label.innerHTML = `
+            <input type="radio"
+                   name="${inputId}"
+                   id="${inputId}"
+                   value="${option}">
+            <span class="custom-radio"></span>
+            <span class="radio-text">${option}</span>
+        `;
+
+        container.appendChild(label);
+    }
+}
+
+
+eel.expose(viewInstanceData);
+/**
+ * Renders data about created instances for an instance-specific management
+ * page.
+ * 
+ * @param {Object} instanceData - Dictionary object containing instance data
+ * (for existing instances) of a specific instance type.
+ * @param {string} containerId - ID of the container element where the
+ * rendered data will be placed.
+ * @param {string} tableId - `id` attribute value that will be set for the
+ * table element containing instance data.
+ * 
+ * @returns {void}
+ */
+function viewInstanceData(
+    instanceData, 
+    containerId, 
+    tableId
+) {
+    tableElement = addTable(
+        containerId, tableId, 
+        instanceData.columns,
+        instanceData.actions.length === 0 ? false : true
+    );
+    // Runs table-related modification if defined
+    instanceDataModifications.table?.(tableElement);
+
+    const dataRows = instanceData.rows;
+    dataRows.forEach(row => {
+        let rowElement = addTableRow(tableId, row, instanceData.actions);
+        // Runs table row-related modification if defined
+        instanceDataModifications.row?.(rowElement, row);
+    });
+}
+
+
+// --------------------------------------------------------------
+// 3. Form input validation
 // --------------------------------------------------------------
 
 /**
@@ -25,9 +132,8 @@ const MAX_REFERENCE_KEY_LENGTH = 50;
  * @param {{
  * value: string, 
  * validator: Function
- * }[]} validations - List of
- * validations that should be completed for a specific form (its input
- * fields).
+ * }[]} validations - List of validations that should be completed 
+ * for a specific form (its input fields).
  */
 async function validateForm(validations) {
     let isValid = true;
@@ -63,13 +169,22 @@ async function validateForm(validations) {
  * @param {string} args.errorMessageText - Input error-related message text
  * that will be shown to user.
  */
-function addInputErrorStyles({outlinedElementId, messageElementId, errorMessageText}) {
+function addInputErrorStyles({
+    outlinedElementId, 
+    messageElementId, 
+    errorMessageText
+}) {
     const outlinedElement = document.getElementById(outlinedElementId);
     outlinedElement.classList.add("input-error");
 
     const messageElement = document.getElementById(messageElementId);
     messageElement.textContent = errorMessageText;
     messageElement.classList.remove("hidden-element");
+
+    // Adjusts height after adding error-related content
+    if(activePopupElement) {
+        adjustHeightOfParent(activePopupElement);
+    }
 }
 
 
@@ -90,13 +205,21 @@ function addInputErrorStyles({outlinedElementId, messageElementId, errorMessageT
  * @param {string} args.messageElementId - ID of error message element that
  * needs to be hidden.
  */
-function removeInputErrorStyles({outlinedElementId, messageElementId}) {
+function removeInputErrorStyles({
+    outlinedElementId, 
+    messageElementId
+}) {
     const outlinedElement = document.getElementById(outlinedElementId);
     outlinedElement.classList.remove("input-error");
 
     const messageElement = document.getElementById(messageElementId);
     messageElement.textContent = "";
     messageElement.classList.add("hidden-element");
+
+    // Adjusts height after removing error-related content
+    if(activePopupElement) {
+        adjustHeightOfParent(activePopupElement);
+    }
 }
 
 

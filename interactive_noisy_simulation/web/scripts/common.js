@@ -7,6 +7,9 @@
 // 2. General content-related functions
 // 3. Container management
 // 4. Data table creation
+// 5. Content animation functionality - JS functionality for 
+//    something that is not yet available through pure CSS (in
+//    other words, hacky workarounds).
 // -----------------------------------------------------------------
 
 // --------------------------------------------------------------
@@ -51,6 +54,8 @@ async function showPopUpWindow(popupName, initializer=null) {
 /**
  * Disables specific form with the given ID.
  * 
+ * Also works for specific input fields.
+ * 
  * @param {string} formId - ID of the form HTML element that needs all of
  * its input fields to be disabled.
  */
@@ -60,6 +65,24 @@ function disableForm(formId) {
 
     for(const el of elements) {
         el.disabled = true;
+    }
+}
+
+
+/**
+ * Enables specific form with the given ID.
+ * 
+ * Also works for specific input fields.
+ * 
+ * @param {string} formId - ID of the form HTML element that needs all of
+ * its input fields to be enabled.
+ */
+function enableForm(formId) {
+    const form = document.getElementById(formId);
+    const elements = form.querySelectorAll("input");
+
+    for(const el of elements) {
+        el.disabled = false;
     }
 }
 
@@ -166,6 +189,7 @@ function addTable(containerId, tableId, columns=[], hasActions=false) {
     }
 
     _appendThroughId(containerId, table);
+    return table;
 }
 
 
@@ -216,6 +240,7 @@ function addTableRow(tableId, rowContent, actions=[]) {
     }
 
     _appendThroughId(tableId, row);
+    return row;
 }
 
 
@@ -243,4 +268,38 @@ function addDynamicContentStyle(cellContent, element) {
         default:
             break;
     }
+}
+
+
+// --------------------------------------------------------------
+// 5. Content animation functionality
+// --------------------------------------------------------------
+
+/**
+ * Adjusts height of an element based on its children and how much space
+ * they take up.
+ * 
+ * This fumction if purely for making CSS-related animations work for
+ * height changes as something like this (in this specific situation)
+ * is not simply accomplishable through pure CSS.
+ * 
+ * @param {HTMLElement} parentElement - Element that will have its height
+ * adjusted.
+ */
+function adjustHeightOfParent(parentElement) {
+    let totalHeight = 0;
+
+    const children = [...parentElement.children];
+
+    children.forEach(child => {
+        if (child.offsetParent === null) return; // skips display:none
+
+        const style = getComputedStyle(child);
+
+        totalHeight += child.offsetHeight;
+        totalHeight += parseFloat(style.marginTop);
+        totalHeight += parseFloat(style.marginBottom);
+    });
+
+    parentElement.style.height = totalHeight + "px";
 }

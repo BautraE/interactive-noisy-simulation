@@ -35,4 +35,19 @@ class InstanceData():
         self.columns.append(name)
         for row, data in zip(self.rows, content):
             row.append(data)
-        
+
+
+    def to_dict(self) -> dict:
+        """Returns contents of self in the form of a dictionary.
+
+        Dictionary keys match the variable names from this dataclass.
+
+        Returns:
+            dict: Dataclass contents.
+        """
+        dictionary = {
+            "columns": self.columns,
+            "rows": self.rows,
+            "actions": self.actions
+        }
+        return dictionary

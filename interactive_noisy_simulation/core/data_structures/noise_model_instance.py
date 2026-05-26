@@ -10,6 +10,8 @@ class NoiseModelInstance:
     """Dataclass for storing a noise model instance.
     
     Attributes:
+        reference_key (str): Key by which the specific object is accessed 
+            in other places of the INS app.
         data_source (str): Reference key for NoiseDataInstance object that
             was the source for creating the NoiseModel and CouplingMap
             objects.
@@ -18,6 +20,7 @@ class NoiseModelInstance:
         coupling_map (CouplingMap): Coupling map that is associated
             with the current noise model.
     """
+    reference_key: str
     data_source: str
     noise_model: NoiseModel
     coupling_map: CouplingMap

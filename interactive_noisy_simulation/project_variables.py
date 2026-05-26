@@ -22,6 +22,9 @@ noise_creator = NoiseCreator()
 from .core.instance_managers.circuit_manager import CircuitManager
 circuit_manager = CircuitManager()
 
+from .core.instance_managers.experiment_manager import ExperimentManager
+experiment_manager = ExperimentManager()
+
 # - Log manager:
 from .core.logs.log_manager import LogManager
 log_manager = LogManager()

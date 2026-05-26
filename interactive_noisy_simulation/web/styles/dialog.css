@@ -30,11 +30,14 @@ File contents list:
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 400px;
+    width: 450px;
     border-radius: 8px;
-    
+
     background-color: #3B3F52;
     filter: drop-shadow(0px 3px 4px #141414);
+
+    transition: height 0.5s ease;
+    overflow: hidden; /* Related to height transitions */
 }
 
 /* Header of pop-up window that contains title
@@ -66,6 +69,86 @@ File contents list:
     flex-direction: column;
     row-gap: 20px;
     padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+    
+    scrollbar-color: #8792C8 #3B3F52;
+}
+
+/* Bar at top of popup for selecting between form steps */
+.form-step-select {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 20px;
+    margin-bottom: 25px;
+
+    display: flex;
+    flex-direction: row;
+    column-gap: 5px;
+}
+
+/* Single step bar with little step title beneath it */
+.step-bar-block {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    cursor: pointer;
+
+    transition: flex 0.7s ease;
+}
+.step-bar-block.active-step {
+    flex: 0 0 120px;
+    cursor: default;
+}
+/* Step bar from step bar block */
+.step-bar {
+    height: 7px;
+    width: 100%;
+    border-radius: 10px;
+
+    box-shadow: inset 0 0 0 1px #B6B4FF;
+
+    transition: box-shadow 0.3s ease,
+        background-color 0.3s ease;
+}
+.step-bar-block.active-step > .step-bar {
+    background-color: #B6B4FF;
+}
+.step-bar-block:not(.active-step):hover .step-bar {
+    box-shadow: inset 0 0 0 1px #c59efc;
+    background-color: #c59efc;
+}
+.step-bar-block:not(.active-step):active .step-bar {
+    box-shadow: inset 0 0 0 1px #9f80ca;
+    background-color: #9f80ca;
+}
+/* Little step title below step bar from step bar block */
+.step-bar-text {
+    font-size: 12px;
+    color: #B6B4FF;
+    text-align: right;
+}
+.step-bar-block.active-step > .step-bar-text {
+    display: none;
+}
+.step-bar-block:not(.active-step):hover .step-bar-text {
+    color: #c59efc;
+}
+.step-bar-block:not(.active-step):active .step-bar-text {
+    color: #9f80ca;
+}
+
+/* Heading block in forms used for informing about currently active 
+   form step. */
+.form-step-heading {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+/* Small text (eg. "Step 1") that appears above form step headings. */
+.form-step-counter {
+    font-size: 12px;
 }
 
 /* Container for a single input (this includes the label,
@@ -86,6 +169,16 @@ File contents list:
     column-gap: 20px;
     justify-content: flex-end;
     margin-top: 15px;
+}
+
+/* Container for buttons at the bottom of form (Cancel, Create, etc.) */
+.form-actions {
+    margin: 20px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    column-gap: 20px;
 }
 
 /* Styles for fields with trackers, for example, length tracker
@@ -238,6 +331,80 @@ input[type="text"]:focus {
 /* When form is disabled */
 .radio-option input:disabled:not(:checked) ~ .radio-text {
     opacity: 0.6;
+}
+
+
+/* -------------------------------------------------------- */
+/* Radio input if there is a toggle-related checkbox above it */
+
+/* Actual checkbox input field */
+.custom-toggle-checkbox-box input[type="checkbox"] {
+    display: none;
+}
+
+/* Container for custom toggle checkbox */
+.custom-toggle-checkbox-box {
+    width: fit-content;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background-color: #151924;
+}
+
+/* Container for checkbox input (so that clicking anywhere near the 
+   rendered input results in clicking the checkbox)*/
+.custom-toggle-checkbox-box label{
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 8px;
+    user-select: none;
+}
+
+/* Custom checkmark box */
+.custom-toggle-checkbox-box .checkbox-box {
+    width: 15px;
+    height: 15px;
+    border: 2px solid #FFD173;
+    border-radius: 4px;
+    position: relative;
+    display: inline-block;
+}
+/* Custom checkmark */
+.custom-toggle-checkbox-box .checkbox-box::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 0.5px;
+    width: 4px;
+    height: 8px;
+    border: solid #FFD173;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) scale(0);
+    transition: transform 0.15s ease-in-out;
+}
+
+/* CSS for when checkbox is checked */
+.custom-toggle-checkbox-box input:checked + .checkbox-box {
+    background-color: #2A2949;
+}
+.custom-toggle-checkbox-box input:checked + .checkbox-box::after {
+    transform: rotate(45deg) scale(1);
+}
+
+/* For when the custom checkbox is above a radio select input (when
+   the checkbox is related to that specific input) */
+.radio-select-with-checkbox .content-box {
+    margin-left: 0;
+    border-top-left-radius: 0;
 }
 
 

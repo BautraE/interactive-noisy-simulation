@@ -2,14 +2,20 @@
     "empty_container": {
         "empty_log": "The {log_type} log is currently empty",
 
-        "no_instances": "There are currently no {instance_type} instances!",
+        "no_instances": "There are currently no {instance_type} instances",
 
-        "no_noise_data_sources": "There are currently no noise data sources to create new noise models from!"
+        "no_instances_for_job": "There are currently no {instance_type} instances to select for this experiment job!",
+
+        "no_noise_data_sources": "There are currently no noise data sources to create new noise models from!",
+
+        "no_experiment_jobs": "This experiment instance currently does not have any jobs",
+
+        "no_instance_for_detailed_view": "There are currently no {instance_type} to display detailed information about"
     },
     
     "log": {
         "created_instance": {
-            "text": "New {instance_type} instance has been created successfully! It can now be accessed with the following reference key: {reference_key}.",
+            "text": "New {instance_type} instance has been created successfully. It can now be accessed with the following reference key: {reference_key}.",
             "highlightables": [
                 "{reference_key}"
             ]
@@ -22,10 +28,24 @@
             ]
         },
 
+        "created_job_instance": {
+            "text": "A new job instance - {job_reference_key} - has been created for the experiment instance {experiment_reference_key}.",
+            "highlightables": [
+                "{job_reference_key}", "{experiment_reference_key}"
+            ]
+        },
+
         "deleted_instance": {
-            "text": "The {instance_type} instance {reference_key} has been deleted successfully!",
+            "text": "The {instance_type} instance {reference_key} has been deleted successfully.",
             "highlightables": [
                 "{reference_key}"
+            ]
+        },
+
+        "deleted_job_instance": {
+            "text": "The job instance {job_reference_key} from the experiment instance {experiment_reference_key} has been deleted successfully.",
+            "highlightables": [
+                "{job_reference_key}", "{experiment_reference_key}"
             ]
         }
     },

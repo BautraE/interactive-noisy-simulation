@@ -11,7 +11,8 @@
 from .instance_managers import (
     noise_data,
     noise_models,
-    circuits
+    circuits,
+    experiments
 )
 
 from .logs import logs
