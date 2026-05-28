@@ -27,8 +27,10 @@ body {
     
     font-family: 'Nunito';
     font-size: 16px;
-    color: white;
+    color: var(--color-text-default);
 
+    /* Filler color in case the intended one does not show 
+       (only for development) */
     background-color: black;
 }
 
@@ -53,7 +55,7 @@ th {
     text-transform: uppercase;
     font-style: italic;
     font-weight: normal;
-    color: #FFD173;
+    color: var(--color-element-highlight-primary);
 
     border-radius: 8px;
 }
@@ -74,7 +76,7 @@ tr {
 }
 
 tr:nth-child(even) {
-    background-color: #222C42;
+    background-color: var(--color-table-rows-even);
 }
 
 tr td:first-child {
@@ -107,7 +109,7 @@ tr td:last-child {
     box-sizing: border-box;
     padding-left: 35px;
 
-    background-color: #2B2E3C;
+    background-color: var(--color-main-navbar-background);
 }
 .main-navbar ul {
     height: 100%;
@@ -124,20 +126,20 @@ tr td:last-child {
 /* Navbar link styles: */
 .main-navbar ul li a {
     text-decoration: none;
-    color: #CDCDCD;
+    color: var(--color-main-navbar-link-text);
     font-size: 16px;
 }
 .main-navbar ul li a:hover {
-    text-shadow: #d5adff 0px 0 13px;
-    color: white;
+    text-shadow: var(--color-main-navbar-link-text-shadow) 0px 0 13px;
+    color: var(--color-main-navbar-link-text-hover);
 }
 .main-navbar ul li a:active {
-    text-shadow: #d5adff 0px 0 15px;
-    color: #9C9AFF;
+    text-shadow: var(--color-main-navbar-link-text-shadow) 0px 0 15px;
+    color: var(--color-main-navbar-link-active);
 }
 /* For current page link */
 .main-navbar ul li a.active {
-    color: #9C9AFF;
+    color: var(--color-main-navbar-link-opened);
 }
 
 
@@ -152,9 +154,9 @@ tr td:last-child {
 .page-content {
     display: flex;
     flex: 1;
-    max-height: var(--max-page-content-height);
+    max-height: var(--height-max-page-content);
 
-    background-color: #3B3F52;
+    background: var(--gradient-primary-background);
 }
 
 /* Content container - div element that will contain specific content
@@ -169,7 +171,7 @@ tr td:last-child {
     padding-right: 35px;
     overflow-y: auto;
 
-    scrollbar-color: #8792C8 #3B3F52;
+    scrollbar-color: var(--scrollbar-color-content-containers);
 }
 
 /* Main heading elements */
@@ -179,7 +181,7 @@ tr td:last-child {
     text-transform: uppercase;
     font-weight: bold;
 
-    filter: drop-shadow(0px 3px 4px #141414);
+    filter: var(--container-drop-shadow);
 }
 
 .content-container-heading {
@@ -205,7 +207,7 @@ tr td:last-child {
 .empty-container-text {
     text-align: center;
 
-    color: #CDCDCD;
+    color: var(--color-text-muted);
 }
 
 
@@ -235,14 +237,13 @@ tr td:last-child {
     padding: 10px;
     border-radius: 8px;
 
-    background-color: #1D2331;
-    scrollbar-color: #6176A8 #1D2331;
+    scrollbar-color: var(--scrollbar-color-content-box);
 }
 .content-box.variant-light {
-    background-color: #1D2331;
+    background-color: var(--color-content-box-light);
 }
 .content-box.variant-dark {
-    background-color: #151924;
+    background-color: var(--color-content-box-dark);
 }
 
 
@@ -274,7 +275,7 @@ tr td:last-child {
     width: 100%;
     padding: 5px;
 
-    background-color: #222534;
+    background-color: var(--color-progress-bar-box);
     border-radius: 8px;
 }
 /* Progress line with percentage text */
@@ -283,7 +284,7 @@ tr td:last-child {
     height: 100%;
     width: 0%;
 
-    background-color: #2bc76f;
+    background-color: var(--color-progress-bar-line);
     border-radius: 8px;
     
     /* Styles for percentage text */
@@ -292,7 +293,7 @@ tr td:last-child {
     align-items: center;
     overflow: hidden;
 
-    color: #ffffff;
+    color: var(--color-progress-bar-text);
     font-size: 12px;
     font-weight: bold;
 }

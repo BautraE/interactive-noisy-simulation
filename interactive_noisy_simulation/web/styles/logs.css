@@ -24,17 +24,29 @@ File contents list:
     padding-top: 10px;
     padding-bottom: 10px;
     border-top-left-radius: 4px;
-    background-color: #2B2E3C;
+    background-color: var(--color-button-variant-default-background);
+    box-shadow: 
+        inset 0 1px 0 0 var(--color-button-variant-default-border), /* Top outline */
+        inset 1px 0 0 0 var(--color-button-variant-default-border); /* Left outline */
 
     cursor: pointer;
 
+    color: var(--color-button-variant-default-text);
     font-size: 18px;
 }
 .log-sidebar-open-button:hover {
-    background-color: #4E63B4;
+    background-color: var(--color-button-variant-default-background-hover);
+    box-shadow: 
+        inset 0 1px 0 0 var(--color-button-variant-default-border-hover), /* Top outline */
+        inset 1px 0 0 0 var(--color-button-variant-default-border-hover); /* Left outline */
+    color: var(--color-button-variant-default-text-hover);
 }
 .log-sidebar-open-button:active {
-    background-color: #192B73;
+    background-color: var(--color-button-variant-default-background-active);
+    box-shadow: 
+        inset 0 1px 0 0 var(--color-button-variant-default-border-active), /* Top outline */
+        inset 1px 0 0 0 var(--color-button-variant-default-border-active); /* Left outline */
+    color: var(--color-button-variant-default-text-active);
 }
 
 /*
@@ -50,7 +62,7 @@ File contents list:
     left: 0;
     z-index: 1;
     width: 100%;
-    height: var(--max-page-content-height);
+    height: var(--height-max-page-content);
 }
 /* Sub-containers */
 .background-cover {
@@ -68,8 +80,8 @@ File contents list:
     padding: 20px;
     overflow-y: auto;
 
-    background-color: #3B3F52;
-    scrollbar-color: #8792C8 #3B3F52;
+    background: var(--gradient-secondary-background);
+    scrollbar-color: var(--scrollbar-color-content-containers);
 }
 
 
@@ -124,7 +136,7 @@ File contents list:
 
 /* Timestamp text */
 .log-timestamp {
-    color: #CDCDCD;
+    color: var(--color-text-muted);
     margin: 0;
 }
 
@@ -141,5 +153,5 @@ File contents list:
 -------------------------------------------------------------- 
 */
 span.highlight {
-    color: #FFD173;
+    color: var(--color-element-highlight-primary);
 }

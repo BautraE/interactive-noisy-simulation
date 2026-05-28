@@ -3,18 +3,34 @@
 // pages.
 // =================================================================
 // File contents list:
-// 1. Pop-up and form functionality.
-// 2. General content-related functions
-// 3. Container management
-// 4. Data table creation
-// 5. Content animation functionality - JS functionality for 
+// 1. Global variables
+// 2. Pop-up and form functionality.
+// 3. General content-related functions
+// 4. Container management
+// 5. Data table creation
+// 6. Content animation functionality - JS functionality for 
 //    something that is not yet available through pure CSS (in
 //    other words, hacky workarounds).
 // -----------------------------------------------------------------
 
+
 // --------------------------------------------------------------
-// 1. Pop-up and form functionality
+// 1. Global variables
 // --------------------------------------------------------------
+
+/**
+ * CSS style classes that get set for specific actions
+ * @type {Object}
+ */
+const ACTION_STYLES = {
+    delete: "variant-red",
+    view: "variant-default"
+}
+
+// --------------------------------------------------------------
+// 2. Pop-up and form functionality
+// --------------------------------------------------------------
+
 /**
  * @typedef {() => (Promise<void>|void)} PopupInitializerFunction
  */
@@ -88,7 +104,7 @@ function enableForm(formId) {
 
 
 // --------------------------------------------------------------
-// 2. General content-related functions
+// 3. General content-related functions
 // --------------------------------------------------------------
 
 eel.expose(addEmptyContainerMessage);
@@ -111,7 +127,7 @@ function addEmptyContainerMessage(messageText, parentElementId) {
 
 
 // --------------------------------------------------------------
-// 3. Container management
+// 4. Container management
 // --------------------------------------------------------------
 
 /**
@@ -127,7 +143,7 @@ function addEmptyContainerMessage(messageText, parentElementId) {
 eel.expose(createContentBox)
 function createContentBox(containerId, boxId) { 
     let contentBox = document.createElement("div");
-    contentBox.classList.add("content-box");
+    contentBox.classList.add("content-box", "variant-light");
     contentBox.id = boxId;
 
     _appendThroughId(containerId, contentBox);
@@ -151,7 +167,7 @@ function removeContainerContent(containerId) {
 
 
 // --------------------------------------------------------------
-// 4. Data table creation
+// 5. Data table creation
 // --------------------------------------------------------------
 
 eel.expose(addTable);
@@ -229,7 +245,7 @@ function addTableRow(tableId, rowContent, actions=[]) {
             let actionElement = document.createElement("a");
             actionElement.role = "button";
             actionElement.innerText = action;
-            actionElement.classList.add("clickable", "action", `${action}-action`);
+            actionElement.classList.add("clickable", "action", ACTION_STYLES[action]);
             actionElement.onclick = () => handleAction(action, rowContent[0]);
 
             actionDiv.appendChild(actionElement);
@@ -272,7 +288,7 @@ function addDynamicContentStyle(cellContent, element) {
 
 
 // --------------------------------------------------------------
-// 5. Content animation functionality
+// 6. Content animation functionality
 // --------------------------------------------------------------
 
 /**

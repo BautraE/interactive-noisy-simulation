@@ -65,7 +65,7 @@ function loadLogMessage(id, message) {
     let aDelete = document.createElement("a");
     aDelete.innerHTML = "Clear";
     aDelete.role = "button";
-    aDelete.classList.add("clickable", "action", "delete-action");
+    aDelete.classList.add("clickable", "action", ACTION_STYLES.delete);
     aDelete.onclick = () => eel.clear_message(id);
 
     let deleteContainer = document.createElement("div");

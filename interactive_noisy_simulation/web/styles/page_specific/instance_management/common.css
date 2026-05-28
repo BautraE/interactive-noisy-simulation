@@ -17,7 +17,7 @@ File contents list:
 -------------------------------------------------------------- 
 */
 .side-navbar {
-    background-color: #222222;
+    background-color: var(--color-side-navbar-background);
     box-sizing: border-box;
     width: 20%;
     padding-top: 35px;
@@ -40,24 +40,24 @@ File contents list:
 /* Navbar link styles: */
 .side-navbar ul li a {
     text-decoration: none;
-    color: white;
+    color: var(--color-side-navbar-link-text);
     font-size: 19px;
 
     display: block;
-    background-color: #323545;
+    background-color: var(--color-side-navbar-link-background);
     border-radius: 4px;
     padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 15px;
     padding-right: 15px;
     margin-right: 35px;
-    filter: drop-shadow(0px 3px 4px #141414);
+    filter: var(--container-drop-shadow);
 }
 .side-navbar ul li a:hover {
-    background-color: #4E63B4;
+    background-color: var(--color-side-navbar-link-background-hover);
 }
 .side-navbar ul li a:active {
-    background-color: #192B73;
+    background-color: var(--color-side-navbar-link-background-active);
 }
 /* For current page link */
 .side-navbar ul li a.active {
@@ -65,7 +65,7 @@ File contents list:
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 
-    background-color: #4644C2;
+    background-color: var(--color-side-navbar-link-background-opened);
 
     pointer-events: none;
 }
@@ -100,8 +100,8 @@ File contents list:
 */
 
 td.green-text {
-    color: #37FF8D;
+    color: var(--color-text-green);
 }
 td.red-text {
-    color: #FF8A8A;
+    color: var(--color-text-red);
 }

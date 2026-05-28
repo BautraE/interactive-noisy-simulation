@@ -202,7 +202,7 @@ function renderDetailedJobView(detailedData) {
         </div>
         <div class="actions">
             <div role="button"
-                 class="clickable button-a light-button"
+                 class="clickable button-regular variant-red"
                  onclick="handleAction('delete', '${detailedData.reference_key}')">Delete</div>
         </div>
     `;

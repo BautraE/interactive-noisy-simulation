@@ -101,7 +101,7 @@ File contents list:
 .detailed-job-view .label {
     text-transform: uppercase;
     font-style: italic;
-    color: #FFD173;
+    color: var(--color-element-highlight-primary);
 }
 
 .detailed-job-view ul {
@@ -117,7 +117,7 @@ File contents list:
 
 .detailed-job-view li > .label {
     text-transform: none;
-    color: #FFE5B1;
+    color: var(--color-element-highlight-secondary);
 }
 
 
@@ -128,7 +128,7 @@ File contents list:
 */
 
 /* Empty container text */
-.content-box.variant-light > .empty-container-text{
+.experiment-jobs > .content-box.variant-light > .empty-container-text{
     margin-top: 30px;
 
     font-size: 16px;
@@ -136,5 +136,5 @@ File contents list:
 
 /* Style for currently selected experiment job row in simple view */
 table tr.active {
-    box-shadow: inset 0 0 0 2px #FFE5B1;
+    box-shadow: inset 0 0 0 2px var(--color-element-highlight-secondary);
 }

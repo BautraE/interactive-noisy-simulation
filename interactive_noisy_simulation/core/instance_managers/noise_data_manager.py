@@ -107,7 +107,7 @@ class NoiseDataManager:
                  instance.source_file.full_path]
                 for instance in self.__noise_data.values()
             ]
-            actions = ["delete", "view"]
+            actions = ["view", "delete"]
         
             return InstanceData(columns=columns,
                                 rows=rows,

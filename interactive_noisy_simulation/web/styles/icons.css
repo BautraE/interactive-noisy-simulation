@@ -15,5 +15,5 @@ Static icons based on images (non-clickable)
     mask-size: contain;
 
     /* Overlay color: */
-    background-color: #FFD173;
+    background-color: var(--color-element-highlight-primary);
 }

@@ -4,5 +4,170 @@ Global scope variables
 -------------------------------------------------------------- 
 */ 
 :root {
-  --max-page-content-height: calc(100vh - 35px);
+  /* 
+  ---------------------------------------------------------
+  Size-related variables 
+  --------------------------------------------------------- 
+  */
+  --height-max-page-content: calc(100vh - 35px);
+  
+
+  /* 
+  ---------------------------------------------------------
+  Color-related variables 
+  --------------------------------------------------------- 
+  */
+  /* General text and specific element colors */
+  --color-text-default: white;
+  --color-text-muted: #CDCDCD;
+  --color-text-red: #FF8A8A;
+  --color-text-green: #ABE188;
+
+  --color-element-highlight-primary: #FFDD97;
+  --color-element-highlight-secondary: #FFE5B1;
+
+
+  /* Main content containers (for page and popup content) */
+  --gradient-primary-background: linear-gradient(
+    135deg,
+    #61628C 0%,
+    #5A5A83 21%,
+    #4F5170 55%,
+    #494C66 74%,
+    #43475C 100%
+  );
+  --gradient-secondary-background: linear-gradient(
+    135deg,
+    #43475C 12%,
+    #4B4E69 22%,
+    #525476 39%,
+    #56577C 47%,
+    #5A5A83 56%,
+    #4B4E69 77%,
+    #43475C 86%
+  );
+
+  --scrollbar-color-content-containers: #B6B4FF transparent;
+
+
+  /* Content boxes */
+  --color-content-box-light: #1D2331;
+  --color-content-box-dark: #151924;
+
+  --scrollbar-color-content-box: #6176A8 transparent;
+
+
+  /* Main navbar */
+  --color-main-navbar-background: #151924;
+
+  --color-main-navbar-link-text: #CDCDCD;
+  --color-main-navbar-link-hover: white;
+  --color-main-navbar-link-active: #9C9AFF;
+  --color-main-navbar-link-opened: #B6B4FF;
+  --color-main-navbar-link-text-shadow: #b391d7;
+
+
+  /* Side navbar */
+  --color-side-navbar-background: #242733;
+
+  --color-side-navbar-link-text: white;
+  
+  --color-side-navbar-link-background: #474567;
+  --color-side-navbar-link-background-hover: #7472a9;
+  --color-side-navbar-link-background-active: #3A3784;
+  --color-side-navbar-link-background-opened: #4644C2;
+
+
+  /* Popup window */
+  --color-popup-title-bar-background: #22283a;
+
+  --color-step-bar: #B6B4FF;
+  --color-step-bar-hover: #CFCEFB;
+  --color-step-bar-active: #9ab7ff;
+
+  --color-standard-inputs-background: #D9D9D9;
+  --color-text-input-focus: #4644C2;
+
+  --color-input-element-highlight: #FFDD97;
+
+  --color-radio-input-unselected-circle: #6c6c6c;
+  --color-checkbox-inside-checked: #2A2949;
+
+  --color-input-error-indicator: #FF8A8A;
+  --color-input-warning-indicator: #FFDD97;
+
+
+  /* Progress bars */
+  --color-progress-bar-box: #222534;
+  --color-progress-bar-line: #2bc76f;
+  --color-progress-bar-text: #ffffff;
+
+
+  /* Clickables and actions */
+  /* Clickables and actions: Previous page links */
+  --color-previous-page-link: #cfcefb;
+  --color-previous-page-link-hover: #ebe5fd;
+  --color-previous-page-link-active: #9e9cfd;
+
+
+  /* Clickables and actions: Actions */
+  --color-actions-variant-red: #FF8A8A;
+  --color-actions-variant-red-hover: #FFC4C6;
+  --color-actions-variant-red-active: #DF3030;
+
+  --color-actions-variant-default: #B6B4FF;
+  --color-actions-variant-default-hover: #CFCEFB;
+  --color-actions-variant-default-active: #9ab7ff;
+
+
+  /* Clickables and actions: Buttons */
+  --color-button-variant-default-background: #2A2949;
+  --color-button-variant-default-background-hover: #282772;
+  --color-button-variant-default-background-active: #181844;
+  --color-button-variant-default-text: #B6B4FF;
+  --color-button-variant-default-text-hover: #CFCEFB;
+  --color-button-variant-default-text-active: #9ab7ff;
+  --color-button-variant-default-border: #B6B4FF;
+  --color-button-variant-default-border-hover: #CFCEFB;
+  --color-button-variant-default-border-active: #9ab7ff;
+
+  --color-button-variant-red-background: #2A2949;
+  --color-button-variant-red-background-hover: #511b1b;
+  --color-button-variant-red-text: #FF8A8A;
+  --color-button-variant-red-text-hover: #FFC4C6;
+  --color-button-variant-red-text-active: #DF3030;
+  --color-button-variant-red-border: #FF8A8A;
+  --color-button-variant-red-border-hover: #FFC4C6;
+  --color-button-variant-red-border-active: #DF3030;
+
+  --color-button-variant-green-background: #2A2949;
+  --color-button-variant-green-background-hover: #29401f;
+  --color-button-variant-green-text: #ABE188;
+  --color-button-variant-green-text-hover: #D8F0C8;
+  --color-button-variant-green-text-active: #50db00;
+  --color-button-variant-green-border: #ABE188;
+  --color-button-variant-green-border-hover: #D8F0C8;
+  --color-button-variant-green-border-active: #50db00;
+
+
+  /* Clickables and actions: Icons */
+  --color-icon-variant-default: #cfcefb;
+  --color-icon-variant-default-hover: #ebe5fd;
+  --color-icon-variant-default-active: #9e9cfd;
+
+  --color-icon-variant-red: #FF8A8A;
+  --color-icon-variant-red-hover: #FFC4C6;
+  --color-icon-variant-red-active: #DF3030;
+
+
+  /* Miscellaneous elements */
+  --color-table-rows-even: #222C42;
+
+
+  /* 
+  ---------------------------------------------------------
+  Other miscellaneous styles
+  --------------------------------------------------------- 
+  */
+  --container-drop-shadow: drop-shadow(0px 3px 4px #141414);
 }

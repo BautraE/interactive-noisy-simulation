@@ -33,8 +33,8 @@ File contents list:
     width: 450px;
     border-radius: 8px;
 
-    background-color: #3B3F52;
-    filter: drop-shadow(0px 3px 4px #141414);
+    background: var(--gradient-secondary-background);
+    filter: var(--container-drop-shadow);
 
     transition: height 0.5s ease;
     overflow: hidden; /* Related to height transitions */
@@ -49,7 +49,7 @@ File contents list:
     border-top-right-radius: 8px;
     word-break: break-word;
 
-    background-color: #2B2E3C;
+    background-color: var(--color-popup-title-bar-background);
 }
 
 /* Title for pop-up window */
@@ -59,7 +59,7 @@ File contents list:
 
     text-transform: uppercase;
     font-size: 16px;
-    filter: drop-shadow(0px 3px 4px #141414);
+    filter: var(--container-drop-shadow);
 }
 
 /* Form element that acts as a container for encapsulating
@@ -72,7 +72,7 @@ File contents list:
     max-height: 400px;
     overflow-y: auto;
     
-    scrollbar-color: #8792C8 #3B3F52;
+    scrollbar-color: var(--scrollbar-color-content-containers);
 }
 
 /* Bar at top of popup for selecting between form steps */
@@ -107,36 +107,36 @@ File contents list:
     width: 100%;
     border-radius: 10px;
 
-    box-shadow: inset 0 0 0 1px #B6B4FF;
+    box-shadow: inset 0 0 0 1px var(--color-step-bar);
 
     transition: box-shadow 0.3s ease,
         background-color 0.3s ease;
 }
 .step-bar-block.active-step > .step-bar {
-    background-color: #B6B4FF;
+    background-color: var(--color-step-bar);
 }
 .step-bar-block:not(.active-step):hover .step-bar {
-    box-shadow: inset 0 0 0 1px #c59efc;
-    background-color: #c59efc;
+    box-shadow: inset 0 0 0 1px var(--color-step-bar-hover);
+    background-color: var(--color-step-bar-hover);
 }
 .step-bar-block:not(.active-step):active .step-bar {
-    box-shadow: inset 0 0 0 1px #9f80ca;
-    background-color: #9f80ca;
+    box-shadow: inset 0 0 0 1px var(--color-step-bar-active);
+    background-color: var(--color-step-bar-active);
 }
 /* Little step title below step bar from step bar block */
 .step-bar-text {
     font-size: 12px;
-    color: #B6B4FF;
+    color: var(--color-step-bar);
     text-align: right;
 }
 .step-bar-block.active-step > .step-bar-text {
     display: none;
 }
 .step-bar-block:not(.active-step):hover .step-bar-text {
-    color: #c59efc;
+    color: var(--color-step-bar-hover);
 }
 .step-bar-block:not(.active-step):active .step-bar-text {
-    color: #9f80ca;
+    color: var(--color-step-bar-active);
 }
 
 /* Heading block in forms used for informing about currently active 
@@ -190,7 +190,7 @@ File contents list:
     text-align: right;
     margin-top: 7px;
 
-    color: #CDCDCD;
+    color: var(--color-text-muted);
 }
 
 /* 
@@ -204,6 +204,7 @@ File contents list:
 
 /* Container for file input */
 .file-input-box {
+    height: 40px;
     display: flex;
     row-gap: 10px;
     column-gap: 10px;
@@ -225,7 +226,7 @@ File contents list:
     word-break: break-word;
     margin: 0;
 
-    color: #CDCDCD;
+    color: var(--color-text-muted);
 }
 
 /* -------------------------------------------------------- */
@@ -241,12 +242,12 @@ input[type="text"] {
     outline: none;
     border: none;
     border-radius: 4px;
-    background-color:#D9D9D9;
-    filter: drop-shadow(0px 3px 4px #141414);
+    background-color: var(--color-standard-inputs-background);
+    filter: var(--container-drop-shadow);
 }
 input[type="text"]:focus {
     outline-width: 5px;
-    outline-color: #4644C2;
+    outline-color: var(--color-text-input-focus);
     outline-style: inset;
 }
 
@@ -264,7 +265,7 @@ input[type="text"]:focus {
     border-radius: 8px;
 }
 .radio-select-box > *:nth-child(even) {
-    background-color: #222C42;
+    background-color: var(--color-table-rows-even);
 }
 
 /* Label element that acts as a container for other specific
@@ -291,14 +292,14 @@ input[type="text"]:focus {
     margin-right: 10px;
     position: relative;
 
-    border: 2px solid #666;
+    border: 2px solid var(--color-radio-input-unselected-circle);
     border-radius: 50%;
 
     transition: 0.3s ease;
 }
 /* Outer circle changing color once selected */
 .radio-option input:checked + .custom-radio {
-    border-color: #FFD173;
+    border-color: var(--color-input-element-highlight);
 }
 /* Inner dot that appears, when selected */
 .radio-option input:checked + .custom-radio::after {
@@ -310,7 +311,7 @@ input[type="text"]:focus {
     height: 8px;
     transform: translate(-50%, -50%);
     
-    background: #FFD173;
+    background: var(--color-input-element-highlight);
     border-radius: 50%;
 }
 /* When form is disabled */
@@ -320,12 +321,12 @@ input[type="text"]:focus {
 
 /* Text styling */
 .radio-text {
-    color: #ccc;
+    color: var(--color-text-muted);
     transition: 0.3s ease;
 }
 /* Selected text */
 .radio-option input:checked + .custom-radio + .radio-text {
-    color: #ffffff;
+    color: var(--color-text-default);
     font-weight: 500;
 }
 /* When form is disabled */
@@ -356,7 +357,7 @@ input[type="text"]:focus {
 
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
-    background-color: #151924;
+    background-color: var(--color-content-box-dark);
 }
 
 /* Container for checkbox input (so that clicking anywhere near the 
@@ -373,7 +374,7 @@ input[type="text"]:focus {
 .custom-toggle-checkbox-box .checkbox-box {
     width: 15px;
     height: 15px;
-    border: 2px solid #FFD173;
+    border: 2px solid var(--color-input-element-highlight);
     border-radius: 4px;
     position: relative;
     display: inline-block;
@@ -386,7 +387,7 @@ input[type="text"]:focus {
     top: 0.5px;
     width: 4px;
     height: 8px;
-    border: solid #FFD173;
+    border: solid var(--color-input-element-highlight);
     border-width: 0 2px 2px 0;
     transform: rotate(45deg) scale(0);
     transition: transform 0.15s ease-in-out;
@@ -394,7 +395,7 @@ input[type="text"]:focus {
 
 /* CSS for when checkbox is checked */
 .custom-toggle-checkbox-box input:checked + .checkbox-box {
-    background-color: #2A2949;
+    background-color: var(--color-checkbox-inside-checked);
 }
 .custom-toggle-checkbox-box input:checked + .checkbox-box::after {
     transform: rotate(45deg) scale(1);
@@ -415,17 +416,17 @@ input[type="text"]:focus {
    whenever there is something wrong with the input value. */
 input.input-error,
 .input-error {
-    outline: 4px inset #FF8A8A;
+    outline: 4px inset var(--color-input-error-indicator);
 }
 
 /* Validation-related color mode styles (yellow for warning,
    red for incorrect). */
 .input-warning {
-    color: #FFD96F;
+    color: var(--color-input-warning-indicator);
 }
 .input-error-message,
 .incorrect-input {
-    color: #FF8A8A;
+    color: var(--color-input-error-indicator);
 }
 
 /* Error message text that appears above input fields. */
