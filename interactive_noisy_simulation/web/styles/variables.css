@@ -91,6 +91,8 @@ Global scope variables
   --color-input-element-highlight: #FFDD97;
 
   --color-radio-input-unselected-circle: #6c6c6c;
+  --color-radio-input-circle-hover: #a19f8c;
+  --color-radio-input-text-hover: #FFE5B1;
   --color-checkbox-inside-checked: #2A2949;
 
   --color-input-error-indicator: #FF8A8A;
@@ -162,6 +164,7 @@ Global scope variables
 
   /* Miscellaneous elements */
   --color-table-rows-even: #222C42;
+  --color-table-rows-border-hover: #a19f8c;
 
 
   /* 

@@ -137,4 +137,10 @@ File contents list:
 /* Style for currently selected experiment job row in simple view */
 table tr.active {
     box-shadow: inset 0 0 0 2px var(--color-element-highlight-secondary);
+
+    pointer-events: none;
+}
+
+.experiment-jobs table tr:hover {
+    box-shadow: inset 0 0 0 2px var(--color-table-rows-border-hover);
 }

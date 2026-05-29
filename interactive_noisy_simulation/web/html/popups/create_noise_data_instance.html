@@ -33,7 +33,7 @@
                        class="clickable action variant-default"
                        onclick="eel.select_csv()">Choose file</a>
                     <p id="selected-file" 
-                    class="selected-file hidden-element"></p>
+                       class="selected-file hidden-element"></p>
                     <div role="button"
                          id="remove-selected-file-icon"
                          class="clickable x-icon variant-red hidden-element"
@@ -43,14 +43,14 @@
                          name="file-path">
                </div>
           </div>
-          <!-- Create / Cancel buttons -->
-          <div class="form-input-group last-in-form">
-               <div role="button"
-                    class="clickable button-regular variant-default"
-                    onclick="hidePopUpWindow()">Cancel</div>
-               <div role="button"
-                    class="clickable button-regular variant-green"
-                    onclick="importCSVCalibrationData()">Create instance</div>
-          </div>
      </form>
+     <!-- Create / Cancel buttons -->
+     <div class="form-actions">
+          <div role="button"
+               class="clickable button-regular variant-default"
+               onclick="hidePopUpWindow()">Cancel</div>
+          <div role="button"
+               class="clickable button-regular variant-green"
+               onclick="importCSVCalibrationData()">Create instance</div>
+     </div>
 </div>

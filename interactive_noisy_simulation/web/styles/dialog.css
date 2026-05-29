@@ -162,14 +162,6 @@ File contents list:
 .form-input-group > :not(label) {
     margin-left: 20px;
 }
-/* Last input is a container with buttons for either cancelling
-   or finishing a specific action. */
-.form-input-group.last-in-form {
-    flex-direction: row;
-    column-gap: 20px;
-    justify-content: flex-end;
-    margin-top: 15px;
-}
 
 /* Container for buttons at the bottom of form (Cancel, Create, etc.) */
 .form-actions {
@@ -332,6 +324,14 @@ input[type="text"]:focus {
 /* When form is disabled */
 .radio-option input:disabled:not(:checked) ~ .radio-text {
     opacity: 0.6;
+}
+
+/* When hovering over unselected radio input option */
+.radio-option:hover .radio-text {
+    color: var(--color-radio-input-text-hover);
+}
+.radio-option:hover .custom-radio {
+    border-color: var(--color-radio-input-hover);
 }
 
 

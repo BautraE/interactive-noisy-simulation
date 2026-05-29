@@ -140,6 +140,8 @@ tr td:last-child {
 /* For current page link */
 .main-navbar ul li a.active {
     color: var(--color-main-navbar-link-opened);
+
+    pointer-events: none;
 }
 
 
