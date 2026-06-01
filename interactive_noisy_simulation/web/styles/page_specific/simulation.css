@@ -1,0 +1,88 @@
+/* 
+=================================================================
+Style rules specifically for the "Simulation" page.
+=================================================================
+File contents list:
+1. Main content containers.
+2. Left-side content.
+3. Right-side content.
+-----------------------------------------------------------------
+
+--------------------------------------------------------------
+1. Main content containers
+-------------------------------------------------------------- 
+*/
+.content-container {
+    display: flex;
+    flex-direction: row;
+    column-gap: 30px;
+}
+
+.content-left, .content-right {
+    display: flex;
+    flex-direction: column;
+}
+.content-left {
+    flex: 2;
+}
+.content-right {
+    flex: 1;
+}
+
+
+/*
+--------------------------------------------------------------
+2. Left-side content
+-------------------------------------------------------------- 
+*/
+/* Main page heading that happens to be on the left content side. */
+.content-left .content-container-heading {
+    text-align: left;
+}
+
+/* Container for all other left-side content, excluding the main
+   page heading. */
+.content-left > div {
+    display: flex;
+    flex-direction: column;
+    row-gap: 25px;
+
+    margin-left: 20px;
+    flex: 1;
+}
+
+/* Heading for left-side content. */
+.content-left > div > h2.small-heading {
+    margin-bottom: 0;
+}
+
+/* Container for content boxes containing experiment instance
+   information. */
+.experiment-table-container {
+    display: flex;
+    flex-direction: column;
+    
+    flex: 1;
+}
+
+/* Small text above experiment instance content boxes. */
+.experiment-table-container p {
+    margin-bottom: 15px;
+}
+
+/* Experiment-instance-content boxes. */
+.experiment-table-container .content-box {
+    flex: 1;
+}
+
+
+/*
+--------------------------------------------------------------
+3. Right-side content
+-------------------------------------------------------------- 
+*/
+/* Main content box for right-side content. */
+.content-right .content-box {
+    margin: 0;
+    flex: 1;
+}

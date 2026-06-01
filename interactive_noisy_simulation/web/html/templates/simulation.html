@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% set active_main_page = "simulation" %}
+
+{% block css %}
+<link rel="stylesheet" 
+      href="../styles/page_specific/simulation.css">
+{% endblock %}
+
+{% block content %}
+<!-- Current page content -->
+<div class="content-container">
+    <div class="content-left">
+        <h1 class="content-container-heading">Simulation</h1>
+        <div>
+            <h2 class="small-heading">Experiment queue creation</h2>
+            <div class="experiment-table-container">
+                <p>Available experiments:</p>
+                <div class="content-box variant-light"></div>
+            </div>
+            <div class="experiment-table-container">
+                <p>Queued experiments:</p>
+                <div class="content-box variant-light"></div>
+            </div>
+        </div>
+    </div>
+    <div class="content-right">
+        <div class="content-box variant-dark"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" 
+        src="../scripts/simulation.js"></script>
+{% endblock %}

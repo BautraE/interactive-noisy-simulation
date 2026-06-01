@@ -84,7 +84,9 @@ def _build_pages() -> None:
         "experiment_instances.html":
         "instance_management/experiments/all_instances.html",
         "experiment_instance.html":
-        "instance_management/experiments/single_instance.html"
+        "instance_management/experiments/single_instance.html",
+        "simulation.html":
+        "simulation.html"
     }
     
     with (
