@@ -141,6 +141,6 @@ table tr.active {
     pointer-events: none;
 }
 
-.experiment-jobs table tr:hover {
+.experiment-jobs table tr.clickable:hover {
     box-shadow: inset 0 0 0 2px var(--color-table-rows-border-hover);
 }

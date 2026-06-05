@@ -22,6 +22,7 @@ Global scope variables
   --color-text-muted: #CDCDCD;
   --color-text-red: #FF8A8A;
   --color-text-green: #ABE188;
+  --color-text-yellow: #FFE5B1;
 
   --color-element-highlight-primary: #FFDD97;
   --color-element-highlight-secondary: #FFE5B1;
@@ -113,13 +114,17 @@ Global scope variables
 
 
   /* Clickables and actions: Actions */
+  --color-actions-variant-default: #B6B4FF;
+  --color-actions-variant-default-hover: #CFCEFB;
+  --color-actions-variant-default-active: #9ab7ff;
+
   --color-actions-variant-red: #FF8A8A;
   --color-actions-variant-red-hover: #FFC4C6;
   --color-actions-variant-red-active: #DF3030;
 
-  --color-actions-variant-default: #B6B4FF;
-  --color-actions-variant-default-hover: #CFCEFB;
-  --color-actions-variant-default-active: #9ab7ff;
+  --color-actions-variant-green: #ABE188;
+  --color-actions-variant-green-hover: #D8F0C8;
+  --color-actions-variant-green-active: #50db00;
 
 
   /* Clickables and actions: Buttons */

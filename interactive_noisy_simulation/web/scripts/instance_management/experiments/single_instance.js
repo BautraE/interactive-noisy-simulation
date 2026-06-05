@@ -27,7 +27,7 @@ const jobFormSteps = {
 // Assignment of specific functions that shoul be executed upon loading
 // tables and rows for displaying existing instance data.
 instanceDataModifications = {
-    row: modifyRowElement,
+    row: modifyDataRow,
     table: addEventListenerToTable
 }
 
@@ -66,6 +66,22 @@ function setSpecificInstanceName(instanceName) {
 
 
 /**
+ * Calls sub-functions that are responsible for making required changes
+ * related to the specific table row.
+ * 
+ * @param {HTMLElement} rowElement - HTML row element that will
+ * be modified.
+ * @param {Array} rowContent - Array of row content (as strings) that
+ * are displayed within the row. Primarily used for obtaining something
+ * that will be used during element modification.
+ */
+function modifyDataRow(rowElement, rowContent) {
+    addAttributesToRow(rowElement, rowContent);
+    colorStatusCell(rowElement, rowContent);
+}
+
+
+/**
  * Adds additional attribues to created instance table row elements.
  * 
  * All data row elements will have the class "clickable"
@@ -80,9 +96,34 @@ function setSpecificInstanceName(instanceName) {
  * are displayed within the row. Primarily used for obtaining something
  * that will be used during element modification.
  */
-function modifyRowElement(rowElement, rowContent) {
+function addAttributesToRow(rowElement, rowContent) {
     rowElement.classList.add("clickable");
     rowElement.dataset.jobId = rowContent[0];
+}
+
+
+/**
+ * Adds specific CSS styles for the status collumn (accomplished through 
+ * table rows).
+ * 
+ * @param {HTMLElement} rowElement - HTML row element that will
+ * be modified.
+ * @param {Array} rowContent - Array of row content (as strings) that
+ * are displayed within the row. Primarily used for obtaining something
+ * that will be used during element modification.
+ */
+function colorStatusCell(rowElement, rowContent) {
+    const statusMessageStyles = {
+        Completed: "variant-green",
+        Partial: "variant-yellow",
+        Pending: "variant-grey",
+    }
+
+    let statusCell = rowElement.children[1];
+    let statusStyle = statusMessageStyles[rowContent[1]];
+    if(statusStyle) {
+        statusCell.classList.add("status-text", statusStyle);
+    }
 }
 
 
@@ -196,6 +237,19 @@ function renderDetailedJobView(detailedData) {
                     <li>
                         <span class="label">Circuit optimization level:</span>  
                         <span>${detailedData.optimization_level}</span>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <span class="label">Job progress:</span>
+                <ul>
+                    <li>
+                        <span class="label">Completed shots:</span>  
+                        <span>${detailedData.completed_shots}</span>
+                    </li>
+                    <li>
+                        <span class="label">Remaining shots:</span>  
+                        <span>${detailedData.remaining_shots}</span>
                     </li>
                 </ul>
             </div>

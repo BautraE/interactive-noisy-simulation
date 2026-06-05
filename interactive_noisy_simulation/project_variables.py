@@ -29,6 +29,10 @@ experiment_manager = ExperimentManager()
 from .core.logs.log_manager import LogManager
 log_manager = LogManager()
 
+# - Simulation manager:
+from .core.simulation.simulation_manager import SimulationManager
+simulation_manager = SimulationManager()
+
 # - Key blocker:
 from .core.key_blocker import KeyBlocker
 key_blocker = KeyBlocker()

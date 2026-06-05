@@ -17,4 +17,6 @@ from .instance_managers import (
 
 from .logs import logs
 
+from .simulation import simulation
+
 from . import general

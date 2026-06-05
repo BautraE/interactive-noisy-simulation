@@ -7,9 +7,6 @@ File contents list:
    pages for different instance types.
 2. Miscellaneous content element styling - various specific
    element styles that only apply in specific pages.
-3. Instance data table content styling - specific value-related
-   styles that get added to some data cells, for example,
-   related instance availability.
 -----------------------------------------------------------------
 
 --------------------------------------------------------------
@@ -90,18 +87,4 @@ File contents list:
     margin-top: 30px;
 
     font-size: 20px;
-}
-
-
-/* 
--------------------------------------------------------------- 
-3. Instance data table content styling
--------------------------------------------------------------- 
-*/
-
-td.green-text {
-    color: var(--color-text-green);
-}
-td.red-text {
-    color: var(--color-text-red);
 }

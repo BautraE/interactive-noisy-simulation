@@ -16,21 +16,41 @@
             <h2 class="small-heading">Experiment queue creation</h2>
             <div class="experiment-table-container">
                 <p>Available experiments:</p>
-                <div class="content-box variant-light"></div>
+                <div class="content-box variant-light"
+                     id="queueable-experiments-container"></div>
             </div>
             <div class="experiment-table-container">
                 <p>Queued experiments:</p>
-                <div class="content-box variant-light"></div>
+                <div class="content-box variant-light"
+                     id="queued-experiments-container"></div>
             </div>
         </div>
     </div>
     <div class="content-right">
-        <div class="content-box variant-dark"></div>
+        <div class="content-box variant-dark">
+            <h2 class="small-heading">Queue Execution</h2>
+            <div>
+                <div>
+                    <span class="label">Queued experiments:</span>  
+                    <span id="total_queued_experiments"></span>
+                </div>
+                <div>
+                    <span class="label">Total jobs:</span>  
+                    <span id="total_queued_jobs"></span>
+                </div>
+                <div>
+                    <span class="label">Incomplete jobs:</span>  
+                    <span id="total_incomplete_jobs"></span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
+<script type="text/javascript" 
+        src="../scripts/instance_management/common.js"></script>
 <script type="text/javascript" 
         src="../scripts/simulation.js"></script>
 {% endblock %}

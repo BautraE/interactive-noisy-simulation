@@ -92,6 +92,17 @@ File contents list:
     --text-color: var(--color-actions-variant-red-active);
 }
 
+/* Action for creating / adding stuff */
+.action.variant-green {
+    --text-color: var(--color-actions-variant-green);
+}
+.action.variant-green:hover {
+    --text-color: var(--color-actions-variant-green-hover);
+}
+.action.variant-green:active {
+    --text-color: var(--color-actions-variant-green-active);
+}
+
 
 /* 
 -------------------------------------------------------------- 

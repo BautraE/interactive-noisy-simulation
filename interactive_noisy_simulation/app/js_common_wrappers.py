@@ -135,3 +135,19 @@ def set_selected_file(
             input field's value.
     """
     eel.setSelectedFile(file_name, full_path)
+
+
+def update_span_content(
+    new_content: str,
+    span_id: str
+) -> None:
+    """Updates content of span elements (meant for small text-related
+    values or numbers).
+    
+    Wrapper function for `Python Eel` JS function call.
+
+    Args:
+        new_content (str): new content that will replace the old.
+        span_id (str): id of span element that will have its content updated.
+    """
+    eel.updateSpanContent(new_content, span_id)

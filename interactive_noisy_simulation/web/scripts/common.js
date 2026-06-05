@@ -24,7 +24,9 @@
  */
 const ACTION_STYLES = {
     delete: "variant-red",
-    view: "variant-default"
+    view: "variant-default",
+    add: "variant-green",
+    remove: "variant-red"
 }
 
 // --------------------------------------------------------------
@@ -123,6 +125,21 @@ function addEmptyContainerMessage(messageText, parentElementId) {
     messageElement.innerHTML = messageText;
 
     _appendThroughId(parentElementId, messageElement);
+}
+
+
+eel.expose(updateSpanContent);
+/**
+ * Updates content of span elements (meant for small text-related
+ * values or numbers).
+ * 
+ * @param {string} newContent - new content that will replace the old.
+ * @param {string} spanId - id of span element that will have its content 
+ * updated.
+ */
+function updateSpanContent(newContent, spanId) {
+    let spanElement = document.getElementById(spanId);
+    spanElement.innerText = newContent;
 }
 
 

@@ -13,7 +13,11 @@ class ExperimentManager:
     # 1. Initialization (constructor method).
     # 2. Class properties.
     # 3. Experiment instance management - creating new instances, viewing and
-    #       deleting existing ones.
+    #    deleting existing ones.
+    # 4. Job instance management for experiments - creating new instances, 
+    #    viewing and deleting existing ones.
+    # 5. Functionality related to the `Simulation` page - viewing specific
+    #    experiment instances.
     # =========================================================================
 
     # =========================================================================
@@ -34,7 +38,7 @@ class ExperimentManager:
         instances.
         
         Returns:
-            dict[str, ExperimentInstance] - dictionary with reference keys and 
+            dict[str, ExperimentInstance]: Dictionary with reference keys and 
                 instances as its data.
         """
         return self._experiments
@@ -65,6 +69,7 @@ class ExperimentManager:
         Returned information includes:
         - Reference key for the current instance;
         - Job count within experiment;
+        - Job completion progress;
         - Experiment completion status.
 
         Returns:
@@ -74,11 +79,12 @@ class ExperimentManager:
         """
         if self._experiments:
             columns = [
-                "Reference key", "Job count"
+                "Reference key", "Job count", "Job progress", 
+                "Completion status"
             ]
             rows = [
-                [instance.reference_key, 
-                 instance.job_count]
+                [instance.reference_key, instance.job_count,
+                 instance.job_progress, instance.status]
                 for instance in self._experiments.values()
             ]
             actions = ["view", "delete"]
@@ -148,7 +154,7 @@ class ExperimentManager:
             reference_key=job_reference_key,
             circuit=circuit_instance,
             noise_model=noise_model_instance,
-            shot_count=shot_count,
+            shot_count=int(shot_count),
             hardware=hardware,
             simulation_method=simulation_method,
             optimization_level=optimization_level)
@@ -192,10 +198,10 @@ class ExperimentManager:
         experiment = self._experiments[experiment_reference_key]
         if experiment.jobs:
             columns = [
-                "Reference key"
+                "Reference key", "Completion status"
             ]
             rows = [
-                [job.reference_key]
+                [job.reference_key, job.status]
                 for job in experiment.jobs.values()
             ]
         
@@ -236,7 +242,49 @@ class ExperimentManager:
             # Simulator settings
             "shot_count": job.shot_count,
             "hardware": job.hardware,
-            "simulation_method": job.simulation_method
+            "simulation_method": job.simulation_method,
+            # Job progress metrics,
+            "completed_shots": job.completed_shots,
+            "remaining_shots": job.remaining_shots
         }
         
         return detailed_data
+
+
+    # =========================================================================
+    # 5. Functionality related to the `Simulation` page
+    # =========================================================================
+    
+    def get_queueable_instance_data(self) -> InstanceData | None:
+        """Returns data about currently created experiment instances.
+
+        Returned information includes:
+        - Reference key for the current instance;
+        - Job completion progress;
+        - Experiment completion status.
+
+        Returns:
+            InstanceData: Dataclasss for displayable instance data.
+                If there is no data to be displayed, the function returns
+                nothing (`None`).
+        """
+        if self._experiments:
+            rows = [
+                [instance.reference_key, instance.job_progress, 
+                 instance.status]
+                for instance in self._experiments.values()
+                if not instance.is_queued
+            ]
+            # If all existing experiments are not eligible for the experiment
+            # execution queue.
+            if not rows: 
+                return None
+
+            columns = [
+                "Reference key", "Job progress", "Completion status"
+            ]
+            actions = ["add"]
+        
+            return InstanceData(columns=columns,
+                                rows=rows,
+                                actions=actions)

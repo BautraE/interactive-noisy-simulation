@@ -17,6 +17,11 @@
 // Pop-up element variable used for dynamic height adjustment
 // (related to pop-up window height changing animation)
 let popup;
+// Assignment of specific functions that shoul be executed upon loading
+// tables and rows for displaying existing instance data.
+instanceDataModifications = {
+    row: colorStatusCell,
+}
 
 // --------------------------------------------------------------
 // 2. Initial page-specific actions that are performed upon
@@ -29,6 +34,31 @@ window.addEventListener('load', function() {
         eel.view_experiment_instances();
     }, 1);
 });
+
+
+/**
+ * Adds specific CSS styles for the status collumn (accomplished through 
+ * table rows).
+ * 
+ * @param {HTMLElement} rowElement - HTML row element that will
+ * be modified.
+ * @param {Array} rowContent - Array of row content (as strings) that
+ * are displayed within the row. Primarily used for obtaining something
+ * that will be used during element modification.
+ */
+function colorStatusCell(rowElement, rowContent) {
+    const statusMessageStyles = {
+        Completed: "variant-green",
+        Partial: "variant-yellow",
+        Pending: "variant-grey",
+    }
+
+    let statusCell = rowElement.children[3];
+    let statusStyle = statusMessageStyles[rowContent[3]];
+    if(statusStyle) {
+        statusCell.classList.add("status-text", statusStyle);
+    }
+}
 
 
 // --------------------------------------------------------------
@@ -77,8 +107,8 @@ function initNewInstanceForm() {
     // -------------------------------------------------------------------------------
     // Adjusting height of current form window for height change animation
 
-    popup = document.querySelector('.pop-up');
-    adjustHeightOfParent(popup);
+    activePopupElement = document.querySelector('.pop-up');
+    adjustHeightOfParent(activePopupElement);
     
     // -------------------------------------------------------------------------------
     // Adding required event listeners to form
@@ -88,8 +118,7 @@ function initNewInstanceForm() {
     referenceKeyInput.addEventListener('change', () =>
         removeInputErrorStyles({
             outlinedElementId: "reference-key", 
-            messageElementId: "reference-key-input-message",
-            popupElement: popup
+            messageElementId: "reference-key-input-message"
         })
     );
     referenceKeyInput.addEventListener('input', () =>
@@ -150,8 +179,7 @@ async function validateReferenceKey(referenceKey) {
         addInputErrorStyles({
             outlinedElementId: outlinedElementId,
             messageElementId: messageElementId,
-            errorMessageText: "Reference key is mandatory!",
-            popupElement: popup
+            errorMessageText: "Reference key is mandatory!"
         });
         return false;
     }
@@ -161,8 +189,7 @@ async function validateReferenceKey(referenceKey) {
             outlinedElementId: outlinedElementId,
             messageElementId: messageElementId,
             errorMessageText: `The reference key is too long! Max length is 
-            ${MAX_REFERENCE_KEY_LENGTH} characters!`,
-            popupElement: popup
+            ${MAX_REFERENCE_KEY_LENGTH} characters!`
         });
         return false;
     }
@@ -172,8 +199,7 @@ async function validateReferenceKey(referenceKey) {
         addInputErrorStyles({
             outlinedElementId: outlinedElementId,
             messageElementId: messageElementId,
-            errorMessageText: "This reference key is already used by another experiment instance!",
-            popupElement: popup
+            errorMessageText: "This reference key is already used by another experiment instance!"
         });
         return false;
     }

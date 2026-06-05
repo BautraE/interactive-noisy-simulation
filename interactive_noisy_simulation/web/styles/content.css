@@ -11,6 +11,7 @@ File contents list:
 5. Situation-specific styles - hiding / showing elements, 
    disabling scrolling, etc.
 6. Progress bar styles.
+7. Status text styles.
 -----------------------------------------------------------------
 
 --------------------------------------------------------------
@@ -298,4 +299,30 @@ tr td:last-child {
     color: var(--color-progress-bar-text);
     font-size: 12px;
     font-weight: bold;
+}
+
+
+/* 
+-------------------------------------------------------------- 
+7. Status text styles
+-------------------------------------------------------------- 
+*/
+td.green-text {
+    color: var(--color-text-green);
+}
+td.red-text {
+    color: var(--color-text-red);
+}
+
+.status-text {
+    text-transform: uppercase;
+}
+.status-text.variant-green {
+    color: var(--color-text-green);
+}
+.status-text.variant-grey {
+    color: var(--color-text-muted);
+}
+.status-text.variant-yellow {
+    color: var(--color-text-yellow);
 }

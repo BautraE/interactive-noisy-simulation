@@ -2,6 +2,8 @@
     "empty_container": {
         "empty_log": "The {log_type} log is currently empty",
 
+        "no_instance_for_detailed_view": "There are currently no {instance_type} to display detailed information about",
+
         "no_instances": "There are currently no {instance_type} instances",
 
         "no_instances_for_job": "There are currently no {instance_type} instances to select for this experiment job!",
@@ -10,7 +12,9 @@
 
         "no_experiment_jobs": "This experiment instance currently does not have any jobs",
 
-        "no_instance_for_detailed_view": "There are currently no {instance_type} to display detailed information about"
+        "no_queueable_experiments": "There are currently no queueable experiment instances",
+
+        "no_queued_experiments": "The experiment queue is currently empty"
     },
     
     "log": {

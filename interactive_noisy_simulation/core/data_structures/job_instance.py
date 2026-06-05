@@ -29,6 +29,8 @@ class Job:
             transpilation process (for preparing the selected circuit 
             to be run on a simulator with the selected noise model). 
             `None` will only be set if the simulation is noiseless.
+        completed_shots (int): Amount of times that the selected circuit
+            has been already executed. This acts as a job proggess metric.
     """
     reference_key: str
     circuit: CircuitInstance
@@ -37,3 +39,46 @@ class Job:
     simulation_method: str
     noise_model: NoiseModelInstance | None = None
     optimization_level: int | None = None
+    completed_shots: int = 0
+
+
+    @property
+    def status(self) -> str:
+        """Returns status of job based on completed shots.
+        
+        Returns:
+            str: Status message.
+        """
+        if self.completed_shots == 0:
+            return "Pending"
+        elif self.completed_shots == self.shot_count:
+            return "Completed"
+        else:
+            return "Partial"
+
+
+    @property
+    def is_complete(self) -> bool:
+        """Returns job completion state for internal INS functionality
+        in the form of a boolean value (`True` or `False`), based on 
+        completed shots.
+        
+        Returns:
+            bool: Whether or not the job is completed (if all shots are 
+            completed).
+        """
+        if self.shot_count == self.completed_shots:
+            return True
+        else:
+            return False
+
+
+    @property
+    def remaining_shots(self) -> int:
+        """Returns the number of remaining shots that the job has left to 
+        complete.
+        
+        Returns:
+            int: Number of remaining shots.
+        """
+        return self.shot_count - self.completed_shots
