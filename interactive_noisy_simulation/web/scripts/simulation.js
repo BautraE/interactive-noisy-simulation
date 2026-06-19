@@ -6,6 +6,7 @@
 // 2. Initial page-specific actions that are performed upon
 //    loading in this page.
 // 3. Action handling
+// 4. Content & specific element management
 // -----------------------------------------------------------------
 
 // --------------------------------------------------------------
@@ -30,6 +31,9 @@ window.addEventListener('load', function() {
     }, 1);
 });
 
+// --------------------------------------------------------------
+// Instance data modification functions that are executed upon loading
+// in instance data.
 
 /**
  * Adds specific CSS styles for the status collumn (accomplished through 
@@ -43,11 +47,18 @@ window.addEventListener('load', function() {
  */
 function colorStatusCell(rowElement, rowContent) {
     const statusMessageStyles = {
-        Completed: "variant-green",
-        Partial: "variant-yellow",
-        Pending: "variant-grey",
+        // Shared statuses
+        completed: "variant-green",
+        "no jobs": "variant-grey",
+        // Completion status
+        partial: "variant-yellow",
+        pending: "variant-grey",
+        // Execution status
+        queued: "variant-grey",
+        "in progress": "variant-yellow"
     }
 
+    // Experiment completion status is located in the 3rd column
     let statusCell = rowElement.children[2];
     let statusStyle = statusMessageStyles[rowContent[2]];
     if(statusStyle) {
@@ -76,6 +87,41 @@ function handleAction(actionType, rowId) {
             break;
         case "remove":
             eel.remove_experiment_from_queue(rowId);
+            break;
+    }
+}
+
+
+// --------------------------------------------------------------
+// 4. Content & specific element management
+// --------------------------------------------------------------
+
+eel.expose(updateQueueExecutionButton);
+/**
+ * Adds specific relevant CSS style class to the queue execution
+ * button, based on the given state:
+ * - "unavailable" - Queue cannot be executed because there are
+ *   either no jobs to run, or the queue is empty;
+ * - "running" - The queue is being executed;
+ * - "available" - The queue is eligible to be executed.
+ * 
+ * @param {string} state - State, based on which the queue execution
+ * button will be styled.
+ */
+function updateQueueExecutionButton(state) {
+    const buttonElement = document.getElementById("queue-execution-button");
+    switch (state) {
+        case "unavailable":
+            removeClassesByPrefix(buttonElement, "variant-");
+            buttonElement.classList.add("variant-disabled");
+            break;
+        case "running":
+            removeClassesByPrefix(buttonElement, "variant-");
+            buttonElement.classList.add("variant-disabled");
+            break;
+        case "available":
+            removeClassesByPrefix(buttonElement, "variant-");
+            buttonElement.classList.add("variant-green");
             break;
     }
 }

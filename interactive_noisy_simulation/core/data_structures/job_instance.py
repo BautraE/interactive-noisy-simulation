@@ -1,5 +1,5 @@
 # Standard library imports:
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 # Imports only used for type definition:
 from .circuit_instance import CircuitInstance
@@ -40,6 +40,7 @@ class Job:
     noise_model: NoiseModelInstance | None = None
     optimization_level: int | None = None
     completed_shots: int = 0
+    result_counts: dict[str, int] = field(default_factory=dict)
 
 
     @property
@@ -50,11 +51,11 @@ class Job:
             str: Status message.
         """
         if self.completed_shots == 0:
-            return "Pending"
+            return "pending"
         elif self.completed_shots == self.shot_count:
-            return "Completed"
+            return "completed"
         else:
-            return "Partial"
+            return "partial"
 
 
     @property
@@ -82,3 +83,32 @@ class Job:
             int: Number of remaining shots.
         """
         return self.shot_count - self.completed_shots
+    
+
+    @property
+    def completion_percentage(self) -> float:
+        """Returns completion percentage based on completed shots, compared to
+        total number of shots.
+        
+        Returns:
+            float: Job completion percentage.
+        """
+        percentage = (self.completed_shots / self.shot_count) * 100.0
+        return round(percentage, 2)
+    
+
+    def add_results(
+        self, 
+        new_results: dict[str, int]
+    ) -> None:
+        """Adds additional result data to job instance from a completed shot
+        batch.
+
+        Args:
+            new_results (dict[str, int]): Additional result data from completed
+                shots that will be added to the total result data of the job
+                instance.
+        """
+        for key, value in new_results.items():
+            self.result_counts[key] = self.result_counts.get(key, 0) + value
+            self.completed_shots += value

@@ -71,7 +71,7 @@ class NoiseCreator:
                 instance.
             noise_data (NoiseDataInstance): Noise data source for the new 
                 NoiseModelInstance object.
-            progress_callback (Callable[[float], None]): Reference to 
+            progress_callback (Callable[[float], None] | None): Reference to 
                 callback function that gets called for displayable progress 
                 tracking.
         """

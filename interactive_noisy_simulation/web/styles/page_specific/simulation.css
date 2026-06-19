@@ -97,7 +97,10 @@ File contents list:
     display: flex;
     flex-direction: column;
     row-gap: 20px;
-    padding: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 
 /* Small headings for sub-sections within right-side content box */
@@ -106,7 +109,7 @@ File contents list:
 }
 
 /* Containers for sub-section content within right-side content box */
-.content-right .content-box > div {
+.content-right .content-box > div.content-group {
     display: flex;
     flex-direction: column;
     row-gap: 15px;
@@ -117,4 +120,19 @@ File contents list:
     text-transform: uppercase;
     font-style: italic;
     color: var(--color-element-highlight-primary);
+}
+
+/* Centered buttons in right-side content box */
+.content-right div.clickable {
+    align-self: center;
+}
+
+/* Label text above progress bars */
+.content-right .content-group p {
+    margin-bottom: 10px;
+}
+
+/* Horizontal line dividing content sub-sections */
+.content-right hr {
+    width: 90%;
 }

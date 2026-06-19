@@ -151,6 +151,14 @@ File contents list:
     --border-color: var(--color-button-variant-default-border-active);
 }
 
+.button-regular.variant-disabled {
+    --background-color: var(--color-button-variant-disabled-background);
+    --text-color: var(--color-button-variant-disabled-text);
+    --border-color: var(--color-button-variant-disabled-border);
+
+    pointer-events: none;
+}
+
 .button-regular.variant-red {
     --background-color: var(--color-button-variant-red-background);
     --text-color: var(--color-button-variant-red-text);

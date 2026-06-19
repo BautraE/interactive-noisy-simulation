@@ -143,6 +143,25 @@ function updateSpanContent(newContent, spanId) {
 }
 
 
+eel.expose(updateProgressBar);
+/**
+ * Updates current progress percentage values for progress bar showing
+ * creation of a new NoiseModelInstance object.
+ * 
+ * @param {number} percentage - New progress percentage value.
+ * @param {string} barId - ID of the progress bar being updated.
+ */
+function updateProgressBar(percentage, barId) {
+    const progressBar = document.getElementById(barId);
+
+    // Removes default inactive class from the progress bar.
+    progressBar.classList.remove("inactive");
+
+    progressBar.style.width = `${percentage}%`;
+    progressBar.innerText = `${percentage}%`;
+}
+
+
 // --------------------------------------------------------------
 // 4. Container management
 // --------------------------------------------------------------

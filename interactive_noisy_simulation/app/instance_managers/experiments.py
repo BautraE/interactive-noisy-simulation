@@ -2,6 +2,7 @@
 import eel
 
 # Project-related imports:
+from ...utils import optional_int
 from ..general import inform_empty_container
 from ..logs.logs import add_log_message
 from ..js_common_wrappers import remove_container_content
@@ -234,10 +235,10 @@ def create_job_for_experiment(
                   job_reference_key=job_reference_key,
                   circuit_instance=circuit_instance,
                   noise_model_instance=noise_model_instance,
-                  shot_count=shot_count,
+                  shot_count=int(shot_count),
                   hardware=hardware,
                   simulation_method=simulation_method,
-                  optimization_level=optimization_level)
+                  optimization_level=optional_int(optimization_level))
     
     add_log_message(message=LOG_MESSAGES["created_job_instance"],
                     job_reference_key=job_reference_key,

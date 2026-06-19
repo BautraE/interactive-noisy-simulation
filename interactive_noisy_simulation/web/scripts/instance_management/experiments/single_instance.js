@@ -114,11 +114,12 @@ function addAttributesToRow(rowElement, rowContent) {
  */
 function colorStatusCell(rowElement, rowContent) {
     const statusMessageStyles = {
-        Completed: "variant-green",
-        Partial: "variant-yellow",
-        Pending: "variant-grey",
+        completed: "variant-green",
+        partial: "variant-yellow",
+        pending: "variant-grey"
     }
 
+    // Job completion status is located in the 2nd column
     let statusCell = rowElement.children[1];
     let statusStyle = statusMessageStyles[rowContent[1]];
     if(statusStyle) {
@@ -252,6 +253,14 @@ function renderDetailedJobView(detailedData) {
                         <span>${detailedData.remaining_shots}</span>
                     </li>
                 </ul>
+            </div>
+            <div>
+                <span class="label">Current result counts:</span>
+                ${
+                    typeof detailedData.current_result_counts === "string"
+                        ? `<span>${detailedData.current_result_counts}</span>`
+                        : `<pre>${JSON.stringify(detailedData.current_result_counts, null, 4)}</pre>`
+                }
             </div>
         </div>
         <div class="actions">

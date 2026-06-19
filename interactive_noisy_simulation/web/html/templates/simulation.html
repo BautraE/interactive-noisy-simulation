@@ -29,7 +29,7 @@
     <div class="content-right">
         <div class="content-box variant-dark">
             <h2 class="small-heading">Queue Execution</h2>
-            <div>
+            <div class="content-group">
                 <div>
                     <span class="label">Queued experiments:</span>  
                     <span id="total_queued_experiments"></span>
@@ -41,6 +41,36 @@
                 <div>
                     <span class="label">Incomplete jobs:</span>  
                     <span id="total_incomplete_jobs"></span>
+                </div>
+            </div>
+            <div id="queue-execution-button"
+                 role="button"
+                 class="clickable button-regular"
+                 onclick="eel.execute_queued_experiments()">
+                 Execute queued jobs</div>
+            <hr>
+            <h2 class="small-heading">Execution Progress</h2>
+            <div class="content-group">
+                <div>
+                    <p>Overall progress:</p>
+                    <div class="progress-bar">
+                        <div class="current-progress inactive"
+                             id="execution-overall-progress">--</div>
+                    </div>
+                </div>
+                <div>
+                    <p>Current experiment progress:</p>
+                    <div class="progress-bar">
+                        <div class="current-progress inactive"
+                             id="execution-experiment-progress">--</div>
+                    </div>
+                </div>
+                <div>
+                    <p>Current job progress:</p>
+                    <div class="progress-bar">
+                        <div class="current-progress inactive"
+                             id="execution-job-progress">--</div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,15 +1,45 @@
+# Standard library imports:
+import warnings
+
+#Third party imports:
+from qiskit import transpile
+from qiskit_aer import AerSimulator
+
 # Project-related imports:
 from ..data_structures.instance_data import InstanceData
 
 # Imports only used for type definition:
 from ..data_structures.experiment_instance import ExperimentInstance
+from ..data_structures.job_instance import Job
+from qiskit import QuantumCircuit
+from typing import Callable
+
+
+SHOT_BATCH_SIZE = 1000
 
 
 class SimulationManager:
+    # =========================================================================
+    # Table of Contents for SimulationManager
+    # =========================================================================
+    # 1. Initialization (constructor method).
+    # 2. Class properties.
+    # 3. Queue management.
+    # 4. Queue execution.
+    # =========================================================================
+
+    # =========================================================================
+    # 1. Initialization (constructor method).
+    # =========================================================================
+
     def __init__(self) -> None:
         """Constructor method."""
         self._simulation_queue: list[ExperimentInstance] = []
+        self.is_executing: bool = False
 
+    # =========================================================================
+    # 2. Class properties.
+    # =========================================================================
 
     @property
     def queue_lenght(self) -> int:
@@ -46,12 +76,14 @@ class SimulationManager:
         """
         num_queued_incomplete_jobs = 0
         for experiment in self._simulation_queue:
-            num_queued_incomplete_jobs = experiment.complete_jobs
+            num_queued_incomplete_jobs = experiment.incomplete_jobs
         
         return num_queued_incomplete_jobs
 
     
-    # Queue management:
+    # =========================================================================
+    # 3. Queue management.
+    # =========================================================================
 
     def add_experiment_to_queue(
         self,
@@ -99,7 +131,7 @@ class SimulationManager:
             ]
             rows = [
                 [experiment.reference_key, experiment.job_progress, 
-                 experiment.status]
+                 experiment.execution_status]
                 for experiment in self._simulation_queue
             ]
             actions = ["remove"]
@@ -107,3 +139,188 @@ class SimulationManager:
             return InstanceData(columns=columns,
                                 rows=rows,
                                 actions=actions)
+        
+
+    # =========================================================================
+    # 4. Queue execution.
+    # =========================================================================
+
+    def execute_queue(
+        self,
+        ui_refresh_callback: Callable[[], None],
+        progress_callback: Callable[[float, float, float], None]
+    ) -> None:
+        """Begins executing the experiment queue in order.
+
+        Args:
+            ui_refresh_callback (Callable[[], None]): Callback function for
+                updating content on the page `Simulation`.
+            progress_callback (Callable[[float, float, float], None]): Callback
+                function for updating queue execution progress bars with new
+                completion percentage values.
+        """
+        for experiment in self._simulation_queue:
+            experiment.is_executing = True
+            # Update that experiment is being executed
+            ui_refresh_callback()
+            for job in experiment.jobs.values():
+                # Displays initial job progress
+                self._update_queue_execution_progress(
+                    progress_callback, 
+                    running_experiment=experiment, 
+                    running_job=job)
+
+                simulator = self._get_simulator_instance(job_instance=job)
+                circuit = self._get_transpiled_circuit(job_instance=job, 
+                                                       simulator=simulator)
+                
+                self._run_job(job=job, 
+                              simulator=simulator, 
+                              transpiled_circuit=circuit, 
+                              progress_callback=progress_callback, 
+                              experiment=experiment)
+                # Update that job is complete
+                ui_refresh_callback()
+
+            experiment.is_executing = False
+            # Update that experiment is complete
+            ui_refresh_callback()
+
+
+    def _run_job(
+        self,
+        job: Job,
+        simulator: AerSimulator,
+        transpiled_circuit: QuantumCircuit,
+        progress_callback: Callable[[float, float, float], None],
+        experiment: ExperimentInstance
+    ) -> None:
+        """Executes current job instance in batches of shots, progressively 
+        adding up to the job result.
+
+        Shot batch is determined by the `SHOT_BATCH_SIZE` constant.
+
+        Args:
+            job (Job): Current job instance that will be executed.
+            simulator (AerSimulator): Simulator instance that the current
+                job will be using.
+            transpiled_circuit (QuantumCircuit): Transpiled circuit that the 
+                simulator will be running.
+            progress_callback (Callable[[float, float, float], None]): Callback
+                function for updating queue execution progress bars with new
+                completion percentage values.
+            experiment (ExperimentInstance): Current experiment instance being
+                executed. (Only used as `progress_callback` argument)
+        """
+        while not job.is_complete:
+            shot_batch = min(SHOT_BATCH_SIZE, job.remaining_shots)
+            
+            aer_job = simulator.run(circuits=transpiled_circuit, 
+                                              shots=shot_batch)
+            
+            job.add_results(new_results=aer_job.result().get_counts())
+
+            self._update_queue_execution_progress(progress_callback, 
+                                                  running_experiment=experiment, 
+                                                  running_job=job)
+
+
+    def _get_simulator_instance(
+        self,
+        job_instance: Job
+    ) -> AerSimulator:
+        """Creates and returns a simulator instance that the current job
+        instance will be using.
+
+        Args:
+            job_instance (Job): Current job instance that will be
+                executed.
+
+        Returns:
+            AerSimulator: Created simulator instance that the current job
+                instance will be using.
+        """
+        # Noisy simulation requires specific AerSimulator 
+        # configuration.
+        if job_instance.noise_model:
+            return AerSimulator(
+                coupling_map=job_instance.noise_model.coupling_map,
+                noise_model=job_instance.noise_model.noise_model)
+        # Noiseless simulation is just with the default AerSimulator.
+        else:
+            return AerSimulator()
+
+
+    def _get_transpiled_circuit(
+        self,
+        job_instance: Job,
+        simulator: AerSimulator
+    ) -> QuantumCircuit:
+        """Creates and returns a transpiled circuit that can be run on
+        the specific simulator instance.
+
+        Args:
+            job_instance (Job): Current job instance that will be
+                executed.
+            simulator (AerSimulator): Simulator instance that the current
+                job will be using.
+
+        Returns:
+            QuantumCircuit: Transpiled circuit that the simulator will be
+                running.
+        """
+        # While doing everything correctly, there seems to be an error 
+        # message regarding providing the coupling_map and basis_bates 
+        # together with backend. I could not currently find a solution 
+        # as to how it can be removed, which is why this code bit is 
+        # here - to remove it.
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action="ignore", 
+                message=f"Providing `coupling_map` and/or `basis_gates` "
+                        f"along with `backend` is not recommended"
+            )
+
+            # If there is no noise, optimization level is not allowed
+            # to be set, thus, it should be set to 0 (INS default).
+            optimization_level = job_instance.optimization_level or 0
+
+            return transpile(
+                circuits=job_instance.circuit.circuit,
+                backend=simulator,
+                coupling_map=simulator.coupling_map,
+                optimization_level=optimization_level)
+
+
+    def _update_queue_execution_progress(
+        self,
+        progress_callback: Callable[[float, float, float], None],
+        running_experiment: ExperimentInstance,
+        running_job: Job
+    ) -> None:
+        """Calculates new progress percentage values and calls progress 
+        callback function to update all progress bars.
+
+        Args:
+            progress_callback (Callable[[float, float, float], None]): Callback
+                function for updating queue execution progress bars with new
+                completion percentage values.
+            running_experiment (ExperimentInstance): Experiment instance
+                currently being executed.
+            running_job (Job): Job instance currently being executed.
+        """
+        # Calculates total complete and in general shots.
+        total_shots = 0
+        total_complete_shots = 0
+        for experiment in self._simulation_queue:
+            total_shots += experiment.total_shots
+            total_complete_shots += experiment.total_completed_shots
+        # Calculates returnable percentage values.
+        overall_percentage = (total_complete_shots / total_shots) * 100.0
+        overall_percentage = round(overall_percentage, 2)
+        experiment_percentage = running_experiment.completion_percentage
+        job_percentage = running_job.completion_percentage
+        # Calls progress callback function to update all 3x progress bars.
+        progress_callback(overall_percentage, 
+                          experiment_percentage,
+                          job_percentage)

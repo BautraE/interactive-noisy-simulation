@@ -39,6 +39,12 @@ p, h1, h2, h3, h4, ul {
     margin: 0;
 }
 
+/* Horizontal line separating different content parts */
+hr {
+    border-width: 2px;
+    border-color: var(--color-hr-border);
+}
+
 
 /*
 --------------------------------------------------------------
@@ -289,6 +295,9 @@ tr td:last-child {
 
     background-color: var(--color-progress-bar-line);
     border-radius: 8px;
+
+    transition: background-color 0.5s ease,
+                width 0.1s ease;
     
     /* Styles for percentage text */
     display: flex;
@@ -299,6 +308,12 @@ tr td:last-child {
     color: var(--color-progress-bar-text);
     font-size: 12px;
     font-weight: bold;
+}
+/* Progress line style for when the specific process with trackable
+   progress is not running. */
+.current-progress.inactive {
+    width: 100%;
+    background-color: var(--color-progress-bar-line-inactive);
 }
 
 

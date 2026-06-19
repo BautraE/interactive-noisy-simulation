@@ -8,7 +8,11 @@ from ..js_common_wrappers import (
 )
 from ..general import inform_empty_container
 from ..instance_managers.js_manager_wrappers import view_instance_data
-from ...project_variables import EMPTY_CONTAINER_MESSAGES
+from ..logs.logs import add_log_message
+from ...project_variables import (
+    EMPTY_CONTAINER_MESSAGES,
+    LOG_MESSAGES
+)
 
 # Manager class objects:
 from ...project_variables import (
@@ -34,6 +38,7 @@ def update_simulation_content() -> None:
     view_queueable_experiments()
     view_queued_experiments()
     update_detailed_queue_data()
+    update_queue_execution_button()
 
 
 def view_queueable_experiments() -> None:
@@ -110,6 +115,8 @@ def add_experiment_to_queue(
     reference_key: str
 ) -> None:
     """Adds existing experiment to the execution queue.
+
+    Exposed function to `Python Eel` for use with JavaScript.
     
     Args:
         reference_key (str): Reference key of experiment instance being
@@ -128,6 +135,8 @@ def remove_experiment_from_queue(
     reference_key: str
 ) -> None:
     """Removes experiment from the execution queue.
+
+    Exposed function to `Python Eel` for use with JavaScript.
     
     Args:
         reference_key (str): Reference key of experiment instance being
@@ -139,3 +148,69 @@ def remove_experiment_from_queue(
     experiment_instance.is_queued = False
     # Updates UI
     update_simulation_content()
+
+
+# --------------------------------------------------------------
+# Executing queue.
+# --------------------------------------------------------------
+
+def update_queue_execution_button() -> None:
+    """Updates style and status of button for executing the experiment
+    queue:
+    - "unavailable" - Queue cannot be executed because there are
+      either no jobs to run, or the queue is empty;
+    - "running" - The queue is being executed;
+    - "available" - The queue is eligible to be executed.
+    """
+    if sm.is_executing:
+        state = "running"
+    elif sm.total_queued_incomplete_jobs == 0:
+        state = "unavailable"
+    else:
+        state = "available"
+    
+    eel.updateQueueExecutionButton(state)
+
+
+@eel.expose
+def execute_queued_experiments() -> None:
+    """Calls SimulationManager object to begin executing the experiment
+    queue.
+
+    Exposed function to `Python Eel` for use with JavaScript.
+    """
+    add_log_message(message=LOG_MESSAGES["queue_execution_started"],
+                    queued_experiment_count=f"{sm.queue_lenght}")
+    
+    sm.is_executing = True
+    update_queue_execution_button()
+    sm.execute_queue(ui_refresh_callback=update_simulation_content,
+                     progress_callback=update_progress_bars)
+    sm.is_executing = False
+    update_queue_execution_button()
+
+    add_log_message(message=LOG_MESSAGES["queue_execution_finished"],
+                    queued_experiment_count=f"{sm.queue_lenght}")
+
+
+def update_progress_bars(
+    overall_percentage: float,
+    experiment_percentage: float,
+    job_percentage: float
+) -> None:
+    """Calls JS function for updating progress bar percentages based on the
+    received values.
+    
+    Args:
+        overall_percentage (float): Overall completion percentage of the 
+            experiment queue.
+        experiment_percentage (float): Current experiment completion 
+            percentage.
+        job_percentage (float): Current job completion percentage.
+    """
+    eel.updateProgressBar(overall_percentage, 
+                          "execution-overall-progress")
+    eel.updateProgressBar(experiment_percentage, 
+                          "execution-experiment-progress")
+    eel.updateProgressBar(job_percentage, 
+                          "execution-job-progress")

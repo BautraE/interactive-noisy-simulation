@@ -16,10 +16,13 @@ class ExperimentInstance:
             instance.
         is_queued (bool): Whether or not this experiment is in a queue to
             be executed.
+        is_executing (bool): Whether or not this experiment is currently being
+            executed.
     """
     reference_key: str
     jobs: dict[str, Job] = field(default_factory=dict)
     is_queued: bool = False
+    is_executing: bool = False
 
 
     @property
@@ -46,6 +49,56 @@ class ExperimentInstance:
                 num_complete_jobs += 1
         
         return num_complete_jobs
+    
+
+    @property
+    def incomplete_jobs(self) -> int:
+        """Returns number of incomplete jobs within the experiment instance.
+        
+        Returns:
+            int: Number of incomplete jobs.
+        """
+        return self.job_count - self.complete_jobs
+    
+
+    @property
+    def completion_percentage(self) -> float:
+        """Returns completion percentage based on completed shots, compared to
+        total number of shots (across all jobs within the experiment).
+        
+        Returns:
+            float: Experiment completion percentage.
+        """
+        percentage = (self.total_completed_shots / self.total_shots) * 100.0
+        return round(percentage, 2)
+    
+
+    @property
+    def total_completed_shots(self) -> int:
+        """Returns number of total completed shots across all jobs within the
+        experiment instance.
+        
+        Returns:
+            int: Number of total completed shots.
+        """
+        shots = 0
+        for job in self.jobs.values():
+            shots += job.completed_shots
+        return shots
+
+
+    @property
+    def total_shots(self) -> int:
+        """Returns number of total shots across all jobs within the experiment
+        instance.
+        
+        Returns:
+            int: Number of total shots.
+        """
+        shots = 0
+        for job in self.jobs.values():
+            shots += job.shot_count
+        return shots
 
     
     @property
@@ -78,13 +131,32 @@ class ExperimentInstance:
         complete_jobs = self.complete_jobs
 
         if total_jobs == 0:
-            return "No jobs"
+            return "no jobs"
         elif complete_jobs == 0:
-            return "Pending"
+            return "pending"
         elif complete_jobs == total_jobs:
-            return "Completed"
+            return "completed"
         else:
-            return "Partial"
+            return "partial"
+        
+    
+    @property
+    def execution_status(self) -> str:
+        """Returns execution status of experiment.
+
+        This is used by the experiment execution queue.
+        
+        Returns:
+            str: Status message.
+        """
+        if self.job_count == 0:
+            return "no jobs"
+        elif self.is_executing:
+            return "in progress"
+        elif self.job_count == self.complete_jobs:
+            return "completed"
+        else:
+            return "queued"
 
 
     def add_job(

@@ -104,6 +104,12 @@ File contents list:
     color: var(--color-element-highlight-primary);
 }
 
+.detailed-job-view pre {
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
 .detailed-job-view ul {
     display: flex;
     flex-direction: column;

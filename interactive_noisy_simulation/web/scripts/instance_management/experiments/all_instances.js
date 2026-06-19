@@ -48,11 +48,13 @@ window.addEventListener('load', function() {
  */
 function colorStatusCell(rowElement, rowContent) {
     const statusMessageStyles = {
-        Completed: "variant-green",
-        Partial: "variant-yellow",
-        Pending: "variant-grey",
+        completed: "variant-green",
+        partial: "variant-yellow",
+        pending: "variant-grey",
+        "no jobs": "variant-grey"
     }
 
+    // Experiment completion status is located in the 4th column
     let statusCell = rowElement.children[3];
     let statusStyle = statusMessageStyles[rowContent[3]];
     if(statusStyle) {

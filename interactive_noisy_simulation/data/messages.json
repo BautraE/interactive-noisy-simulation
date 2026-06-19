@@ -51,6 +51,20 @@
             "highlightables": [
                 "{job_reference_key}", "{experiment_reference_key}"
             ]
+        },
+
+        "queue_execution_finished": {
+            "text": "Queue execution has finished successfully - all {queued_experiment_count} queued experiments were completed.",
+            "highlightables": [
+                "{queued_experiment_count}"
+            ]
+        },
+        
+        "queue_execution_started": {
+            "text": "Queue execution has started - all {queued_experiment_count} queued experiments are set to be completed in the specified order.",
+            "highlightables": [
+                "{queued_experiment_count}"
+            ]
         }
     },
 

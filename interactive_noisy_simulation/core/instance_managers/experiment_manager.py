@@ -154,7 +154,7 @@ class ExperimentManager:
             reference_key=job_reference_key,
             circuit=circuit_instance,
             noise_model=noise_model_instance,
-            shot_count=int(shot_count),
+            shot_count=shot_count,
             hardware=hardware,
             simulation_method=simulation_method,
             optimization_level=optimization_level)
@@ -245,7 +245,10 @@ class ExperimentManager:
             "simulation_method": job.simulation_method,
             # Job progress metrics,
             "completed_shots": job.completed_shots,
-            "remaining_shots": job.remaining_shots
+            "remaining_shots": job.remaining_shots,
+            # Job results:
+            "current_result_counts": job.result_counts if job.result_counts
+                                     else "No result counts available yet"
         }
         
         return detailed_data

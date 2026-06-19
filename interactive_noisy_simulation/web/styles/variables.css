@@ -17,7 +17,7 @@ Global scope variables
   Color-related variables 
   --------------------------------------------------------- 
   */
-  /* General text and specific element colors */
+  /* General text and element highlight colors */
   --color-text-default: white;
   --color-text-muted: #CDCDCD;
   --color-text-red: #FF8A8A;
@@ -105,6 +105,8 @@ Global scope variables
   --color-progress-bar-line: #2bc76f;
   --color-progress-bar-text: #ffffff;
 
+  --color-progress-bar-line-inactive: #6A8D79;
+
 
   /* Clickables and actions */
   /* Clickables and actions: Previous page links */
@@ -138,6 +140,10 @@ Global scope variables
   --color-button-variant-default-border-hover: #CFCEFB;
   --color-button-variant-default-border-active: #9ab7ff;
 
+  --color-button-variant-disabled-background: #454545;
+  --color-button-variant-disabled-text: #CDCDCD;
+  --color-button-variant-disabled-border: #CDCDCD;
+
   --color-button-variant-red-background: #2A2949;
   --color-button-variant-red-background-hover: #511b1b;
   --color-button-variant-red-text: #FF8A8A;
@@ -170,6 +176,8 @@ Global scope variables
   /* Miscellaneous elements */
   --color-table-rows-even: #222C42;
   --color-table-rows-border-hover: #a19f8c;
+
+  --color-hr-border: #3B3F52;
 
 
   /* 
