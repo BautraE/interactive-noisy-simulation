@@ -68,7 +68,7 @@ def create_experiment_instance(
     # Create new noise data instance:
     em.create_instance(reference_key)
     
-    add_log_message(message=LOG_MESSAGES["created_instance"],
+    add_log_message(content=LOG_MESSAGES["created_instance"],
                     instance_type="experiment",
                     reference_key=reference_key)
     
@@ -92,7 +92,7 @@ def remove_experiment_instance(
     # Remove existing noise data instance:
     em.remove_instance(reference_key)
 
-    add_log_message(message=LOG_MESSAGES["deleted_instance"],
+    add_log_message(content=LOG_MESSAGES["deleted_instance"],
                     instance_type="experiment",
                     reference_key=reference_key)
 
@@ -240,7 +240,7 @@ def create_job_for_experiment(
                   simulation_method=simulation_method,
                   optimization_level=optional_int(optimization_level))
     
-    add_log_message(message=LOG_MESSAGES["created_job_instance"],
+    add_log_message(content=LOG_MESSAGES["created_job_instance"],
                     job_reference_key=job_reference_key,
                     experiment_reference_key=experiment_reference_key)
     
@@ -264,7 +264,7 @@ def remove_job_from_experiment(
     """
     em.remove_job(experiment_reference_key, job_reference_key)
 
-    add_log_message(message=LOG_MESSAGES["deleted_job_instance"],
+    add_log_message(content=LOG_MESSAGES["deleted_job_instance"],
                     job_reference_key=job_reference_key,
                     experiment_reference_key=experiment_reference_key)
     

@@ -24,6 +24,8 @@ with (resources.files(data) / "messages.json").open("r", encoding="utf8") as fil
     message_file = json.load(file)
 # Informative text that appears in containers if they have no content to display
 EMPTY_CONTAINER_MESSAGES = message_file["empty_container"]
+# Error log message text
+ERROR_MESSAGES = message_file["error"]
 # Message log message text
 LOG_MESSAGES = message_file["log"]
 # Messages that get printed out during terminal command execution

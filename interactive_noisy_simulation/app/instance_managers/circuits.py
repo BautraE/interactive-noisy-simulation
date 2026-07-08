@@ -78,7 +78,7 @@ def create_circuit_instance(
     cm.create_instance(reference_key, source_file)
     
     new_instance = cm.circuits[reference_key]
-    add_log_message(message=LOG_MESSAGES["created_instance_from_file"],
+    add_log_message(content=LOG_MESSAGES["created_instance_from_file"],
                     instance_type="circuit",
                     reference_key=reference_key,
                     full_path=new_instance.source_file.full_path)
@@ -103,7 +103,7 @@ def remove_circuit_instance(
     # Remove existing noise data instance:
     cm.remove_instance(reference_key)
 
-    add_log_message(message=LOG_MESSAGES["deleted_instance"],
+    add_log_message(content=LOG_MESSAGES["deleted_instance"],
                     instance_type="circuit",
                     reference_key=reference_key)
 

@@ -7,19 +7,21 @@
 import eel
 
 
-def load_log_message(
-        message_id: str, 
-        message: dict
+def load_log_entry(
+        entry_id: str, 
+        log_entry: dict,
+        entry_type: str
 ) -> None:
-    """Loads message into log.
+    """Loads log entry into log.
 
     Wrapper function for `Python Eel` JS function call.
 
     Args:
-        message_id (str): id of the message (used for specific log instance
+        entry_id (str): id of the log entry (used for specific log entry
             clearing functionality).
-        message (dict): message dictionary containing all required information
-            about displayable message (message text, highlightables, 
-            timestamp).
+        log_entry (dict): log entry dictionary containing all required information
+            about displayable entry (text, highlightables, timestamp).
+        message_type (str): type of log entry being loaded. (e.g. `message` 
+            or `error`).
     """
-    eel.loadLogMessage(message_id, message)
+    eel.loadLogEntry(entry_id, log_entry, entry_type)

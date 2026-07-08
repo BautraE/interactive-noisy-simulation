@@ -7,7 +7,7 @@ File contents list:
    of side panel, at the bottom-right corner of the active page.
 2. Main div containers that make the log panel.
 3. Content of the log side panel.
-4. Message fragment highlighting styles.
+4. Log entry text fragment highlighting styles.
 -----------------------------------------------------------------
 
 -------------------------------------------------------------- 
@@ -119,18 +119,18 @@ File contents list:
 /* Message part of log */
 
 /* Each log message instance that is made visible in the content box */
-.log-instance {
+.log-entry {
     display: flex;
 }
 
 /* Message log instance container for action (ex. "Clear") */
-.log-instance-action-box {
+.log-entry-action-box {
     margin-right: 20px;
 }
 
 /* Message log instance container for timestamp and
    message text */
-.log-instance-content-box {
+.log-entry-content-box {
     word-break: break-word;
 }
 
@@ -141,7 +141,7 @@ File contents list:
 }
 
 /* Message text of log instance */
-.log-instance-content-box p:last-child {
+.log-entry-content-box p:last-child {
     margin-top: 5px;
     margin-bottom: 0;
 }
@@ -149,7 +149,7 @@ File contents list:
 
 /*
 --------------------------------------------------------------
-4. Message fragment highlighting styles.
+4. Log entry text fragment highlighting styles.
 -------------------------------------------------------------- 
 */
 span.highlight {

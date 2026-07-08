@@ -4,9 +4,12 @@ import warnings
 #Third party imports:
 from qiskit import transpile
 from qiskit_aer import AerSimulator
+from qiskit.transpiler.exceptions import TranspilerError # For bug workaround
 
 # Project-related imports:
 from ..data_structures.instance_data import InstanceData
+from ...exceptions import SimulationError
+from ...project_variables import ERROR_MESSAGES
 
 # Imports only used for type definition:
 from ..data_structures.experiment_instance import ExperimentInstance
@@ -16,6 +19,12 @@ from typing import Callable
 
 
 SHOT_BATCH_SIZE = 1000
+# Related to Qiskit transpile bug: 'HighLevelSynthesis is unable to synthesize "measure"'
+# It sometimes fails to transpile the circuit and returns this error if the 
+# optimization level for the transpilation process is set above 0.
+# A hacky solution for it would be to attempt the transpilation process
+# multiple times, ignoring the exception, until it finally works.
+MAX_TRANSPILATION_ATTEMPTS = 100
 
 
 class SimulationManager:
@@ -76,7 +85,7 @@ class SimulationManager:
         """
         num_queued_incomplete_jobs = 0
         for experiment in self._simulation_queue:
-            num_queued_incomplete_jobs = experiment.incomplete_jobs
+            num_queued_incomplete_jobs += experiment.incomplete_jobs
         
         return num_queued_incomplete_jobs
 
@@ -163,28 +172,29 @@ class SimulationManager:
             experiment.is_executing = True
             # Update that experiment is being executed
             ui_refresh_callback()
-            for job in experiment.jobs.values():
-                # Displays initial job progress
-                self._update_queue_execution_progress(
-                    progress_callback, 
-                    running_experiment=experiment, 
-                    running_job=job)
+            try:
+                for job in experiment.jobs.values():
+                    # Displays initial job progress
+                    self._update_queue_execution_progress(
+                        progress_callback, 
+                        running_experiment=experiment, 
+                        running_job=job)
 
-                simulator = self._get_simulator_instance(job_instance=job)
-                circuit = self._get_transpiled_circuit(job_instance=job, 
-                                                       simulator=simulator)
-                
-                self._run_job(job=job, 
-                              simulator=simulator, 
-                              transpiled_circuit=circuit, 
-                              progress_callback=progress_callback, 
-                              experiment=experiment)
-                # Update that job is complete
+                    simulator = self._get_simulator_instance(job_instance=job)
+                    circuit = self._get_transpiled_circuit(job_instance=job, 
+                                                           simulator=simulator)
+                    
+                    self._run_job(job=job, 
+                                  simulator=simulator, 
+                                  transpiled_circuit=circuit, 
+                                  progress_callback=progress_callback, 
+                                  experiment=experiment)
+                    # Update that job is complete
+                    ui_refresh_callback()
+            finally:
+                experiment.is_executing = False
+                # Update that experiment is complete
                 ui_refresh_callback()
-
-            experiment.is_executing = False
-            # Update that experiment is complete
-            ui_refresh_callback()
 
 
     def _run_job(
@@ -216,7 +226,7 @@ class SimulationManager:
             shot_batch = min(SHOT_BATCH_SIZE, job.remaining_shots)
             
             aer_job = simulator.run(circuits=transpiled_circuit, 
-                                              shots=shot_batch)
+                                    shots=shot_batch)
             
             job.add_results(new_results=aer_job.result().get_counts())
 
@@ -285,11 +295,20 @@ class SimulationManager:
             # to be set, thus, it should be set to 0 (INS default).
             optimization_level = job_instance.optimization_level or 0
 
-            return transpile(
-                circuits=job_instance.circuit.circuit,
-                backend=simulator,
-                coupling_map=simulator.coupling_map,
-                optimization_level=optimization_level)
+            # Required in order to avoid the following exception:
+            # "HighLevelSynthesis is unable to synthesize 'measure'"
+            # Attempt loop for HighLevelSynthesis bug workaround:
+            for _ in range(MAX_TRANSPILATION_ATTEMPTS):
+                try:
+                    return transpile(
+                        circuits=job_instance.circuit.circuit,
+                        backend=simulator,
+                        coupling_map=simulator.coupling_map,
+                        optimization_level=optimization_level)
+                except TranspilerError: pass
+            # Raises error if none of the set attempts were successful:
+            raise SimulationError(ERROR_MESSAGES["sim_transpilation_bug"],
+                                  transpilation_attempt_count=MAX_TRANSPILATION_ATTEMPTS)
 
 
     def _update_queue_execution_progress(

@@ -11,6 +11,16 @@ from importlib import resources
 PACKAGE_ROOT = resources.files("interactive_noisy_simulation")
 
 
+# Static project data:
+from .data._data import (
+    EMPTY_CONTAINER_MESSAGES,
+    ERROR_MESSAGES,
+    LOG_MESSAGES, 
+    TERMINAL_MESSAGES,
+    TERMINAL_COMMAND_DESCRIPTION
+)
+
+
 # Sharable class objects:
 # - Specific instance managers:
 from .core.instance_managers.noise_data_manager import NoiseDataManager
@@ -36,12 +46,3 @@ simulation_manager = SimulationManager()
 # - Key blocker:
 from .core.key_blocker import KeyBlocker
 key_blocker = KeyBlocker()
-
-
-# Static project data:
-from .data._data import (
-    EMPTY_CONTAINER_MESSAGES,
-    LOG_MESSAGES, 
-    TERMINAL_MESSAGES,
-    TERMINAL_COMMAND_DESCRIPTION
-)

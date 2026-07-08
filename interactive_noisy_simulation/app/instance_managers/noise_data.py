@@ -80,7 +80,7 @@ def import_csv_calibration_data(
     ndm.import_csv_data(reference_key, source_file)
     
     new_instance = ndm.noise_data[reference_key]
-    add_log_message(message=LOG_MESSAGES["created_instance_from_file"],
+    add_log_message(content=LOG_MESSAGES["created_instance_from_file"],
                     instance_type="noise data",
                     reference_key=reference_key,
                     full_path=new_instance.source_file.full_path)
@@ -105,7 +105,7 @@ def remove_noise_data_instance(
     # Remove existing noise data instance:
     ndm.remove_noise_data_instance(reference_key)
 
-    add_log_message(message=LOG_MESSAGES["deleted_instance"],
+    add_log_message(content=LOG_MESSAGES["deleted_instance"],
                     instance_type="noise data",
                     reference_key=reference_key)
 

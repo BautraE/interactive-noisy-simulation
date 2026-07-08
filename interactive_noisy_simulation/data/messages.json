@@ -16,6 +16,15 @@
 
         "no_queued_experiments": "The experiment queue is currently empty"
     },
+
+    "error": {
+        "sim_transpilation_bug": {
+            "text": "None of the {transpilation_attempt_count} transpilation attempts were successful! Please retry executing the queued jobs!",
+            "highlightables": [
+                "retry executing the queued jobs"
+            ]
+        }
+    },
     
     "log": {
         "created_instance": {

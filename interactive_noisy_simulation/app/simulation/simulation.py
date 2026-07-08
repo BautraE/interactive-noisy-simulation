@@ -2,13 +2,17 @@
 import eel
 
 # Project-related imports:
+from ...exceptions import SimulationError
 from ..js_common_wrappers import (
     remove_container_content,
     update_span_content
 )
 from ..general import inform_empty_container
 from ..instance_managers.js_manager_wrappers import view_instance_data
-from ..logs.logs import add_log_message
+from ..logs.logs import (
+    add_log_message,
+    add_log_error
+)
 from ...project_variables import (
     EMPTY_CONTAINER_MESSAGES,
     LOG_MESSAGES
@@ -179,18 +183,23 @@ def execute_queued_experiments() -> None:
 
     Exposed function to `Python Eel` for use with JavaScript.
     """
-    add_log_message(message=LOG_MESSAGES["queue_execution_started"],
+    add_log_message(content=LOG_MESSAGES["queue_execution_started"],
                     queued_experiment_count=f"{sm.queue_lenght}")
     
     sm.is_executing = True
     update_queue_execution_button()
-    sm.execute_queue(ui_refresh_callback=update_simulation_content,
-                     progress_callback=update_progress_bars)
-    sm.is_executing = False
-    update_queue_execution_button()
-
-    add_log_message(message=LOG_MESSAGES["queue_execution_finished"],
-                    queued_experiment_count=f"{sm.queue_lenght}")
+    try:
+        sm.execute_queue(ui_refresh_callback=update_simulation_content,
+                         progress_callback=update_progress_bars)
+    except SimulationError as e:
+        add_log_error(content=e.message, 
+                      **e.placeholders)
+    else:
+        add_log_message(content=LOG_MESSAGES["queue_execution_finished"],
+                        queued_experiment_count=f"{sm.queue_lenght}")
+    finally:
+        sm.is_executing = False
+        update_queue_execution_button()
 
 
 def update_progress_bars(

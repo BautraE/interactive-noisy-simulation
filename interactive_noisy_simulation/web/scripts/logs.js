@@ -2,7 +2,7 @@
 // Functionality related to message and error log
 // =================================================================
 
-// Loading existing messages and errors into log content box
+// Loading existing message and error entries into log
 window.addEventListener('load', function() {
     setTimeout(function() {
         eel.show_log_messages();
@@ -41,70 +41,79 @@ function hideLogSidebar() {
 // Loading and rendering current messages and errors into log
 // --------------------------------------------------------------
 /**
- * @typedef {Object} Message
- * @property {string} message_text - log message text.
- * @property {string[]} highlightables - message text fragments
+ * @typedef {Object} LogEntry
+ * @property {string} text - log entry text.
+ * @property {string[]} highlightables - log entry text fragments
  * that need to be highlighted.
- * @property {string} timestamp - time at which the message was 
+ * @property {string} timestamp - time at which the log entry was 
  * generated.
  */
 
-eel.expose(loadLogMessage)
+eel.expose(loadLogEntry)
 /**
- * Loads message into log.
+ * Loads log entry into specific log section.
  * 
- * @param {string} id - id of the message (used for specific log
+ * @param {string} entryId - id of the log entry (used for specific log
  * instance clearing functionality).
- * @param {Message} message - object of message that needs to be
+ * @param {LogEntry} logEntry - object of log entry that needs to be
  * displayed.
+ * @param {LogEntry} entryType - type of log entry being loaded. 
+ * (e.g. `message` or `error`).
  */
-function loadLogMessage(id, message) {
-    addHighlights(message);
+function loadLogEntry(entryId, logEntry, entryType) {
+    addHighlights(logEntry);
     
-    // Message part with delete action
+    // Log entry part with delete action
     let aDelete = document.createElement("a");
     aDelete.innerHTML = "Clear";
     aDelete.role = "button";
     aDelete.classList.add("clickable", "action", ACTION_STYLES.delete);
-    aDelete.onclick = () => eel.clear_message(id);
 
     let deleteContainer = document.createElement("div");
-    deleteContainer.classList.add("log-instance-action-box");
+    deleteContainer.classList.add("log-entry-action-box");
     deleteContainer.appendChild(aDelete);
 
-    // Message part with timestamp and text
+    // Log entry part with timestamp and text
     let pTimestamp = document.createElement("p");
     pTimestamp.classList.add("log-timestamp");
-    pTimestamp.innerHTML = message.timestamp;
-    let pMessage = document.createElement("p");
-    pMessage.innerHTML = message.message_text;
+    pTimestamp.innerHTML = logEntry.timestamp;
+    let pText = document.createElement("p");
+    pText.innerHTML = logEntry.text;
 
-    let messageContentContainer = document.createElement("div");
-    messageContentContainer.classList.add("log-instance-content-box");
-    messageContentContainer.appendChild(pTimestamp);
-    messageContentContainer.appendChild(pMessage);
+    let logEntryContentContainer = document.createElement("div");
+    logEntryContentContainer.classList.add("log-entry-content-box");
+    logEntryContentContainer.appendChild(pTimestamp);
+    logEntryContentContainer.appendChild(pText);
 
-    // Combining both containers into one for the entire message
-    // instance
-    let messageContainer = document.createElement("div");
-    messageContainer.classList.add("log-instance");
-    messageContainer.appendChild(deleteContainer);
-    messageContainer.appendChild(messageContentContainer);
+    // Combining both containers into one for the entire log entry
+    let logEntryContainer = document.createElement("div");
+    logEntryContainer.classList.add("log-entry");
+    logEntryContainer.appendChild(deleteContainer);
+    logEntryContainer.appendChild(logEntryContentContainer);
 
-    // Append everything to the log message content box
-    _appendThroughId("messages", messageContainer, "before");
+    // Append everything to the log entry content box
+    switch (entryType) {
+        case "message":
+            aDelete.onclick = () => eel.clear_message(entryId);
+            _appendThroughId("messages", logEntryContainer, "before");
+            break;
+        case "error":
+            aDelete.onclick = () => eel.clear_error(entryId);
+            _appendThroughId("errors", logEntryContainer, "before");
+            break;
+    }
 }
 
 
 /**
- * Adds highlighting style to defined message fragments, based
- * on `message.highlightables` array.
+ * Adds highlighting style to defined log entry text fragments, based
+ * on `logEntry.highlightables` array.
  * 
- * @param {Message} message - Object of message that needs its fragments
- * to be highlighted.
+ * @param {LogEntry} logEntry - Object of log entry that needs its text 
+ * fragments to be highlighted.
  */
-function addHighlights(message) {
-    const escaped = message.highlightables
+function addHighlights(logEntry) {
+    const escaped = logEntry.highlightables
         // longest first (avoids issue with highlighting substrings)
         .sort((a, b) => b.length - a.length)
         .map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
@@ -116,7 +125,7 @@ function addHighlights(message) {
         'g'
     );
 
-    message.message_text = message.message_text.replace(regex, (match, before, word) => {
+    logEntry.text = logEntry.text.replace(regex, (match, before, word) => {
         return `${before}<span class="highlight">${word}</span>`;
     });
 }

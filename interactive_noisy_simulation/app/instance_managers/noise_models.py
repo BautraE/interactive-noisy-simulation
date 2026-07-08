@@ -81,7 +81,7 @@ def create_noise_model_instance(
                           instance_type="noise_data", 
                           blocker_key=reference_key)
     
-    add_log_message(message=LOG_MESSAGES["created_instance"],
+    add_log_message(content=LOG_MESSAGES["created_instance"],
                     instance_type="noise model",
                     reference_key=reference_key)
     
@@ -111,7 +111,7 @@ def remove_noise_model_instance(
     # Remove existing noise model instance:
     nc.remove_noise_model_instance(reference_key)
 
-    add_log_message(message=LOG_MESSAGES["deleted_instance"],
+    add_log_message(content=LOG_MESSAGES["deleted_instance"],
                     instance_type="noise model",
                     reference_key=reference_key)
     
