@@ -4,6 +4,11 @@
 # The following methods are used for adding specific errors to a noise 
 # model, as well as obtaining a list of basis gates and the coupling map.
 # =========================================================================
+# 1. Obtaining list of basis gates and coupling map
+# 2. Adding readout errors
+# 3. Adding depolarizing errors
+# 4. Adding thermal relaxation errors
+# =========================================================================
 
 #Third party imports:
 import pandas
@@ -25,7 +30,7 @@ from pandas.core.series import Series
 
 
 # --------------------------------------------------------------
-# Obtaining list of basis gates and coupling map
+# 1. Obtaining list of basis gates and coupling map
 # --------------------------------------------------------------
 
 def get_basis_gates(
@@ -95,7 +100,7 @@ def get_coupling_map(
 
 
 # --------------------------------------------------------------
-# Adding errors
+# 2. Adding readout errors
 # --------------------------------------------------------------
 
 def add_readout_error(
@@ -129,8 +134,12 @@ def add_readout_error(
     noise_model.add_readout_error(readout_error, [qubit])
 
 
+# --------------------------------------------------------------
+# 3. Adding depolarizing errors
+# --------------------------------------------------------------
+
 def add_depolarizing_error(
-        qubit: int, 
+        current_qubit: int, 
         columns: Series, 
         noise_model: NoiseModel
 ) -> None:
@@ -150,7 +159,7 @@ def add_depolarizing_error(
     https://qiskit.github.io/qiskit-aer/tutorials/3_building_noise_models.html
 
     Args:
-        qubit (int): The number of the current qubit.
+        current_qubit (int): The number of the current qubit.
         columns (Series): Table data for the current qubit. 
             Basically a row, however, to access a certain attribute, 
             you must do as follows: `column["attribute_name"]`, where 
@@ -161,6 +170,7 @@ def add_depolarizing_error(
     """
     for gate in CONFIG["single_qubit_gates"]:
         single_qubit_gate = CSV_COLUMNS[gate]
+        # If the gate is part of the basis gate list of the backend
         if single_qubit_gate["csv_name"] in columns:
             error_data = columns[single_qubit_gate["csv_name"]]
             # In one case the single-qubit gate error values were NaN
@@ -173,29 +183,36 @@ def add_depolarizing_error(
                 noise_model.add_quantum_error(
                     error=error, 
                     instructions=single_qubit_gate["code_name"], 
-                    qubits=[qubit], 
+                    qubits=[current_qubit], 
                     warnings=False)
 
     for gate in CONFIG["two_qubit_gates"]:
         two_qubit_gate = CSV_COLUMNS[gate]
+        # If the gate is part of the basis gate list of the backend
         if two_qubit_gate["csv_name"] in columns:
             error_data = columns[two_qubit_gate["csv_name"]]
+            # error data will be nan if there are no connected qubits to the
+            # current qubit.
             if not pandas.isna(error_data):
                 # Since each row of these columns may contain more
                 # than one data entry.
-                for target_qubit in error_data.keys():
+                for connected_qubit, error_parameter in error_data.items():
                     error = depolarizing_error(
-                        param=error_data[target_qubit],
+                        param=error_parameter,
                         num_qubits=2)
                     noise_model.add_quantum_error(
                         error=error,
                         instructions=two_qubit_gate["code_name"], 
-                        qubits=[qubit, target_qubit],
+                        qubits=[current_qubit, connected_qubit],
                         warnings=False)
-                    
+
+
+# --------------------------------------------------------------
+# 4. Adding thermal relaxation errors
+# --------------------------------------------------------------
 
 def add_thermal_error(
-        qubit: int, 
+        current_qubit: int, 
         columns: Series, 
         noise_model: NoiseModel,
         noise_dataframe: pandas.DataFrame
@@ -218,15 +235,9 @@ def add_thermal_error(
     - Some T2 values in the available CSV data from IBM's QPUs are bigger
       than 2*T1 so they need to be truncated (this is also done in the 
       available code example from IBM).
-    
-    This code was written based on given examples by IBM on how to 
-    create such errors (a link to the web page is available 
-    further on).
-    Link to IBM documentation on the mention topic:
-    https://qiskit.github.io/qiskit-aer/tutorials/3_building_noise_models.html
 
     Args:
-        qubit (int): The number of the current qubit.
+        current_qubit (int): The number of the current qubit.
         columns (Series): Table data for the current qubit. Basically 
             a row, however, to access a certain attribute, you must do 
             as follows: `column["attribute_name"]`, where 
@@ -240,98 +251,223 @@ def add_thermal_error(
             for two-qubit gates.
     """ 
     t1_time = columns[CSV_COLUMNS["t1_time"]["csv_name"]] * 1e-6
+    # Some T2 values in the available CSV data from IBM's QPUs are bigger
+    # than 2*T1 so they need to be truncated
     csv_t2_value = columns[CSV_COLUMNS["t2_time"]["csv_name"]] * 1e-6
-    t2_time = min(
-        csv_t2_value,
-        t1_time * 2)
+    t2_time = min(csv_t2_value, t1_time * 2)
+    
+    # Exits function if no T1 or T2 times are provided.
+    # There have been situations, where this is the case, which is why
+    # this validation exists.
+    if pandas.isna(t1_time) | pandas.isna(t2_time): return
 
-    # All single-qubit gates have the same thermal relaxation error
     single_qubit_gate_time = columns[
         CSV_COLUMNS["1q_gate_time"]["csv_name"]
     ] * 1e-9
+    two_qubit_gate_times = columns[CSV_COLUMNS["2q_gate_time"]["csv_name"]]
+
+    _add_single_qubit_gate_thermal_errors(t1_time=t1_time,
+                                          t2_time=t2_time,
+                                          gate_time=single_qubit_gate_time,
+                                          noise_model=noise_model,
+                                          current_qubit=current_qubit,
+                                          columns=columns)
+
+    _add_two_qubit_gate_thermal_errors(q1_t1_time=t1_time,
+                                       q1_t2_time=t2_time,
+                                       gate_times=two_qubit_gate_times,
+                                       current_qubit=current_qubit,
+                                       noise_model=noise_model,
+                                       columns=columns,
+                                       noise_dataframe=noise_dataframe)
+    
+    _add_other_operation_thermal_errors(t1_time=t1_time,
+                                        t2_time=t2_time,
+                                        current_qubit=current_qubit,
+                                        noise_model=noise_model,
+                                        columns=columns)
+
+
+def _add_single_qubit_gate_thermal_errors(
+    t1_time: float,
+    t2_time: float,
+    gate_time: float,
+    current_qubit: int,
+    noise_model: NoiseModel,
+    columns: Series
+) -> None:
+    """Creates and adds thermal relaxation errors to all single-qubit gates of
+    the backend.
+    
+    This code was written based on given examples by IBM on how to 
+    create such errors (a link to the web page is available 
+    further on).
+    Link to IBM documentation on the mention topic:
+    https://qiskit.github.io/qiskit-aer/tutorials/3_building_noise_models.html
+    
+    Args:
+        t1_time (float): T1 relaxation time for the current qubit.
+        t2_time (float): T2 relaxation time for the current qubit.
+        gate_time (float): Single-qubit gate time. This time applies to all
+            single-qubit gates for the current qubit.
+        current_qubit (int) The number of the current qubit.
+        noise_model (NoiseModel): The noise model object, to which
+            the newly created errors will be added.
+        columns (Series): Table data for the current qubit. Basically 
+            a row, however, to access a certain attribute, you must do 
+            as follows: `column["attribute_name"]`, where 
+            `"attribute_name"` is the column name in the dataframe.
+    """
+    # All single-qubit gates have the same thermal relaxation error
     thermal_error_1q = thermal_relaxation_error(
         t1=t1_time, 
         t2=t2_time, 
-        time=single_qubit_gate_time)
+        time=gate_time)
     
     for gate in CONFIG["single_qubit_gates"]:
         # RZ gates use a different gate time
         if gate == "rz_gate_error": continue
         single_qubit_gate = CSV_COLUMNS[gate]
+        # If the gate is part of the basis gate list of the backend
         if single_qubit_gate["csv_name"] in columns:
             noise_model.add_quantum_error(
                 error=thermal_error_1q,
                 instructions=single_qubit_gate["code_name"],
-                qubits=[qubit],
+                qubits=[current_qubit],
                 warnings=False)
 
-    # Similarly, all two-qubit gates have the same thermal relaxation error
-    two_qubit_gate_time = columns[CSV_COLUMNS["2q_gate_time"]["csv_name"]]
+
+def _add_two_qubit_gate_thermal_errors(
+    q1_t1_time: float,
+    q1_t2_time: float,
+    gate_times: dict[int, float] | float, # If float, then its nan
+    current_qubit: int,
+    noise_model: NoiseModel,
+    columns: Series,
+    noise_dataframe: pandas.DataFrame
+) -> None:
+    """Creates and adds thermal relaxation errors to all two-qubit gates of the
+    backend.
+    
+    This code was written based on given examples by IBM on how to 
+    create such errors (a link to the web page is available 
+    further on).
+    Link to IBM documentation on the mention topic:
+    https://qiskit.github.io/qiskit-aer/tutorials/3_building_noise_models.html
+
+    Args:
+        q1_t1_time (float): T1 relaxation time for the current qubit.
+        q1_t2_time (float): T2 relaxation time for the current qubit.
+        gate_times (dict[int, float] | float): Two-qubit gate tims. This time 
+            applies to all two-qubit gates for each specific connected qubit 
+            pair. The value will be a `dictionary` in the case of there being
+            one or more connected qubits to the current qubit. The value will
+            be a `float` if there are no connected qubits to the current qubit
+            , thus it will be `nan`
+        current_qubit (int): The number of the current qubit.
+        noise_model (NoiseModel): The noise model object, to which
+            the newly created errors will be added.
+        columns (Series): Table data for the current qubit. Basically 
+            a row, however, to access a certain attribute, you must do 
+            as follows: `column["attribute_name"]`, where 
+            `"attribute_name"` is the column name in the dataframe.
+        noise_dataframe (pandas.DataFrame): The same dataframe, from 
+            which the qubit number and columns attributes are from. 
+            It is required here because certain connected qubit noise 
+            data must be found to create the thermal relaxation error 
+            for two-qubit gates.
+    """
     # Multi-value columns may be emptry in CSV
-    if not pandas.isna(two_qubit_gate_time):
-        for target_qubit in two_qubit_gate_time.keys():
+    if not pandas.isna(gate_times):
+        for connected_qubit, gate_time in gate_times.items():
             # T1 & T2 times for target qubits
-            t1_time_q2 = noise_dataframe.at[
-                target_qubit, 
+            q2_t1_time = noise_dataframe.at[
+                connected_qubit, 
                 CSV_COLUMNS["t1_time"]["csv_name"]
             ] * 1e-6
-            
+            # Some T2 values in the available CSV data from IBM's QPUs are bigger
+            # than 2*T1 so they need to be truncated
             csv_t2_value = noise_dataframe.at[
-                target_qubit, CSV_COLUMNS["t2_time"]["csv_name"]
+                connected_qubit, CSV_COLUMNS["t2_time"]["csv_name"]
             ] * 1e-6
-            t2_time_q2 = min(
+            q2_t2_time = min(
                 csv_t2_value,
-                t1_time_q2 * 2)
+                q2_t1_time * 2)
             
+            # Exits function if no T1 or T2 times are provided.
+            # There have been situations, where this is the case, which is why
+            # this validation exists.
+            if pandas.isna(q2_t1_time) | pandas.isna(q2_t2_time): continue
+            
+            # All two-qubit gates have the same thermal relaxation error
+            # (within the scope of a single qubit connection in the backend
+            # coupling map)
             thermal_error_2q = thermal_relaxation_error(
-                t1=t1_time, 
-                t2=t2_time, 
-                time=two_qubit_gate_time[target_qubit] * 1e-9).expand(
+                t1=q1_t1_time, 
+                t2=q1_t2_time, 
+                time=gate_time * 1e-9).expand(
                     thermal_relaxation_error(
-                        t1=t1_time_q2, 
-                        t2=t2_time_q2, 
-                        time=two_qubit_gate_time[target_qubit] * 1e-9))
+                        t1=q2_t1_time, 
+                        t2=q2_t2_time, 
+                        time=gate_time * 1e-9))
 
+            # Adding created thermal relaxation error for all two-qubit gates
+            # for the current qubit pair
             for gate in CONFIG["two_qubit_gates"]:
                 two_qubit_gate = CSV_COLUMNS[gate]
+                # If the gate is part of the basis gate list of the backend
                 if two_qubit_gate["csv_name"] in columns:
                     noise_model.add_quantum_error(
                         error=thermal_error_2q,
                         instructions=two_qubit_gate["code_name"],
-                        qubits=[qubit, target_qubit],
+                        qubits=[current_qubit, connected_qubit],
                         warnings=False)
 
-    # Creating and adding thermal relax error for measure operation
-    readout_time = columns[CSV_COLUMNS["readout_time"]["csv_name"]] * 1e-9
-    thermal_error_readout = thermal_relaxation_error(
-        t1=t1_time, 
-        t2=t2_time, 
-        time=readout_time)
-    noise_model.add_quantum_error(
-        error=thermal_error_readout, 
-        instructions="measure", 
-        qubits=[qubit],
-        warnings=False)
 
-    # Creating and adding thermal relax error for reset operation
-    reset_time = columns[CSV_COLUMNS["reset_time"]["csv_name"]] * 1e-9
-    thermal_error_reset = thermal_relaxation_error(
-        t1=t1_time,
-        t2=t2_time,
-        time=reset_time)
-    noise_model.add_quantum_error(
-        error=thermal_error_reset,
-        instructions="reset",
-        qubits=[qubit],
-        warnings=False)
+def _add_other_operation_thermal_errors(
+    t1_time: float,
+    t2_time: float,
+    current_qubit: int,
+    noise_model: NoiseModel,
+    columns: Series
+) -> None:
+    """Creating and adding thermal relaxation errors to other operations
+    that are not single- or two-qubit gates.
+    
+    Such operations include: measure, reset, rz (because it has a gate 
+    time of 0).
 
-    # Creating and adding thermal relax error for RZ gate
-    thermal_error_rz = thermal_relaxation_error(
-        t1=t1_time,
-        t2=t2_time,
-        time=0)
-    noise_model.add_quantum_error(
-        error=thermal_error_rz,
-        instructions="rz", 
-        qubits=[qubit],
-        warnings=False)
+    This code was written based on given examples by IBM on how to 
+    create such errors (a link to the web page is available 
+    further on).
+    Link to IBM documentation on the mention topic:
+    https://qiskit.github.io/qiskit-aer/tutorials/3_building_noise_models.html
+
+    Args:
+        t1_time (float): T1 relaxation time for the current qubit.
+        t2_time (float): T2 relaxation time for the current qubit.
+        current_qubit (int): The number of the current qubit.
+        noise_model (NoiseModel): The noise model object, to which
+            the newly created errors will be added.
+        columns (Series): Table data for the current qubit. Basically 
+            a row, however, to access a certain attribute, you must do 
+            as follows: `column["attribute_name"]`, where 
+            `"attribute_name"` is the column name in the dataframe.
+    """
+    # Operation name & operation time
+    operations = {
+        "measure": columns[CSV_COLUMNS["readout_time"]["csv_name"]],
+        "reset": columns[CSV_COLUMNS["reset_time"]["csv_name"]],
+        "rz": 0
+    }
+
+    for operation, operation_time in operations.items():
+        thermal_error = thermal_relaxation_error(
+            t1=t1_time, 
+            t2=t2_time, 
+            time=operation_time * 1e-9)
+        noise_model.add_quantum_error(
+            error=thermal_error, 
+            instructions=operation, 
+            qubits=[current_qubit],
+            warnings=False)
