@@ -13,7 +13,7 @@ import eel
 # --------------------------------------------------------------
 
 def remove_container_content(
-        container_id: str
+    container_id: str
 ) -> None:
     """Clears (deletes) all child elements from a parent element based on
     its ID.
@@ -28,8 +28,8 @@ def remove_container_content(
 
 
 def add_content_box(
-        container_id: str,
-        box_id: str
+    container_id: str,
+    box_id: str
 ) -> None:
     """Adds content box inside specific container for the purpose housing
     some kind of data or information.
@@ -49,10 +49,10 @@ def add_content_box(
 # --------------------------------------------------------------
 
 def add_table(
-        container_id: str, 
-        table_id: str,
-        columns: list[str] = [],
-        has_actions: bool = False
+    container_id: str, 
+    table_id: str,
+    columns: list[str] = [],
+    has_actions: bool = False
 ) -> None:
     """Adds table inside specific container for the purpose of displaying
     some kind of data.
@@ -74,9 +74,9 @@ def add_table(
 
 
 def add_table_row(
-        table_id: str, 
-        row_content: list[str],
-        actions: list[str] = []
+    table_id: str, 
+    row_content: list[str],
+    actions: list[str] = []
 ) -> None:
     """Creates new row with given data and adds it to the table with the 
     specified ID.
@@ -101,8 +101,8 @@ def add_table_row(
 # --------------------------------------------------------------
 
 def add_empty_container_message(
-        message: str, 
-        container_id: str
+    message: str, 
+    container_id: str
 ) -> None:
     """Calls JS function to display specific message that notifies 
     that there is nothing to currently display in a specific 
@@ -119,8 +119,8 @@ def add_empty_container_message(
 
 
 def set_selected_file(
-        file_name: str,
-        full_path: str
+    file_name: str,
+    full_path: str
 ) -> None:
     """Changes appearance of custom file input form field and sets value of 
     hidden input field to the selected file path on device so that Python 
@@ -151,3 +151,49 @@ def update_span_content(
         span_id (str): id of span element that will have its content updated.
     """
     eel.updateSpanContent(new_content, span_id)
+
+
+def update_progress_bar(
+    percentage: float | str,
+    bar_id: str
+) -> None:
+    """Updates current progress percentage values for a specific progress bar
+    based on it's id.
+
+    Wrapper function for `Python Eel` JS function call.
+
+    Args:
+        percentage (float|str): New progress percentage value. If this value 
+            will be of type string, it will be `--` - a placeholder for when 
+            there is no calculable percentage value.
+        bar_id (str): ID of the progress bar being updated.
+    """
+    eel.updateProgressBar(percentage, bar_id)
+
+
+def activate_progress_bar(
+    bar_id: str
+) -> None:
+    """Activates specific progress bar by removing style class for inactive 
+    visual identifiers.
+
+    Wrapper function for `Python Eel` JS function call.
+
+    Args:
+        bar_id (str): ID of the progress bar being activated.
+    """
+    eel.activateProgressBar(bar_id)
+
+
+def deactivate_progress_bar(
+    bar_id: str
+) -> None:
+    """Deactivates specific progress bar by adding style class for inactive 
+    visual identifiers.
+    
+    Wrapper function for `Python Eel` JS function call.
+
+    Args:
+        bar_id (str): ID of the progress bar being deactivated.
+    """
+    eel.deactivateProgressBar(bar_id)

@@ -6,7 +6,8 @@ from ..general import inform_empty_container
 from ..logs.logs import add_log_message
 from ..js_common_wrappers import (
     add_table, add_table_row,
-    remove_container_content
+    remove_container_content,
+    update_progress_bar
 )
 from ...project_variables import key_blocker
 from ...project_variables import (
@@ -200,4 +201,5 @@ def update_progress(
         new_percentage (float): New progress percentage value that will 
             replace the old one.
     """
-    eel.updateInstanceProgress(new_percentage)
+    update_progress_bar(percentage=new_percentage,
+                        bar_id="current-progress")

@@ -175,7 +175,7 @@ class SimulationManager:
             try:
                 for job in experiment.jobs.values():
                     # Displays initial job progress
-                    self._update_queue_execution_progress(
+                    self.update_queue_execution_progress(
                         progress_callback, 
                         running_experiment=experiment, 
                         running_job=job)
@@ -230,9 +230,9 @@ class SimulationManager:
             
             job.add_results(new_results=aer_job.result().get_counts())
 
-            self._update_queue_execution_progress(progress_callback, 
-                                                  running_experiment=experiment, 
-                                                  running_job=job)
+            self.update_queue_execution_progress(progress_callback, 
+                                                 running_experiment=experiment, 
+                                                 running_job=job)
 
 
     def _get_simulator_instance(
@@ -311,35 +311,51 @@ class SimulationManager:
                                   transpilation_attempt_count=MAX_TRANSPILATION_ATTEMPTS)
 
 
-    def _update_queue_execution_progress(
+    def update_queue_execution_progress(
         self,
-        progress_callback: Callable[[float, float, float], None],
-        running_experiment: ExperimentInstance,
-        running_job: Job
+        progress_callback: Callable[[float|str, float|str, float|str], None],
+        running_experiment: ExperimentInstance | None = None,
+        running_job: Job | None = None
     ) -> None:
         """Calculates new progress percentage values and calls progress 
         callback function to update all progress bars.
 
+        If the running experiment and job are not given, progress will be calculated
+        based on the currently created experiment queue. If there are no experiments
+        in the queue, the progress callback function is called with `--` as arguments
+        instead of actual percentage values to serve as placeholders.
+
         Args:
-            progress_callback (Callable[[float, float, float], None]): Callback
-                function for updating queue execution progress bars with new
-                completion percentage values.
-            running_experiment (ExperimentInstance): Experiment instance
-                currently being executed.
-            running_job (Job): Job instance currently being executed.
+            progress_callback (Callable[[float|str, float|str, float|str], None]): 
+                Callback function for updating queue execution progress bars with 
+                new completion percentage values.
+            running_experiment (ExperimentInstance | None): Experiment instance
+                currently being executed. (Default: `None`)
+            running_job (Job | None): Job instance currently being executed.
+                (Default: `None`)
         """
-        # Calculates total complete and in general shots.
-        total_shots = 0
-        total_complete_shots = 0
-        for experiment in self._simulation_queue:
-            total_shots += experiment.total_shots
-            total_complete_shots += experiment.total_completed_shots
-        # Calculates returnable percentage values.
-        overall_percentage = (total_complete_shots / total_shots) * 100.0
-        overall_percentage = round(overall_percentage, 2)
-        experiment_percentage = running_experiment.completion_percentage
-        job_percentage = running_job.completion_percentage
-        # Calls progress callback function to update all 3x progress bars.
-        progress_callback(overall_percentage, 
-                          experiment_percentage,
-                          job_percentage)
+        # If simulation queue is empty, there are no percentage values to calculate.
+        if not self._simulation_queue:
+            progress_callback("--", "--", "--")
+        else:
+            # Calculates total complete and in general shots.
+            total_shots = 0
+            total_complete_shots = 0
+            for experiment in self._simulation_queue:
+                total_shots += experiment.total_shots
+                total_complete_shots += experiment.total_completed_shots
+            # Calculates returnable percentage values.
+            overall_percentage = (total_complete_shots / total_shots) * 100.0
+            overall_percentage = round(overall_percentage, 2)
+            if running_experiment and running_job:
+                experiment_percentage = running_experiment.completion_percentage
+                job_percentage = running_job.completion_percentage
+            else:
+                first_experiment = self._simulation_queue[0]
+                first_job = next(iter(first_experiment.jobs.values()))
+                experiment_percentage = first_experiment.completion_percentage
+                job_percentage = first_job.completion_percentage
+            # Calls progress callback function to update all 3x progress bars.
+            progress_callback(overall_percentage, 
+                              experiment_percentage,
+                              job_percentage)

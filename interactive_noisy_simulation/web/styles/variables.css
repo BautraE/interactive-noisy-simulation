@@ -120,6 +120,8 @@ Global scope variables
   --color-actions-variant-default-hover: #CFCEFB;
   --color-actions-variant-default-active: #9ab7ff;
 
+  --color-actions-variant-disabled: #CDCDCD;
+
   --color-actions-variant-red: #FF8A8A;
   --color-actions-variant-red-hover: #FFC4C6;
   --color-actions-variant-red-active: #DF3030;

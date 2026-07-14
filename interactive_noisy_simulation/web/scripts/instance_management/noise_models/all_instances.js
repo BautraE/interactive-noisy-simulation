@@ -146,20 +146,6 @@ async function createNoiseModelInstance() {
 }
 
 
-eel.expose(updateInstanceProgress);
-/**
- * Updates current progress percentage values for progress bar showing
- * creation of a new NoiseModelInstance object.
- * 
- * @param {number} percentage - New progress percentage value.
- */
-function updateInstanceProgress(percentage) {
-    const progressBar = document.getElementById("current-progress");
-    progressBar.style.width = `${percentage}%`;
-    progressBar.innerText = `${percentage}%`;
-}
-
-
 // --------------------------------------------------------------
 // Input validation
 

@@ -145,20 +145,55 @@ function updateSpanContent(newContent, spanId) {
 
 eel.expose(updateProgressBar);
 /**
- * Updates current progress percentage values for progress bar showing
- * creation of a new NoiseModelInstance object.
+ * Updates current progress percentage values for a specific progress bar
+ * based on its id.
  * 
- * @param {number} percentage - New progress percentage value.
+ * @param {number|string} percentage - New progress percentage value.
+ * If this value will be of type string, it will be `--` - a placeholder
+ * for when there is no calculable percentage value.
  * @param {string} barId - ID of the progress bar being updated.
  */
 function updateProgressBar(percentage, barId) {
     const progressBar = document.getElementById(barId);
+    const progressLabel = progressBar.nextElementSibling;
+
+    if (typeof percentage === "number") {
+        progressBar.style.width = `${percentage}%`;
+        progressLabel.innerText = `${percentage}%`;
+    } else {
+        progressBar.style.width = `100%`;
+        progressLabel.innerText = `${percentage}`;
+    }
+}
+
+
+eel.expose(activateProgressBar);
+/**
+ * Activates specific progress bar by removing style class for
+ * inactive visual identifiers.
+ * 
+ * @param {string} barId - ID of the progress bar being activated.
+ */
+function activateProgressBar(barId) {
+    const progressBar = document.getElementById(barId);
 
     // Removes default inactive class from the progress bar.
     progressBar.classList.remove("inactive");
+}
 
-    progressBar.style.width = `${percentage}%`;
-    progressBar.innerText = `${percentage}%`;
+
+eel.expose(deactivateProgressBar);
+/**
+ * Deactivates specific progress bar by adding style class for
+ * inactive visual identifiers.
+ * 
+ * @param {string} barId - ID of the progress bar being deactivated.
+ */
+function deactivateProgressBar(barId) {
+    const progressBar = document.getElementById(barId);
+
+    // Adds default inactive class to the progress bar.
+    progressBar.classList.add("inactive");
 }
 
 

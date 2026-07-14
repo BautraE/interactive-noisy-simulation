@@ -81,6 +81,14 @@ File contents list:
     --text-color: var(--color-actions-variant-default-active);
 }
 
+/* Disabled action variant (requires manual removal of 
+   onClick event) */
+.action.variant-disabled {
+    --text-color: var(--color-actions-variant-disabled);
+
+    cursor: default;
+}
+
 /* Action for deleting / removing stuff */
 .action.variant-red {
     --text-color: var(--color-actions-variant-red);

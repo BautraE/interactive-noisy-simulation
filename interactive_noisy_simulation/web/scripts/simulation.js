@@ -16,7 +16,7 @@
 // Assignment of specific functions that shoul be executed upon loading
 // tables and rows for displaying existing instance data.
 instanceDataModifications = {
-    row: colorStatusCell
+    row: modifyDataRow
 }
 
 
@@ -34,6 +34,57 @@ window.addEventListener('load', function() {
 // --------------------------------------------------------------
 // Instance data modification functions that are executed upon loading
 // in instance data.
+
+/**
+ * Calls sub-functions that are responsible for making required changes
+ * related to the specific table row.
+ * 
+ * @param {HTMLElement} rowElement - HTML row element that will
+ * be modified.
+ * @param {Array} rowContent - Array of row content (as strings) that
+ * are displayed within the row. Primarily used for obtaining something
+ * that will be used during element modification.
+ */
+function modifyDataRow(rowElement, rowContent) {
+    colorStatusCell(rowElement, rowContent);
+    validateQueueEligibility(rowElement, rowContent);
+}
+
+
+/**
+ * Validates if experiment can be added to queue based on the provided
+ * completion status (accomplished through table rows).
+ * 
+ * If an experiment has no jobs or all jobs are completed, its action
+ * button to add it to the queue will be disabled and a tooltip will
+ * be added that explains as to why it is disabled.
+ * 
+ * @param {HTMLElement} rowElement - HTML row element that will
+ * be modified.
+ * @param {Array} rowContent - Array of row content (as strings) that
+ * are displayed within the row. Primarily used for obtaining something
+ * that will be used during element modification.
+ */
+function validateQueueEligibility(rowElement, rowContent) {
+    // Completion status is the 3rd column.
+    if (rowContent[2] === "no jobs" || rowContent[2] === "completed") {
+        const actionsCell = rowElement.children[3];
+        const actionElement = actionsCell.querySelector("a");
+        if (actionElement.innerHTML === "add") {
+            // Disables action element.
+            removeClassesByPrefix(actionElement, "variant-")
+            actionElement.classList.add("variant-disabled");
+            actionElement.onclick = null;
+            // Adds hover tooltips that explain why input is disabled.
+            if (rowContent[2] === "no jobs") {
+                actionElement.title = "This experiment contains no jobs.";
+            } else if (rowContent[2] === "completed") {
+                actionElement.title = "All jobs from this experiment are completed.";
+            }
+        }   
+    }
+}
+
 
 /**
  * Adds specific CSS styles for the status collumn (accomplished through 

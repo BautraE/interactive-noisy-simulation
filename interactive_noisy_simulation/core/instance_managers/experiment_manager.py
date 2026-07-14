@@ -237,7 +237,7 @@ class ExperimentManager:
             # Noise-related settings
             "noise_model": job.noise_model.reference_key if job.noise_model
                            else "Noiseless simulation",
-            "optimization_level": job.optimization_level if job.optimization_level
+            "optimization_level": job.optimization_level if job.optimization_level is not None
                                   else "No optimization for noiseless simulation",
             # Simulator settings
             "shot_count": job.shot_count,

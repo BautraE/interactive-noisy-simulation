@@ -5,7 +5,10 @@ import eel
 from ...exceptions import SimulationError
 from ..js_common_wrappers import (
     remove_container_content,
-    update_span_content
+    update_span_content,
+    update_progress_bar,
+    activate_progress_bar,
+    deactivate_progress_bar
 )
 from ..general import inform_empty_container
 from ..instance_managers.js_manager_wrappers import view_instance_data
@@ -42,6 +45,7 @@ def update_simulation_content() -> None:
     view_queueable_experiments()
     view_queued_experiments()
     update_detailed_queue_data()
+    update_progress_bars()
     update_queue_execution_button()
 
 
@@ -188,6 +192,7 @@ def execute_queued_experiments() -> None:
     
     sm.is_executing = True
     update_queue_execution_button()
+    activate_progress_bars()
     try:
         sm.execute_queue(ui_refresh_callback=update_simulation_content,
                          progress_callback=update_progress_bars)
@@ -199,27 +204,57 @@ def execute_queued_experiments() -> None:
                         queued_experiment_count=f"{sm.queue_lenght}")
     finally:
         sm.is_executing = False
+        deactivate_progress_bars()
         update_queue_execution_button()
 
 
 def update_progress_bars(
-    overall_percentage: float,
-    experiment_percentage: float,
-    job_percentage: float
+    overall_percentage: float | str | None = None,
+    experiment_percentage: float | str | None = None,
+    job_percentage: float | str | None = None
 ) -> None:
     """Calls JS function for updating progress bar percentages based on the
     received values.
+
+    If the percentage value arguments are of type `str`, they contain the value
+    `--` - a placeholder for when there is no percentage value to calculate.
+
+    If no percentage values are given, the function for calculating these
+    percentage values is called and will return the progress values based
+    on the currently created queue.
     
     Args:
-        overall_percentage (float): Overall completion percentage of the 
-            experiment queue.
-        experiment_percentage (float): Current experiment completion 
-            percentage.
-        job_percentage (float): Current job completion percentage.
+        overall_percentage (float|str|None): Overall completion percentage of the 
+            experiment queue. (Default: `None`)
+        experiment_percentage (float|str|None): Current experiment completion 
+            percentage. (Default: `None`)
+        job_percentage (float|str|None): Current job completion percentage.
+            (Default: `None`)
     """
-    eel.updateProgressBar(overall_percentage, 
-                          "execution-overall-progress")
-    eel.updateProgressBar(experiment_percentage, 
-                          "execution-experiment-progress")
-    eel.updateProgressBar(job_percentage, 
-                          "execution-job-progress")
+    if (
+        overall_percentage is not None 
+        and experiment_percentage is not None 
+        and job_percentage is not None
+    ):
+        update_progress_bar(percentage=overall_percentage, 
+                            bar_id="execution-overall-progress")
+        update_progress_bar(percentage=experiment_percentage, 
+                            bar_id="execution-experiment-progress")
+        update_progress_bar(percentage=job_percentage, 
+                            bar_id="execution-job-progress")
+    else:
+        sm.update_queue_execution_progress(progress_callback=update_progress_bars)
+    
+
+def activate_progress_bars() -> None:
+    """Calls JS functions to activate all execution tracking progress bars."""
+    activate_progress_bar(bar_id="execution-overall-progress")
+    activate_progress_bar(bar_id="execution-experiment-progress")
+    activate_progress_bar(bar_id="execution-job-progress")
+
+
+def deactivate_progress_bars() -> None:
+    """Calls JS functions to deactivate all execution tracking progress bars."""
+    deactivate_progress_bar(bar_id="execution-overall-progress")
+    deactivate_progress_bar(bar_id="execution-experiment-progress")
+    deactivate_progress_bar(bar_id="execution-job-progress")
