@@ -13,6 +13,14 @@ PACKAGE_ROOT = resources.files("interactive_noisy_simulation")
 
 # Static project data:
 from .data._data import (
+    # CSV data-related:
+    USED_CSV_COLUMNS,
+    MULTI_DATA_CSV_COLUMNS,
+    UNNECESSARY_CSV_COLUMNS,
+    # Supported qubit gates:
+    SINGLE_QUBIT_GATES,
+    TWO_QUBIT_GATES,
+    # Messages:
     EMPTY_CONTAINER_MESSAGES,
     ERROR_MESSAGES,
     LOG_MESSAGES, 

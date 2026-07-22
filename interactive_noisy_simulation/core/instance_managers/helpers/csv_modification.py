@@ -9,12 +9,16 @@
 import numpy, pandas
 
 # Project-related imports:
-from ....data._data import (
-    CONFIG, CSV_COLUMNS
+from ....project_variables import (
+    MULTI_DATA_CSV_COLUMNS,
+    UNNECESSARY_CSV_COLUMNS, 
+    USED_CSV_COLUMNS
 )
 
 
-def add_additional_columns(dataframe: pandas.DataFrame) -> None:
+def add_additional_columns(
+    dataframe: pandas.DataFrame
+) -> None:
     """Adds additional columns for noise data storage.
 
     Adds 2 additional columns to the dataframe for:
@@ -32,7 +36,7 @@ def add_additional_columns(dataframe: pandas.DataFrame) -> None:
             columns will be added.
     """
     # Initializing new column for neighboring qubits
-    neighboring_qubits_column = CSV_COLUMNS["neighboring_qubits"]["csv_name"]
+    neighboring_qubits_column = "neighboring_qubits"
     dataframe[neighboring_qubits_column] = numpy.nan
     # This is done so that dataframe can store lists
     dataframe[neighboring_qubits_column] = dataframe[
@@ -40,10 +44,12 @@ def add_additional_columns(dataframe: pandas.DataFrame) -> None:
     
     # This might change, if they add this information in the CSV files
     # at some point in time
-    dataframe[CSV_COLUMNS["reset_time"]["csv_name"]] = 1300
+    dataframe["reset_time"] = 1300
 
 
-def modify_dataframe_data(dataframe: pandas.DataFrame) -> None:
+def modify_dataframe_data(
+    dataframe: pandas.DataFrame
+) -> None:
     """Modifies all multi data columns in the dataframe.
 
     Some of the data columns in the CSV file are initially designed
@@ -54,9 +60,6 @@ def modify_dataframe_data(dataframe: pandas.DataFrame) -> None:
     
     This is done for simpler actions down the road in regards to 
     using these columns.
-    
-    A list of all multi-data columns that this method goes through is 
-    available in the configuration file `config.json`.
 
     Alongside this, neighboring qubits are also retrieved during this 
     process since you iterate through each qubit, for which you see all 
@@ -66,15 +69,12 @@ def modify_dataframe_data(dataframe: pandas.DataFrame) -> None:
         dataframe (pandas.DataFrame): Data from this dataframe will 
             be modified.
     """
-    neighboring_qubits_column = CSV_COLUMNS["neighboring_qubits"]["csv_name"]
-
     for current_qubit in range(len(dataframe)):
         found_neighbors = []
         are_neighbors_found = False
-        for column in CONFIG["multi_data_columns"]:
-            column_name = CSV_COLUMNS[column]["csv_name"]
-            if column_name in dataframe.columns:
-                column_values = dataframe.at[current_qubit, column_name]
+        for column in MULTI_DATA_CSV_COLUMNS:
+            if column in dataframe.columns:
+                column_values = dataframe.at[current_qubit, column]
                 if not pandas.isna(column_values):
                     column_values_list = column_values.split(";")
                     modified_data = {}
@@ -85,29 +85,48 @@ def modify_dataframe_data(dataframe: pandas.DataFrame) -> None:
                         if not are_neighbors_found:
                             found_neighbors.append(int(target_qubit))
                     dataframe.at[
-                        current_qubit, column_name] = modified_data
+                        current_qubit, column] = modified_data
                     dataframe.at[
                         current_qubit, 
-                        neighboring_qubits_column] = found_neighbors
+                        "neighboring_qubits"] = found_neighbors
                     # Only need to go through one multi-value column to 
                     # find neighbors
                     are_neighbors_found = True
 
 
 def remove_unnecessary_collumns( 
-        dataframe: pandas.DataFrame
+    dataframe: pandas.DataFrame
 ) -> None:
     """Removes data columns that are not used to simulate noise.
 
     Not all columns in the provided CSV files are used in the
     creation of errors for a noise model, therefore they are 
-    removed. A list of all removable columns is available in the 
-    configuration file `config.json` as `not_required_columns`.
+    removed.
 
     Args:
         dataframe (pandas.DataFrame): Dataframe from which the 
             columns will be removed.
     """
-    for column in CONFIG["not_required_columns"]:
+    for column in UNNECESSARY_CSV_COLUMNS:
         if column in dataframe.columns:
             dataframe.pop(column)
+
+
+def rename_dataframe_columns(
+    dataframe: pandas.DataFrame
+) -> None:
+    """Changes default names of imported CSV file data columns to match keys
+    used inside of `csv_columns.json`. 
+
+    Args:
+        dataframe (pandas.DataFrame): Dataframe, whose data columns will be
+            renamed.
+    """
+    name_changes = {
+        data["csv_name"]: key
+        for key, data in USED_CSV_COLUMNS.items()
+        if "csv_name" in data
+    }
+    
+    dataframe.rename(columns=name_changes,
+                     inplace=True)

@@ -7,7 +7,8 @@ from ..data_structures.noise_data_instance import NoiseDataInstance
 from ..data_structures.instance_data import InstanceData
 from .helpers.csv_modification import (
     add_additional_columns, modify_dataframe_data,
-    remove_unnecessary_collumns
+    remove_unnecessary_collumns,
+    rename_dataframe_columns
 )
 
 
@@ -73,6 +74,7 @@ class NoiseDataManager:
         # Processing imported CSV file:
         dataframe = pandas.read_csv(source_file.path)
         remove_unnecessary_collumns(dataframe)
+        rename_dataframe_columns(dataframe)
         add_additional_columns(dataframe)
         modify_dataframe_data(dataframe)
 

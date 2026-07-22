@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 
 # Local project imports:
-from ...data._data import CSV_COLUMNS
+from ...project_variables import USED_CSV_COLUMNS
 
 # Imports only used for type definition:
 from pandas import DataFrame
@@ -56,10 +56,10 @@ class NoiseDataInstance:
         """
         qubit_data = {}
 
-        for column in CSV_COLUMNS.values():
-            if column["csv_name"] in self.dataframe.columns:
+        for column_reference, column in USED_CSV_COLUMNS.items():
+            if column_reference in self.dataframe.columns:
                 name = column["name"]
-                value = self.dataframe.loc[qubit_nr, column["csv_name"]]
+                value = self.dataframe.loc[qubit_nr, column_reference]
                 qubit_data[name] = value
         
         return qubit_data
