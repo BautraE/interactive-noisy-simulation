@@ -41,6 +41,14 @@ let instanceDataModifications = {};
 /**
  * Loads available radio input options based on retrieved data.
  * 
+ * It is also possible to return empty container messages to this function
+ * as a `string` in situations, where there are no available radio input
+ * options.
+ * 
+ * Also works for updating radio input option fields if some condition is met,
+ * changing the supported choices. Previously selected value is preserved if
+ * that same option is present after the changes.
+ * 
  * @param {{
  * containerId: string,
  * inputId: string,
@@ -54,19 +62,46 @@ let instanceDataModifications = {};
  * @param {function(): string[]} args.dataRetrievalFunction - List of radio 
  * input option texts. If no options are available to be added, an empty
  * list (array in JS) is returned.
+ * @param {Object} args.dataRetrievalArgs - Dictionary of additional arguments
+ * that are passed to the data retrieval function, affecting what kind of
+ * data gets returned.
  * 
  * @returns {void}
  */
 async function loadRadioInputOptions({
     containerId,
     inputId,
-    dataRetrievalFunction
+    dataRetrievalFunction,
+    dataRetrievalArgs
 }) {
-    let options = await dataRetrievalFunction()();
+    // Obtains available options
+    let options;
+    if (dataRetrievalArgs) {
+        options = await dataRetrievalFunction(dataRetrievalArgs)();
+    } else {
+        options = await dataRetrievalFunction()();
+    }
 
+    let previousSelection;
+    if (options.length) {
+        // Saves previously selected value if there was one
+        previousSelection = document.querySelector(
+            `input[name="${inputId}"]:checked`
+        )?.value;
+    }
+
+    // Removes any previous content in for displayable data update
+    removeContainerContent(containerId);
+
+    // If empty container message is returned instead of options, that message
+    // is rendered.
+    if (typeof options == "string") {
+        addEmptyContainerMessage(options, containerId);
+        return;
+    }
+    
     const container = document.getElementById(containerId);
-
-    for(let option of options) {
+    for(let option of options ?? []) {
         //  Clicking anywhere on label element ensures input activation.
         const label = document.createElement("label");
         label.classList.add("radio-option");
@@ -75,7 +110,8 @@ async function loadRadioInputOptions({
             <input type="radio"
                    name="${inputId}"
                    id="${inputId}"
-                   value="${option}">
+                   value="${option}"
+                   ${option === previousSelection ? "checked" : ""}>
             <span class="custom-radio"></span>
             <span class="radio-text">${option}</span>
         `;
@@ -113,10 +149,10 @@ function viewInstanceData(
     instanceDataModifications.table?.(tableElement);
 
     const dataRows = instanceData.rows;
-    dataRows.forEach(row => {
-        let rowElement = addTableRow(tableId, row, instanceData.actions);
+    dataRows.forEach(rowData => {
+        let rowElement = addTableRow(tableId, rowData, instanceData.actions);
         // Runs table row-related modification if defined
-        instanceDataModifications.row?.(rowElement, row);
+        instanceDataModifications.row?.(rowElement, rowData);
     });
 }
 

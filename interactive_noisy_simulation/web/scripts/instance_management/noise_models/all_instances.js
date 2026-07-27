@@ -47,7 +47,11 @@ function handleAction(actionType, rowId) {
  */
 async function initNoiseDataForm() {
     // Adding missing dynamic values and elements
-    await loadAvailableNoiseData();
+    await loadRadioInputOptions({
+        containerId: "noise-source-container",
+        inputId: "noise-data-source",
+        dataRetrievalFunction: eel.get_noise_data_references
+    });
 
     const maxLengthSpan = document.getElementById("reference-key-input-max-length");
     maxLengthSpan.textContent = MAX_REFERENCE_KEY_LENGTH;
@@ -81,35 +85,6 @@ async function initNoiseDataForm() {
             });
         }
     });
-}
-
-
-/**
- * Creates radio input fields for each existing noise data instance.
- * 
- * Used in the pop-up form for creating new noise model instances.
- */
-async function loadAvailableNoiseData() {
-    let reference_keys = await eel.get_noise_data_references()();
-
-    const container = document.getElementById("noise-source-container");
-
-    for(let key of reference_keys) {
-        //  Clicking anywhere on label element ensures input activation.
-        const label = document.createElement("label");
-        label.classList.add("radio-option");
-
-        label.innerHTML = `
-            <input type="radio"
-                   name="noise-data-source"
-                   id="noise-data-source"
-                   value="${key}">
-            <span class="custom-radio"></span>
-            <span class="radio-text">${key}</span>
-        `;
-
-        container.appendChild(label);
-    }
 }
 
 

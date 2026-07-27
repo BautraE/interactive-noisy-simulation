@@ -3,9 +3,30 @@
 // all circuit instances.
 // =================================================================
 // File contents list:
-// 1. Action handling
-// 2. New CircuitInstance creation form functionality
+// 1. Page-specific variables
+// 2. Initial page-specific actions that are performed upon
+//    loading in this page.
+// 3. Action handling.
+// 4. Content management.
+// 5. New CircuitInstance creation form functionality.
 // -----------------------------------------------------------------
+
+
+// --------------------------------------------------------------
+// 1. Page-specific variables
+// --------------------------------------------------------------
+
+// Assignment of specific functions that shoul be executed upon loading
+// tables and rows for displaying existing instance data.
+instanceDataModifications = {
+    row: adjustMemoryRequirements,
+}
+
+
+// --------------------------------------------------------------
+// 2. Initial page-specific actions that are performed upon
+//    loading in this page.
+// --------------------------------------------------------------
 
 // Loading existing noise data instances
 window.addEventListener('load', function() {
@@ -16,7 +37,7 @@ window.addEventListener('load', function() {
 
 
 // --------------------------------------------------------------
-// 1. Action handling
+// 3. Action handling
 // --------------------------------------------------------------
 
 /**
@@ -36,6 +57,79 @@ function handleAction(actionType, rowId) {
     }
 }
 
+
+// --------------------------------------------------------------
+// 4. Content management.
+// --------------------------------------------------------------
+
+/**
+ * Formats the given memory value in bytes to whatever unit is most
+ * appropriate for that specific value.
+ * 
+ * @param {number} bytes - Original memory value in bytes that will be 
+ * formatted.
+ */
+function formatBytes(bytes) {
+    let value = bytes;
+    if (!value) {
+        return `Too large to display`;
+    } else {
+        const units = {
+            "bytes": "B",
+            "kilobytes": "KB",
+            "megabytes": "MB",
+            "gigabytes": "GB",
+            "terabytes": "TB",
+            "petabytes": "PB",
+            "exabytes": "EB",
+            "zettabytes": "ZB",
+            "yottabytes": "YB",
+            "ronnabytes": "RB", // This is so large that it's hilarious
+            "quettabytes": "QB" // I'm keeping these here just for fun
+        }
+        const unitNames = Object.keys(units)
+
+        let i = 0;
+        while (value >= 1024 && i < unitNames.length - 1) {
+            value /= 1024;
+            i++;
+        }
+
+        // 'title' gives hover tooltip functionality, which in this case
+        // explains what does the specific short version of a memory unit
+        // stand for. 
+        return `${value.toFixed(2)} 
+                <span title="${unitNames[i]}">${units[unitNames[i]]}</span>`;
+    }
+}
+
+
+/**
+ * Adjusts the displaying of simulation method memory requirements.
+ * 
+ * @param {HTMLElement} rowElement - HTML row element that will
+ * be modified.
+ * @param {Array} rowContent - Array of row content (as strings) that
+ * are displayed within the row. Primarily used for obtaining something
+ * that will be used during element modification.
+ */
+function adjustMemoryRequirements(rowElement, rowContent) {
+    // Memory requirements is the 3rd collumn
+    const memoryRow = rowElement.children[2];
+    const memoryRequirements = rowContent[2];
+    
+    const contentLines = [];
+    for (const [key, value] of Object.entries(memoryRequirements)) {
+        contentLines.push(`<i>${key}</i>:<br><b>${formatBytes(value)}</b>`);
+    }
+
+    memoryRow.innerHTML = contentLines.join("<br>");
+}
+
+
+// --------------------------------------------------------------
+// 5. New CircuitInstance creation form functionality
+// --------------------------------------------------------------
 
 // --------------------------------------------------------------
 // Initializer function

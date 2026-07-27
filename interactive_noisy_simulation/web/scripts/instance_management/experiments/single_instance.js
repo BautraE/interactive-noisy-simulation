@@ -368,6 +368,7 @@ async function initNewInstanceForm() {
 
     activePopupElement = document.querySelector('.pop-up');
     adjustHeightOfParent(activePopupElement);
+
     
     // -------------------------------------------------------------------------------
     // Adding required event listeners to form:
@@ -411,6 +412,22 @@ async function initNewInstanceForm() {
             removeInputErrorStyles({
                 outlinedElementId: "circuit-instance-container",
                 messageElementId: "circuit-instance-input-message"
+            });
+            loadRadioInputOptions({
+                containerId: "noise-model-container",
+                inputId: "noise-model-instance",
+                dataRetrievalFunction: eel.get_noise_model_references,
+                dataRetrievalArgs: {
+                    circuitInstance: event.target.value // Selected circuit
+                }
+            });
+            loadRadioInputOptions({
+                containerId: "sim-method-options-container",
+                inputId: "sim-method",
+                dataRetrievalFunction: eel.get_available_sim_methods,
+                dataRetrievalArgs: {
+                    circuitInstance: event.target.value // Selected circuit
+                } 
             });
         }
     });
@@ -471,18 +488,6 @@ async function initNewInstanceForm() {
             messageElementId: "shot-count-input-message"
         })
     );
-    
-
-    // Adding required event listeners for hardware input field
-    const hardwareInput = document.getElementById("hardware-options-container");
-    hardwareInput.addEventListener("change", (event) => {
-        if (event.target.name === "hardware-option") {
-            removeInputErrorStyles({
-                outlinedElementId: "hardware-options-container",
-                messageElementId: "hardware-options-input-message"
-            });
-        }
-    });
 
 
     // Adding required event listeners for simulation method input field
@@ -492,6 +497,26 @@ async function initNewInstanceForm() {
             removeInputErrorStyles({
                 outlinedElementId: "sim-method-options-container",
                 messageElementId: "sim-method-options-input-message"
+            });
+            loadRadioInputOptions({
+                containerId: "hardware-options-container",
+                inputId: "hardware-option",
+                dataRetrievalFunction: eel.get_available_hardware_options,
+                dataRetrievalArgs: {
+                    simulationMethod: event.target.value // Selected simulation method
+                } 
+            });
+        }
+    });
+    
+
+    // Adding required event listeners for hardware input field
+    const hardwareInput = document.getElementById("hardware-options-container");
+    hardwareInput.addEventListener("change", (event) => {
+        if (event.target.name === "hardware-option") {
+            removeInputErrorStyles({
+                outlinedElementId: "hardware-options-container",
+                messageElementId: "hardware-options-input-message"
             });
         }
     });

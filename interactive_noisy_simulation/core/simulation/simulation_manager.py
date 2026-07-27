@@ -1,30 +1,18 @@
-# Standard library imports:
-import warnings
-
 #Third party imports:
-from qiskit import transpile
 from qiskit_aer import AerSimulator
-from qiskit.transpiler.exceptions import TranspilerError # For bug workaround
+from qiskit.transpiler import CouplingMap
 
 # Project-related imports:
 from ..data_structures.instance_data import InstanceData
-from ...exceptions import SimulationError
-from ...project_variables import ERROR_MESSAGES
+from ...utils import get_available_memory
 
 # Imports only used for type definition:
 from ..data_structures.experiment_instance import ExperimentInstance
 from ..data_structures.job_instance import Job
-from qiskit import QuantumCircuit
 from typing import Callable
 
 
 SHOT_BATCH_SIZE = 1000
-# Related to Qiskit transpile bug: 'HighLevelSynthesis is unable to synthesize "measure"'
-# It sometimes fails to transpile the circuit and returns this error if the 
-# optimization level for the transpilation process is set above 0.
-# A hacky solution for it would be to attempt the transpilation process
-# multiple times, ignoring the exception, until it finally works.
-MAX_TRANSPILATION_ATTEMPTS = 100
 
 
 class SimulationManager:
@@ -181,12 +169,9 @@ class SimulationManager:
                         running_job=job)
 
                     simulator = self._get_simulator_instance(job_instance=job)
-                    circuit = self._get_transpiled_circuit(job_instance=job, 
-                                                           simulator=simulator)
-                    
+
                     self._run_job(job=job, 
                                   simulator=simulator, 
-                                  transpiled_circuit=circuit, 
                                   progress_callback=progress_callback, 
                                   experiment=experiment)
                     # Update that job is complete
@@ -201,7 +186,6 @@ class SimulationManager:
         self,
         job: Job,
         simulator: AerSimulator,
-        transpiled_circuit: QuantumCircuit,
         progress_callback: Callable[[float, float, float], None],
         experiment: ExperimentInstance
     ) -> None:
@@ -214,8 +198,6 @@ class SimulationManager:
             job (Job): Current job instance that will be executed.
             simulator (AerSimulator): Simulator instance that the current
                 job will be using.
-            transpiled_circuit (QuantumCircuit): Transpiled circuit that the 
-                simulator will be running.
             progress_callback (Callable[[float, float, float], None]): Callback
                 function for updating queue execution progress bars with new
                 completion percentage values.
@@ -225,7 +207,7 @@ class SimulationManager:
         while not job.is_complete:
             shot_batch = min(SHOT_BATCH_SIZE, job.remaining_shots)
             
-            aer_job = simulator.run(circuits=transpiled_circuit, 
+            aer_job = simulator.run(circuits=job.transpiled_circuit, 
                                     shots=shot_batch)
             
             job.add_results(new_results=aer_job.result().get_counts())
@@ -250,65 +232,28 @@ class SimulationManager:
             AerSimulator: Created simulator instance that the current job
                 instance will be using.
         """
-        # Noisy simulation requires specific AerSimulator 
-        # configuration.
+        available_memory_mb = get_available_memory("mb")
+ 
         if job_instance.noise_model:
-            return AerSimulator(
+            simulator = AerSimulator(
                 coupling_map=job_instance.noise_model.coupling_map,
-                noise_model=job_instance.noise_model.noise_model)
-        # Noiseless simulation is just with the default AerSimulator.
+                noise_model=job_instance.noise_model.noise_model,
+                method=job_instance.simulation_method,
+                device=job_instance.hardware,
+                max_memory_mb=available_memory_mb)
         else:
-            return AerSimulator()
+            # Noiseless simulators don't have / need a specific coupling map,
+            # so a fully connected one is created instead. The number of qubits
+            # for this coupling_map is taken from the number of qubits in the
+            # circuit being executed.
+            coupling_map = CouplingMap.from_full(num_qubits=job_instance.circuit.num_qubits)
+            simulator = AerSimulator(
+                coupling_map=coupling_map,
+                method=job_instance.simulation_method,
+                device=job_instance.hardware,
+                max_memory_mb=available_memory_mb)
 
-
-    def _get_transpiled_circuit(
-        self,
-        job_instance: Job,
-        simulator: AerSimulator
-    ) -> QuantumCircuit:
-        """Creates and returns a transpiled circuit that can be run on
-        the specific simulator instance.
-
-        Args:
-            job_instance (Job): Current job instance that will be
-                executed.
-            simulator (AerSimulator): Simulator instance that the current
-                job will be using.
-
-        Returns:
-            QuantumCircuit: Transpiled circuit that the simulator will be
-                running.
-        """
-        # While doing everything correctly, there seems to be an error 
-        # message regarding providing the coupling_map and basis_bates 
-        # together with backend. I could not currently find a solution 
-        # as to how it can be removed, which is why this code bit is 
-        # here - to remove it.
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                action="ignore", 
-                message=f"Providing `coupling_map` and/or `basis_gates` "
-                        f"along with `backend` is not recommended"
-            )
-
-            # If there is no noise, optimization level is not allowed
-            # to be set, thus, it should be set to 0 (INS default).
-            optimization_level = job_instance.optimization_level or 0
-
-            # Required in order to avoid the following exception:
-            # "HighLevelSynthesis is unable to synthesize 'measure'"
-            # Attempt loop for HighLevelSynthesis bug workaround:
-            for _ in range(MAX_TRANSPILATION_ATTEMPTS):
-                try:
-                    return transpile(
-                        circuits=job_instance.circuit.circuit,
-                        backend=simulator,
-                        coupling_map=simulator.coupling_map,
-                        optimization_level=optimization_level)
-                except TranspilerError: pass
-            # Raises error if none of the set attempts were successful:
-            raise SimulationError(ERROR_MESSAGES["sim_transpilation_bug"],
-                                  transpilation_attempt_count=MAX_TRANSPILATION_ATTEMPTS)
+        return simulator
 
 
     def update_queue_execution_progress(

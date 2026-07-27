@@ -1,14 +1,23 @@
 # Third party imports:
 import eel
+from qiskit_aer import AerSimulator
 
 # Project-related imports:
-from ...utils import optional_int
+from ...utils import (
+    optional_int, 
+    get_available_memory,
+    format_message_text
+)
 from ..general import inform_empty_container
 from ..logs.logs import add_log_message
 from ..js_common_wrappers import remove_container_content
 from .js_manager_wrappers import (
     view_instance_data,
     view_job_detailed
+)
+from ...core.instance_managers.helpers.target_creation import (
+    create_target_from_calibration_data,
+    create_basic_target
 )
 from ...project_variables import (
     EMPTY_CONTAINER_MESSAGES, 
@@ -19,7 +28,8 @@ from ...project_variables import (
 from ...project_variables import (
     experiment_manager as em,
     noise_creator as nc,
-    circuit_manager as cm
+    circuit_manager as cm,
+    noise_data_manager as ndm
 )
 
 # --------------------------------------------------------------
@@ -231,6 +241,14 @@ def create_job_for_experiment(
     circuit_instance = cm.circuits.get(circuit_reference_key)
     noise_model_instance = nc.noise_models.get(noise_model_reference_key)
 
+    if noise_model_instance:
+        noise_data_instance = ndm.noise_data[noise_model_instance.data_source]
+        target = create_target_from_calibration_data(
+                    noise_dataframe=noise_data_instance.dataframe)
+    else:
+        target = create_basic_target(
+                    circuit_qubit_count=circuit_instance.num_qubits)
+
     em.create_job(experiment_reference_key=experiment_reference_key, 
                   job_reference_key=job_reference_key,
                   circuit_instance=circuit_instance,
@@ -238,6 +256,7 @@ def create_job_for_experiment(
                   shot_count=int(shot_count),
                   hardware=hardware,
                   simulation_method=simulation_method,
+                  transpilation_target=target,
                   optimization_level=optional_int(optimization_level))
     
     add_log_message(content=LOG_MESSAGES["created_job_instance"],
@@ -313,39 +332,62 @@ def get_circuit_references() -> list[str]:
     ]
 
     if not reference_keys:
-        inform_empty_container(message=EMPTY_CONTAINER_MESSAGES["no_instances_for_job"],
-                               instance_type="circuit",
-                               container_id="circuit-instance-container")
+        message = format_message_text(message=EMPTY_CONTAINER_MESSAGES["no_instances_for_job"],
+                                      instance_type="circuit")
+        return message
 
     return reference_keys
 
 
 @eel.expose
-def get_noise_model_references() -> list[str]:
+def get_noise_model_references(
+    args: dict[str, str] | None = None
+) -> list[str]:
     """Retrieves list of reference keys for existing noise model
     instances.
 
     Exposed function to `Python Eel` for use with JavaScript.
 
+    Args:
+        args (dict[str, str]): Additional arguments that have an influence
+            on what noise model instance option is available.
+            (Checks number of qubits in selected circuit and compares with
+            number of qubits in each noise model isntance)(Default = None)
+
     Returns:
         list[str]: List of reference keys for existing noise model
             instances.
     """
-    instances = nc.noise_models
-    reference_keys = [
-        instance.reference_key for instance in instances.values()
-    ]
+    noise_models = nc.noise_models.values()
 
-    if not reference_keys:
-        inform_empty_container(message=EMPTY_CONTAINER_MESSAGES["no_instances_for_job"],
-                               instance_type="noise model",
-                               container_id="noise-model-container")
+    # If there are no created noise model instances
+    if not noise_models:
+        message = format_message_text(message=EMPTY_CONTAINER_MESSAGES["no_instances_for_job"],
+                                      instance_type="noise model")
+        return message
+
+    if args and noise_models:
+        circuit = cm.circuits[args["circuitInstance"]]
+        reference_keys = [
+            noise_model.reference_key for noise_model in noise_models
+            if circuit.num_qubits <= noise_model.get_qubit_count()
+        ]
+        # If none of the available noise model instances can run the selected circuit
+        if not reference_keys:
+            message = format_message_text(message=EMPTY_CONTAINER_MESSAGES["no_supported_noise_models_for_job"])
+            return message
+    else:
+        reference_keys = [
+            noise_model.reference_key for noise_model in noise_models
+        ]
 
     return reference_keys
 
 
 @eel.expose
-def get_available_hardware_options() -> list[str]:
+def get_available_hardware_options(
+    args: dict[str, str] | None = None
+) -> list[str]:
     """Retrieves list of available hardware options for running
     simulators.
 
@@ -354,32 +396,74 @@ def get_available_hardware_options() -> list[str]:
 
     Exposed function to `Python Eel` for use with JavaScript.
 
+    Args:
+        args (dict[str, str] | None): Additional arguments that
+            have an influence on what hardware option is available.
+            (Not all simulation methods support both `CPU` and `GPU`)
+    
     Returns:
         list[str]: List of available hardware options.
     """
-    return ["CPU"]
+    if args:
+        simulator = AerSimulator(
+            method=args["simulationMethod"])
+    else:
+        simulator = AerSimulator()
+    return list(simulator.available_devices())
 
 
 @eel.expose
-def get_available_sim_methods() -> list[str]:
+def get_available_sim_methods(
+    args: dict[str, str] | None = None
+) -> list[str]:
     """Retrieves list of available simulation method options for running
     simulators.
 
-    Currently only returns "statevector", "density_matrix", and 
-    "matrix_product_state" as a method for validating other options against
-    specific requirements and scenarios has not been implemented yet.
+    Only methods that support measurements (obtaining results) are returned.
+
+    The methods stabilizer and extended_stabilizer have also been removed
+    from the list of returnable simulation methods due to complications
+    with implementing them into INS and other tasks that have to be
+    prioritized.
 
     Exposed function to `Python Eel` for use with JavaScript.
+
+    Args:
+        args (dict[str, str] | None): Additional arguments that
+            have an influence on what simulation methods can
+            be selected.
 
     Returns:
         list[str]: List of available simulation method options.
     """
-    supported_methods = [
-        "statevector",
-        "density_matrix",
-        "matrix_product_state"
+    simulator = AerSimulator()
+    supported_methods = list(simulator.available_methods())
+    # `Unitary` and `superop` dont support `measure` operations (no way of
+    # getting results)
+    # Adding `stabilizer` and `extended_stabilizer` support has been shelved
+    # for the time being.
+    removable_methods = [
+        "automatic",
+        "stabilizer",
+        "extended_stabilizer",
+        "unitary",
+        "superop"
     ]
-    return supported_methods
+
+    # Additional available simulation method filtration based on available
+    # memory (RAM)
+    if args:
+        circuit = cm.circuits[args["circuitInstance"]]
+        memory_requirements = circuit.memory_requirements
+        available_memory = get_available_memory()
+        # Will not include methods if memory requirements for them are too high for
+        # what is available on the end-users device.
+        for method, memory in memory_requirements.items():
+            if not memory or memory > available_memory: 
+                removable_methods.append(method)
+
+    methods = [m for m in supported_methods if m not in removable_methods]
+    return methods
 
 
 @eel.expose

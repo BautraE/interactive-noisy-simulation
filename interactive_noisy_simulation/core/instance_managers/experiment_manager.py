@@ -4,6 +4,10 @@ from ..data_structures.job_instance import Job
 from ..data_structures.instance_data import InstanceData
 from ..data_structures.circuit_instance import CircuitInstance
 from ..data_structures.noise_model_instance import NoiseModelInstance
+from .helpers.transpilation import get_transpiled_circuit
+
+# Imports only used for type definition:
+from qiskit.transpiler import Target
 
 
 class ExperimentManager:
@@ -120,6 +124,7 @@ class ExperimentManager:
         shot_count: int,
         hardware: str,
         simulation_method: str,
+        transpilation_target: Target,
         optimization_level: int | None
     ) -> None:
         """Creates a new job instance and adds it to a specific experiment 
@@ -145,11 +150,19 @@ class ExperimentManager:
                 or `GPU`).
             simulation_method (str): Simulation method that the simulator
                 will use as part of running the specific job instance.
+            transpilation_target (Target): Job-specific target object that
+                will be used during circuit transpilation (this is used
+                to avoid issues with transpilation when using created
+                simulator as backend argument for `transpile` function).
             optimization_level (int | None): Optimization level for the 
                 transpilation process (for preparing the selected circuit 
                 to be run on a simulator with the selected noise model). 
                 `None` will only be set if the simulation is noiseless.
         """
+        transpiled_circuit = get_transpiled_circuit(circuit=circuit_instance.circuit,
+                                                    optimization_level=optimization_level,
+                                                    transpilation_target=transpilation_target)
+
         new_job = Job(
             reference_key=job_reference_key,
             circuit=circuit_instance,
@@ -157,6 +170,8 @@ class ExperimentManager:
             shot_count=shot_count,
             hardware=hardware,
             simulation_method=simulation_method,
+            transpilation_target=transpilation_target,
+            transpiled_circuit=transpiled_circuit,
             optimization_level=optimization_level)
          
         experiment = self._experiments[experiment_reference_key]

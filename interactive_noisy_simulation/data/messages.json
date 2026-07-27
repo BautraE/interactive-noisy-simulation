@@ -2,6 +2,8 @@
     "empty_container": {
         "empty_log": "The {log_type} log is currently empty",
 
+        "no_experiment_jobs": "This experiment instance currently does not have any jobs",
+
         "no_instance_for_detailed_view": "There are currently no {instance_type} to display detailed information about",
 
         "no_instances": "There are currently no {instance_type} instances",
@@ -10,11 +12,11 @@
 
         "no_noise_data_sources": "There are currently no noise data sources to create new noise models from!",
 
-        "no_experiment_jobs": "This experiment instance currently does not have any jobs",
-
         "no_queueable_experiments": "There are currently no queueable experiment instances",
 
-        "no_queued_experiments": "The experiment queue is currently empty"
+        "no_queued_experiments": "The experiment queue is currently empty",
+
+        "no_supported_noise_models_for_job": "None of the available noise model instances are capable of supporting the selected circuit (number of qubits in circuit exceeds number of qubits in the noise model)."
     },
 
     "error": {

@@ -77,7 +77,7 @@ class NoiseCreator:
         """
         noise_dataframe = noise_data.dataframe
 
-        # Creating qiskit_aer.noise NoiseModel object:
+        # Creating NoiseModel object that will contain all created errors
         noise_model = NoiseModel(get_basis_gates(noise_dataframe))
         if progress_callback: progress_callback(5.0)
 

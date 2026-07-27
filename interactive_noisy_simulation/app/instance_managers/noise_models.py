@@ -9,6 +9,7 @@ from ..js_common_wrappers import (
     remove_container_content,
     update_progress_bar
 )
+from ...utils import format_message_text
 from ...project_variables import key_blocker
 from ...project_variables import (
     EMPTY_CONTAINER_MESSAGES, LOG_MESSAGES
@@ -137,8 +138,8 @@ def get_noise_data_references() -> list[str]:
     ]
 
     if not reference_keys:
-        inform_empty_container(message=EMPTY_CONTAINER_MESSAGES["no_noise_data_sources"],
-                               container_id="noise-source-container")
+        message = format_message_text(message=EMPTY_CONTAINER_MESSAGES["no_noise_data_sources"])
+        return message
 
     return reference_keys
 

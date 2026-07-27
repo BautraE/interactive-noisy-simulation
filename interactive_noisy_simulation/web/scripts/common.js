@@ -201,6 +201,7 @@ function deactivateProgressBar(barId) {
 // 4. Container management
 // --------------------------------------------------------------
 
+eel.expose(createContentBox);
 /**
  * Creates a content box element & inserts it into a parent content
  * container element through its ID.
@@ -211,7 +212,6 @@ function deactivateProgressBar(barId) {
  * @param {string} containerId - ID of parent content container.
  * @param {string} boxId - ID of created content box.
  */
-eel.expose(createContentBox)
 function createContentBox(containerId, boxId) { 
     let contentBox = document.createElement("div");
     contentBox.classList.add("content-box", "variant-light");
@@ -221,6 +221,7 @@ function createContentBox(containerId, boxId) {
 }
 
 
+eel.expose(removeContainerContent);
 /**
  * Clears (deletes) all child elements from a parent element based on
  * its ID.
@@ -228,7 +229,6 @@ function createContentBox(containerId, boxId) {
  * @param {string} containerId - ID of container whose child elements will
  * be deleted.
  */
-eel.expose(removeContainerContent)
 function removeContainerContent(containerId) {
     let container = document.getElementById(containerId)
     while (container.firstChild) {

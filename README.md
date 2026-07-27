@@ -144,3 +144,40 @@ The following points describe some additional functionality features that can be
 - Add **extra informative helper methods to each class** that show and explain all available methods to the user. Even though `help()` already exists in Python, the custom methods would have an improved visual output style that is easier to read for the user. 
 
 **Note:** This list of additional features is not final and new things may be added to it down the road.
+
+# NEW NOTES (SLOWLY ADDING INFORMATION HERE FOR THE FINAL VERSION OF THE README.MD FILE)
+
+## Things to note
+
+### Importing circuits from older versions of *Qiskit*
+While developing *INS*, the following error has been encountered: 
+```
+The QPY format version being read, {version_number}, isn't supported by this Qiskit version. Please upgrade your version of Qiskit to load this qpy payload
+```
+This means that there is no issue with importing circuits from older versions, however, it will raise this error if a circuit `.qpy` file was created through an environment with a newer *Qiskit* version than the one being used by *INS*.
+
+This isn't something that can be fixed on the side of *INS*, which means the user should resolve issues related to this, if they appear. This information is mentioned here as an explanation of the situation.
+
+### Automatically-updating radio input fields
+When creating a job for an experiment, additional validation happens, affecting what kind of radio input options will appear. These things are currently not explained anywhere through the UI of INS, thus they will be mentioned here:
+- **Selecting a circuit instance will check which noise model instances support it**. If a quantum circuit has more qubits than the noise model, it will not be shown as an option.
+- **Selecting a circuit instance will check which simulation methods are capable of running it**. Quantum computer simulation is expensive, especially with bigger qubit counts, as it requires a lot of memory (RAM), thus *INS* calculates the required memory for those methods, where it is straightforward to do so (`statevector` and `density_matrix`);
+- **Selecting a simulation method will check what kind of hardware options are available for it** (not all simulation methods support all available hardware options).
+
+In cases, where an option was previously selected before any validation took place, one of the following scenarios will play out:
+- If the previously selected option is still available, it will remain selected in that specific input field;
+- If the previously selected option is no longer available, no option will be selected in that specific input field.
+
+### Different simulation method speeds
+Since this is not currently mentioned anywhere in the UI of *INS*, it will be mentioned here.
+
+From what has been tested, each of the supported simulation methods has a different execution speed:
+- `density_matrix` - completes jobs the fastest, but requires the most memory;
+- `statevector` - is noticeably slower than `density_matrix`, but also requires quite a bit less memory (can simulate 2x the amount of qubits);
+- `matrix_product_state` - the slowest one (especially with noise). Though the benefit of it is the fact that it can simulate way more qubits than the `statevector` method.
+
+### Non-calculable memory (RAM) requirements and potential errors
+Even though it is possible to precisely calculate how much RAM is required to run a circuit with the `statevector` and `density_matrix` simulation methods, there are other situations, where something like this may not be possible (or at the very least, not accomplishable without a complicated solution that might take lots of time to create and implement).
+- **`matrix_product_state`** - The memory requirements of this method are dynamically altered not just by the number of qubits in the circuit, but also the overall entanglement and depth (at least from what I have understood up until the point of writing this). I am also not sure if *Qiskit* functionality will stop this circuit from running successfully if the memory requirements suddenly exceed the available memory (even though this was not tested, the next point might imply that this would happen). In any case, an additional argument / setting is also given to each created simulator instance through INS - `max_memory_mb` (calculated based on available RAM of the used device);
+- Large circuit transpilation has caused an error to be raised in regards to some sort of memory-related issue (`MemoryError`). This was encountered while doing some tests with the `matrix_product_state` method. Similarly as with the previous point, I do not currently know of any optimal way to prevent this from happening, other than limiting, let's say, the number of qubits or depth of the circuit. But as it stands, no restrictions for this have been set by *INS*.
+

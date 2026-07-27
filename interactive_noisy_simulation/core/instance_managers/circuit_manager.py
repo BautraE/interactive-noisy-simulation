@@ -85,6 +85,10 @@ class CircuitManager:
 
         Returned information includes:
         - Reference key for the current instance;
+        - Number of qubits in the circuit;
+        - Amount of memory (RAM) that is required to simulate the specific
+            qubit count of the circuit (calculated for the `statevector` and
+            `density_matrix`simulation methods);
         - Name of the QPY file;
         - Full path of QPY file on user's device.
 
@@ -95,11 +99,15 @@ class CircuitManager:
         """
         if self._circuits:
             columns = [
-                "Reference key", "Source file", 
+                "Reference key", "Number of qubits", 
+                "Memory (RAM) requirements",
+                "Source file", 
                 "Source file path on device"
             ]
             rows = [
-                [instance.reference_key, instance.source_file.name, 
+                [instance.reference_key, instance.num_qubits,
+                 instance.memory_requirements,
+                 instance.source_file.name, 
                  instance.source_file.full_path]
                 for instance in self._circuits.values()
             ]

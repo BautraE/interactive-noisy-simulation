@@ -8,10 +8,10 @@ import eel
 from ...core.data_structures.file import File
 from ..general import inform_empty_container
 from ..js_common_wrappers import (
-    add_table, add_table_row,
     remove_container_content,
     set_selected_file
 )
+from .js_manager_wrappers import view_instance_data
 from ..logs.logs import add_log_message
 from ...project_variables import (
     EMPTY_CONTAINER_MESSAGES, 
@@ -42,14 +42,9 @@ def view_circuit_instances() -> None:
 
     # If data exists, creates table
     if instance_data:
-        add_table(container_id="content-box", 
-                  table_id="circuit-instances",
-                  columns=instance_data.columns,
-                  has_actions=bool(instance_data.actions))
-        for data_row in instance_data.rows:
-            add_table_row(table_id="circuit-instances",
-                          row_content=data_row,
-                          actions=instance_data.actions)
+        view_instance_data(instance_data=instance_data.to_dict(), 
+                           container_id="content-box",
+                           table_id="circuit-instances")
     # If not, adds message stating this
     else:
         inform_empty_container(message=EMPTY_CONTAINER_MESSAGES["no_instances"],
