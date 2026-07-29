@@ -46,8 +46,7 @@ def start_app() -> None:
     # Starting INS
     port = _get_free_port()
     eel.start('generated_html/noise_data_instances.html', 
-              port=port, 
-              size=(1200, 800))
+              port=port)
 
 
 def _get_free_port() -> int:

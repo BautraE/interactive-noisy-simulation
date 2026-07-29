@@ -17,6 +17,7 @@ File contents list:
     background-color: var(--color-side-navbar-background);
     box-sizing: border-box;
     width: 20%;
+    min-width: var(--width-min-side-navbar);
     padding-top: 35px;
 }
 .side-navbar .content-container-heading {

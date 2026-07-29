@@ -35,7 +35,6 @@ File contents list:
 /* Simple experiment job container (visible container) */
 .experiment-jobs .content-box.variant-light {
     width: 65%;
-    min-width: 450px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
@@ -44,7 +43,6 @@ File contents list:
     display: flex;
     flex-direction: column;
     width: 35%;
-    min-width: 250px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 

@@ -9,6 +9,17 @@ Global scope variables
   Size-related variables 
   --------------------------------------------------------- 
   */
+  /* Minimal content element sizes */
+  --width-min-page-content: 1000px;
+  --height-min-page-content: 630px;
+
+  --width-min-side-navbar: 220px;
+
+  --width-min-log-sidebar: 400px;
+
+
+  /* Max height for page content being set to window size and 
+     subtracting size of the main navigation bar. */
   --height-max-page-content: calc(100vh - 35px);
   
 

@@ -112,10 +112,13 @@ tr td:last-child {
 */ 
 .main-navbar {
     position: sticky;
+    z-index: 1;
     top: 0;
     height: 35px;
     width: 100%;
+    min-width: var(--width-min-page-content);
     box-sizing: border-box;
+    
     padding-left: 35px;
 
     background-color: var(--color-main-navbar-background);
@@ -166,6 +169,9 @@ tr td:last-child {
     display: flex;
     flex: 1;
     max-height: var(--height-max-page-content);
+    min-width: var(--width-min-page-content);
+    min-height: var(--height-min-page-content);
+    overflow: auto;
 
     background: var(--gradient-primary-background);
 }
