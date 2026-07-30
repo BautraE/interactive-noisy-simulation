@@ -1,0 +1,435 @@
+/*
+=================================================================
+Dialog / pop-up window styles (as well as form input styles)
+=================================================================
+File contents list:
+1. Dialog window content.
+2. Input field-related styles.
+-----------------------------------------------------------------
+
+-------------------------------------------------------------- 
+1. Dialog window content
+--------------------------------------------------------------
+*/ 
+/* Main container for all pop-ups that may appear in the middle
+   of the screen */
+.pop-up-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 2;
+
+    background-color: rgba(0, 0, 0, 50%);
+}
+
+/* Pop-up window container */
+.pop-up {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 450px;
+    border-radius: 8px;
+
+    background: var(--gradient-secondary-background);
+    filter: var(--container-drop-shadow);
+
+    transition: height 0.5s ease;
+    overflow: hidden; /* Related to height transitions */
+}
+
+/* Header of pop-up window that contains title
+   of the pop-up */
+.pop-up-title-bar {
+    max-width: 100%;
+    padding: 10px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    word-break: break-word;
+
+    background-color: var(--color-popup-title-bar-background);
+}
+
+/* Title for pop-up window */
+.pop-up-title {
+    text-align: center;
+    margin: 0;
+
+    text-transform: uppercase;
+    font-size: 16px;
+    filter: var(--container-drop-shadow);
+}
+
+/* Form element that acts as a container for encapsulating
+   various input fields */
+.pop-up-form {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+    
+    scrollbar-color: var(--scrollbar-color-content-containers);
+}
+
+/* Bar at top of popup for selecting between form steps */
+.form-step-select {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 20px;
+    margin-bottom: 25px;
+
+    display: flex;
+    flex-direction: row;
+    column-gap: 5px;
+}
+
+/* Single step bar with little step title beneath it */
+.step-bar-block {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    cursor: pointer;
+
+    transition: flex 0.7s ease;
+}
+.step-bar-block.active-step {
+    flex: 0 0 120px;
+    cursor: default;
+}
+/* Step bar from step bar block */
+.step-bar {
+    height: 7px;
+    width: 100%;
+    border-radius: 10px;
+
+    box-shadow: inset 0 0 0 1px var(--color-step-bar);
+
+    transition: box-shadow 0.3s ease,
+        background-color 0.3s ease;
+}
+.step-bar-block.active-step > .step-bar {
+    background-color: var(--color-step-bar);
+}
+.step-bar-block:not(.active-step):hover .step-bar {
+    box-shadow: inset 0 0 0 1px var(--color-step-bar-hover);
+    background-color: var(--color-step-bar-hover);
+}
+.step-bar-block:not(.active-step):active .step-bar {
+    box-shadow: inset 0 0 0 1px var(--color-step-bar-active);
+    background-color: var(--color-step-bar-active);
+}
+/* Little step title below step bar from step bar block */
+.step-bar-text {
+    font-size: 12px;
+    color: var(--color-step-bar);
+    text-align: right;
+}
+.step-bar-block.active-step > .step-bar-text {
+    display: none;
+}
+.step-bar-block:not(.active-step):hover .step-bar-text {
+    color: var(--color-step-bar-hover);
+}
+.step-bar-block:not(.active-step):active .step-bar-text {
+    color: var(--color-step-bar-active);
+}
+
+/* Heading block in forms used for informing about currently active 
+   form step. */
+.form-step-heading {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+/* Small text (eg. "Step 1") that appears above form step headings. */
+.form-step-counter {
+    font-size: 12px;
+}
+
+/* Container for a single input (this includes the label,
+   input field itself that may also be a button, as well
+   as other elements that may be required) */
+.form-input-group {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+}
+.form-input-group > :not(label) {
+    margin-left: 20px;
+}
+
+/* Container for buttons at the bottom of form (Cancel, Create, etc.) */
+.form-actions {
+    margin: 20px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    column-gap: 20px;
+}
+
+/* Styles for fields with trackers, for example, length tracker
+   in the form of currentLength/maxLength */
+.input-with-tracker {
+    width: max-content;
+}
+.reference-key-input-length {
+    text-align: right;
+    margin-top: 7px;
+
+    color: var(--color-text-muted);
+}
+
+/* 
+-------------------------------------------------------------- 
+2. Input field-related styles
+-------------------------------------------------------------- 
+*/
+
+/* -------------------------------------------------------- */
+/* File input: */
+
+/* Container for file input */
+.file-input-box {
+    height: 40px;
+    display: flex;
+    row-gap: 10px;
+    column-gap: 10px;
+    align-items: center;
+}
+/* Button for selecting file */
+.file-input-box .button-light {
+    width: 110px;
+}
+/* X-icon for removing selected calibration data file */
+.file-input-box .x-icon {
+    margin-right: 0;
+    margin-left: auto;
+}
+/* Text that represents selected files in cases where it is
+   possible to import something. */
+.selected-file {
+    max-width: 70%;
+    word-break: break-word;
+    margin: 0;
+
+    color: var(--color-text-muted);
+}
+
+/* -------------------------------------------------------- */
+/* Text input: */
+
+input[type="text"] {
+    width: 170px;
+    height: 25px;
+    
+    font-family: 'Nunito';
+    font-size: 16px;
+
+    outline: none;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--color-standard-inputs-background);
+    filter: var(--container-drop-shadow);
+}
+input[type="text"]:focus {
+    outline-width: 5px;
+    outline-color: var(--color-text-input-focus);
+    outline-style: inset;
+}
+
+
+/* -------------------------------------------------------- */
+/* Radio input type: */
+
+/* Container for radio options */
+.radio-select-box {
+    max-height: 150px;
+    overflow-y: auto;
+}
+.radio-select-box > * {
+    padding: 10px;
+    border-radius: 8px;
+}
+.radio-select-box > *:nth-child(even) {
+    background-color: var(--color-table-rows-even);
+}
+
+/* Label element that acts as a container for other specific
+   radtio option-related elements */
+.radio-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+/* Actual input field that gets selected when clicking on label */
+.radio-option input {
+    display: none;
+}
+/* When form is disabled */
+.radio-option:has(input:disabled) {
+    cursor: not-allowed;
+}
+
+/* Custom outer circle for radio input field */
+.custom-radio {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    position: relative;
+
+    border: 2px solid var(--color-radio-input-unselected-circle);
+    border-radius: 50%;
+
+    transition: 0.3s ease;
+}
+/* Outer circle changing color once selected */
+.radio-option input:checked + .custom-radio {
+    border-color: var(--color-input-element-highlight);
+}
+/* Inner dot that appears, when selected */
+.radio-option input:checked + .custom-radio::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    transform: translate(-50%, -50%);
+    
+    background: var(--color-input-element-highlight);
+    border-radius: 50%;
+}
+/* When form is disabled */
+.radio-option input:disabled + .custom-radio {
+    opacity: 0.6;
+}
+
+/* Text styling */
+.radio-text {
+    color: var(--color-text-muted);
+    transition: 0.3s ease;
+}
+/* Selected text */
+.radio-option input:checked + .custom-radio + .radio-text {
+    color: var(--color-text-default);
+    font-weight: 500;
+}
+/* When form is disabled */
+.radio-option input:disabled:not(:checked) ~ .radio-text {
+    opacity: 0.6;
+}
+
+/* When hovering over unselected radio input option */
+.radio-option:hover .radio-text {
+    color: var(--color-radio-input-text-hover);
+}
+.radio-option:hover .custom-radio {
+    border-color: var(--color-radio-input-hover);
+}
+
+
+/* -------------------------------------------------------- */
+/* Radio input if there is a toggle-related checkbox above it */
+
+/* Actual checkbox input field */
+.custom-toggle-checkbox-box input[type="checkbox"] {
+    display: none;
+}
+
+/* Container for custom toggle checkbox */
+.custom-toggle-checkbox-box {
+    width: fit-content;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background-color: var(--color-content-box-dark);
+}
+
+/* Container for checkbox input (so that clicking anywhere near the 
+   rendered input results in clicking the checkbox)*/
+.custom-toggle-checkbox-box label{
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 8px;
+    user-select: none;
+}
+
+/* Custom checkmark box */
+.custom-toggle-checkbox-box .checkbox-box {
+    width: 15px;
+    height: 15px;
+    border: 2px solid var(--color-input-element-highlight);
+    border-radius: 4px;
+    position: relative;
+    display: inline-block;
+}
+/* Custom checkmark */
+.custom-toggle-checkbox-box .checkbox-box::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 0.5px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--color-input-element-highlight);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) scale(0);
+    transition: transform 0.15s ease-in-out;
+}
+
+/* CSS for when checkbox is checked */
+.custom-toggle-checkbox-box input:checked + .checkbox-box {
+    background-color: var(--color-checkbox-inside-checked);
+}
+.custom-toggle-checkbox-box input:checked + .checkbox-box::after {
+    transform: rotate(45deg) scale(1);
+}
+
+/* For when the custom checkbox is above a radio select input (when
+   the checkbox is related to that specific input) */
+.radio-select-with-checkbox .content-box {
+    margin-left: 0;
+    border-top-left-radius: 0;
+}
+
+
+/* -------------------------------------------------------- */
+/* Error highlighting styles: */
+
+/* Input-related element that will have an outline around it
+   whenever there is something wrong with the input value. */
+input.input-error,
+.input-error {
+    outline: 4px inset var(--color-input-error-indicator);
+}
+
+/* Validation-related color mode styles (yellow for warning,
+   red for incorrect). */
+.input-warning {
+    color: var(--color-input-warning-indicator);
+}
+.input-error-message,
+.incorrect-input {
+    color: var(--color-input-error-indicator);
+}
+
+/* Error message text that appears above input fields. */
+.input-error-message {
+    font-size: 14px;
+}

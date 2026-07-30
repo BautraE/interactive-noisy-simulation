@@ -1,0 +1,138 @@
+/* 
+=================================================================
+Style rules specifically for the "Simulation" page.
+=================================================================
+File contents list:
+1. Main content containers.
+2. Left-side content.
+3. Right-side content.
+-----------------------------------------------------------------
+
+--------------------------------------------------------------
+1. Main content containers
+-------------------------------------------------------------- 
+*/
+.content-container {
+    display: flex;
+    flex-direction: row;
+    column-gap: 30px;
+}
+
+.content-left, .content-right {
+    display: flex;
+    flex-direction: column;
+}
+.content-left {
+    flex: 2;
+}
+.content-right {
+    flex: 1;
+}
+
+
+/*
+--------------------------------------------------------------
+2. Left-side content
+-------------------------------------------------------------- 
+*/
+/* Main page heading that happens to be on the left content side. */
+.content-left .content-container-heading {
+    text-align: left;
+}
+
+/* Container for all other left-side content, excluding the main
+   page heading. */
+.content-left > div {
+    display: flex;
+    flex-direction: column;
+    row-gap: 25px;
+
+    margin-left: 20px;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Heading for left-side content. */
+.content-left > div > h2.small-heading {
+    margin-bottom: 0;
+}
+
+/* Container for content boxes containing experiment instance
+   information. */
+.experiment-table-container {
+    display: flex;
+    flex-direction: column;
+    
+    flex: 1;
+    min-height: 0;
+}
+
+/* Small text above experiment instance content boxes. */
+.experiment-table-container p {
+    margin-bottom: 15px;
+}
+
+/* Experiment-instance-content boxes. */
+.experiment-table-container .content-box {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Text that appears if there is no content to currently display
+   within a specific container. */
+.experiment-table-container .empty-container-text {
+    margin-top: 30px;
+}
+
+/*
+--------------------------------------------------------------
+3. Right-side content
+-------------------------------------------------------------- 
+*/
+/* Main content box for right-side content. */
+.content-right .content-box {
+    margin: 0;
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+/* Small headings for sub-sections within right-side content box */
+.content-right .small-heading {
+    margin: 0;
+}
+
+/* Containers for sub-section content within right-side content box */
+.content-right .content-box > div.content-group {
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px;
+}
+
+/* Sub-section content labels */
+.content-right .label {
+    text-transform: uppercase;
+    font-style: italic;
+    color: var(--color-element-highlight-primary);
+}
+
+/* Centered buttons in right-side content box */
+.content-right div.clickable {
+    align-self: center;
+}
+
+/* Label text above progress bars */
+.content-right .content-group p {
+    margin-bottom: 10px;
+}
+
+/* Horizontal line dividing content sub-sections */
+.content-right hr {
+    width: 90%;
+}

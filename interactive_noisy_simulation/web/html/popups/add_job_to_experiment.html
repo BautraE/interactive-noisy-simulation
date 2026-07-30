@@ -1,0 +1,130 @@
+<div class="pop-up">
+     <div class="pop-up-title-bar">
+          <h2 class="pop-up-title">New job for experiment</h2>
+     </div>
+     <!-- Form step selection bar -->
+     <div class="form-step-select">
+          <div class="step-bar-block clickable active-step"
+               data-step-name="job-instance-creation">
+               <div class="step-bar"></div>
+               <span class="step-bar-text">Job instance creation</span>
+          </div>
+          <div class="step-bar-block clickable"
+               data-step-name="noise-settings">
+               <div class="step-bar"></div>
+               <span class="step-bar-text">Noise settings</span>
+          </div>
+          <div class="step-bar-block clickable"
+               data-step-name="simulator-settings">
+               <div class="step-bar"></div>
+               <span class="step-bar-text">Simulator settings</span>
+          </div>
+     </div>
+     <!-- Information regarding current form step -->
+     <div class="form-step-heading">
+          <p class="form-step-counter">
+               Step 
+               <span id="form-current-step-number">1</span>
+          </p>
+          <h2 id="form-current-step-heading-text" 
+              class="medium-heading">Job instance creation</h2>
+     </div>
+     <!-- Input form -->
+     <form class="pop-up-form">
+          <!-- Job instance creation -->
+          <!-- Reference key input -->
+          <div class="form-input-group"
+               data-step-name="job-instance-creation">
+               <label for="reference-key">Reference key:</label>
+               <div class="hidden-element input-error-message"
+                    id="reference-key-input-message"></div>
+               <div class="input-with-tracker">
+                    <input type="text" 
+                           id="reference-key" 
+                           name="reference-key"  
+                           placeholder="Enter reference key">
+                    <div class="reference-key-input-length">
+                         <span id="reference-key-input-length">0</span>
+                         /
+                         <span id="reference-key-input-max-length"></span>
+                    </div>
+               </div>
+          </div>
+          <!-- CircuitInstance selection -->
+          <div class="form-input-group"
+               data-step-name="job-instance-creation">
+               <label>Circuit instance:</label>
+               <div class="hidden-element input-error-message"
+                    id="circuit-instance-input-message"></div>
+               <div class="content-box variant-light radio-select-box noise-data-sources"
+                    id="circuit-instance-container"></div>
+          </div>
+          <!-- Noise settings -->
+          <!-- NoiseModelInstance selection / simple checkbox for noiseless simulation -->
+          <div class="form-input-group hidden-element"
+               data-step-name="noise-settings">
+               <label>Noise model instance:</label>
+               <div class="hidden-element input-error-message"
+                    id="noise-model-input-message"></div>
+               <div class="radio-select-with-checkbox">
+               <div class="custom-toggle-checkbox-box">
+                    <label for="noiseless-simulation">
+                         <input type="checkbox" id="noiseless-simulation">
+                         <span class="checkbox-box"></span>
+                         <span class="checkbox-text">Noiseless simulation</span>
+                    </label>
+               </div>
+               <div class="content-box variant-light radio-select-box noise-data-sources"
+                    id="noise-model-container"></div>
+               </div>
+          </div>
+          <!-- Optimization level selection -->
+          <div class="form-input-group hidden-element"
+               data-step-name="noise-settings">
+               <label>Circuit optimization level:</label>
+               <div class="hidden-element input-error-message"
+                    id="opt-level-input-message"></div>
+               <div class="content-box variant-light radio-select-box noise-data-sources"
+                    id="opt-level-container"></div>
+          </div>
+          <!-- Simulator settings -->
+          <!-- Shot count input -->
+          <div class="form-input-group hidden-element"
+               data-step-name="simulator-settings">
+               <label for="shot-count">Shot count:</label>
+               <div class="hidden-element input-error-message"
+                    id="shot-count-input-message"></div>
+               <input type="text" 
+                      id="shot-count" 
+                      name="shot-count"  
+                      placeholder="Enter shot count">
+          </div>
+          <!-- Simulation method selection -->
+          <div class="form-input-group hidden-element"
+               data-step-name="simulator-settings">
+               <label>Simulation method:</label>
+               <div class="hidden-element input-error-message"
+                    id="sim-method-options-input-message"></div>
+               <div class="content-box variant-light radio-select-box noise-data-sources"
+                    id="sim-method-options-container"></div>
+          </div>
+          <!-- Hardware selection -->
+          <div class="form-input-group hidden-element"
+               data-step-name="simulator-settings">
+               <label>Hardware:</label>
+               <div class="hidden-element input-error-message"
+                    id="hardware-options-input-message"></div>
+               <div class="content-box variant-light radio-select-box noise-data-sources"
+                    id="hardware-options-container"></div>
+          </div>
+     </form>
+     <!-- Create / Cancel buttons -->
+     <div class="form-actions">
+          <div role="button"
+               class="clickable button-regular variant-default"
+               onclick="hidePopUpWindow()">Cancel</div>
+          <div role="button"
+               class="clickable button-regular variant-green"
+               onclick="createInstance()">Create job</div>
+     </div>
+</div>

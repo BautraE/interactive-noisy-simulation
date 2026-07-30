@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% set active_main_page = "instance_management" %}
+{% set active_instance_page = "noise_models" %}
+
+{% block css %}
+<link rel="stylesheet" 
+      href="../styles/page_specific/instance_management/common.css">
+{% endblock %}
+
+{% block content %}
+{% include "instance_management/side_navbar.html" %}
+<!-- Current page content -->
+<div class="content-container">
+    <h1 class="content-container-heading">Noise Model Instance Management</h1>
+    <div class="content-box-header">
+        <div class="left">
+            <p>Noise model instances:</p>
+        </div>
+        <div class="right">
+            <div role="button"
+                 class="clickable button-regular variant-default"
+                 onclick="showPopUpWindow('create_noise_model_instance', initNoiseDataForm)">
+                 Create new instance</div>
+        </div>
+    </div>
+    <div id="content-box" 
+         class="content-box variant-light instances-content-box"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" 
+        src="../scripts/instance_management/noise_models/all_instances.js"></script>
+<script type="text/javascript" 
+        src="../scripts/instance_management/common.js"></script>
+{% endblock %}

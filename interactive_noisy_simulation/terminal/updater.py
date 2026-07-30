@@ -4,7 +4,8 @@ import sys
 
 # Local project imports:
 from ._console import console
-from ..data._data import TERMINAL_MESSAGES
+from ..utils import format_message_text
+from ..project_variables import TERMINAL_MESSAGES
 
 
 def main() -> None:
@@ -22,9 +23,9 @@ def main() -> None:
     if result.returncode == 0:
         console.print(TERMINAL_MESSAGES["update_successful"])
     else:
-        console.print(TERMINAL_MESSAGES["update_failed"].format(
-            error=result.stderr.strip()
-        ))
+        printable_text = format_message_text(message=TERMINAL_MESSAGES["update_failed"],
+                                             error=result.stderr.strip())
+        console.print(printable_text)
 
 
 if __name__ == "__main__":

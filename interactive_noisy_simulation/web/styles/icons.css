@@ -1,0 +1,19 @@
+/* 
+=================================================================
+Static icons based on images (non-clickable)
+=================================================================
+*/
+
+/* Icon of a file */
+.file-icon-image {
+    height: 25px;
+    width: 25px;
+
+    mask-image: url("../assets/file_icon.svg");
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+
+    /* Overlay color: */
+    background-color: var(--color-element-highlight-primary);
+}

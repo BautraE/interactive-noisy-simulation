@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% set active_main_page = "simulation" %}
+
+{% block css %}
+<link rel="stylesheet" 
+      href="../styles/page_specific/simulation.css">
+{% endblock %}
+
+{% block content %}
+<!-- Current page content -->
+<div class="content-container">
+    <div class="content-left">
+        <h1 class="content-container-heading">Simulation</h1>
+        <div>
+            <h2 class="small-heading">Experiment queue creation</h2>
+            <div class="experiment-table-container">
+                <p>Available experiments:</p>
+                <div class="content-box variant-light"
+                     id="queueable-experiments-container"></div>
+            </div>
+            <div class="experiment-table-container">
+                <p>Queued experiments:</p>
+                <div class="content-box variant-light"
+                     id="queued-experiments-container"></div>
+            </div>
+        </div>
+    </div>
+    <div class="content-right">
+        <div class="content-box variant-dark">
+            <h2 class="small-heading">Queue Execution</h2>
+            <div class="content-group">
+                <div>
+                    <span class="label">Queued experiments:</span>  
+                    <span id="total_queued_experiments"></span>
+                </div>
+                <div>
+                    <span class="label">Total jobs:</span>  
+                    <span id="total_queued_jobs"></span>
+                </div>
+                <div>
+                    <span class="label">Incomplete jobs:</span>  
+                    <span id="total_incomplete_jobs"></span>
+                </div>
+            </div>
+            <div id="queue-execution-button"
+                 role="button"
+                 class="clickable button-regular"
+                 onclick="eel.execute_queued_experiments()">
+                 Execute queued jobs</div>
+            <hr>
+            <h2 class="small-heading">Execution Progress</h2>
+            <div class="content-group">
+                <div>
+                    <p>Overall progress:</p>
+                    <div class="progress-bar">
+                        <div class="current-progress inactive"
+                             id="execution-overall-progress"
+                             style="width: 100%;"></div>
+                        <p class="progress-label">--</p>
+                    </div>
+                </div>
+                <div>
+                    <p>Current experiment progress:</p>
+                    <div class="progress-bar">
+                        <div class="current-progress inactive"
+                             id="execution-experiment-progress"
+                             style="width: 100%;"></div>
+                        <p class="progress-label">--</p>
+                    </div>
+                </div>
+                <div>
+                    <p>Current job progress:</p>
+                    <div class="progress-bar">
+                        <div class="current-progress inactive"
+                             id="execution-job-progress"
+                             style="width: 100%;"></div>
+                        <p class="progress-label">--</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" 
+        src="../scripts/instance_management/common.js"></script>
+<script type="text/javascript" 
+        src="../scripts/simulation.js"></script>
+{% endblock %}

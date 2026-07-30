@@ -1,0 +1,22 @@
+<!-- Instance type navigation -->
+<nav class="side-navbar">
+    <h1 class="content-container-heading">Instance Types</h1>
+    <ul>
+        <li>
+            <a class="clickable {{ 'active' if active_instance_page == 'noise_data' }}"
+               href="noise_data_instances.html">Noise Data</a>
+        </li>
+        <li>
+            <a class="clickable {{ 'active' if active_instance_page == 'noise_models' }}" 
+               href="noise_model_instances.html">Noise Models</a>
+        </li>
+        <li>
+            <a class="clickable {{ 'active' if active_instance_page == 'circuits' }}" 
+               href="circuit_instances.html">Circuits</a>
+        </li>
+        <li>
+            <a class="clickable {{ 'active' if active_instance_page == 'experiments' }}"
+               href="experiment_instances.html">Experiments</a>
+        </li>
+    </ul>
+</nav>

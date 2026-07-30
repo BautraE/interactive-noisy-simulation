@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% set active_main_page = "instance_management" %}
+{% set active_instance_page = "experiments" %}
+
+{% block css %}
+<link rel="stylesheet" 
+      href="../styles/page_specific/instance_management/common.css">
+<link rel="stylesheet" 
+      href="../styles/page_specific/instance_management/experiments/single_instance.css">
+{% endblock %}
+
+{% block content %}
+{% include "instance_management/side_navbar.html" %}
+<!-- Current page content -->
+<div class="content-container">
+    <a class="clickable link-previous"
+       onclick="backToInstances()">> Experiment Instances</a>
+    <h1 class="content-container-heading">
+        Experiment instance "<span id="instance-name"></span>"
+    </h1>
+    <div class="content-box-header">
+        <div class="left">
+            <p>Jobs within this experiment instance:</p>
+        </div>
+        <div class="right">
+            <div role="button"
+                 class="clickable button-regular variant-default"
+                 onclick="showPopUpWindow('add_job_to_experiment', initNewInstanceForm)">
+                Add job</div>
+        </div>
+    </div>
+    <!-- Container for experiment job management -->
+    <div class="experiment-jobs">
+        <div class="content-box variant-dark">
+            <h2 class="small-heading">Detailed View</h2>
+            <div class="detailed-job-view"
+                 id="detailed-job-view"></div>
+        </div>
+        <div id="job-instances"
+             class="content-box variant-light"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" 
+        src="../scripts/instance_management/common.js"></script>
+<script type="text/javascript" 
+        src="../scripts/instance_management/experiments/single_instance.js"></script>
+{% endblock %}

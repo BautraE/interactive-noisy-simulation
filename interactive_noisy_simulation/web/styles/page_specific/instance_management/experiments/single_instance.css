@@ -1,0 +1,150 @@
+/* 
+=================================================================
+Page specific styles for page showing specific experiment 
+instance information (jobs associated with experiment).
+=================================================================
+File contents list:
+1. Main page content elements - Styling for any big main elements
+   in this specific page (headings, containers for data, etc).
+2. Detailed experiment job view
+3. Simple experiment job view
+-----------------------------------------------------------------
+
+--------------------------------------------------------------
+1. Main page content elements
+-------------------------------------------------------------- 
+*/
+
+/* Container for experiment job viewing (contains both simple and 
+   detailed view) */
+.experiment-jobs {
+    margin-left: 20px;
+    
+    display: flex;
+    min-height: 0;
+    flex: 1;
+}
+
+/* Sub-containers for experiment job viewing (one container per different 
+   view - simple and detailed) */
+.experiment-jobs .content-box {
+    margin-left: 0;
+
+    overflow-y: auto;
+}
+/* Simple experiment job container (visible container) */
+.experiment-jobs .content-box.variant-light {
+    width: 65%;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+/* Detailed experiment job container (visible container) */
+.experiment-jobs .content-box.variant-dark {
+    display: flex;
+    flex-direction: column;
+    width: 35%;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+
+    padding-bottom: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+
+/*
+--------------------------------------------------------------
+2. Detailed experiment job view
+-------------------------------------------------------------- 
+*/
+
+/* Detailed view heading */
+.content-box.variant-dark > .small-heading {
+    margin-top: 15px;
+}
+
+/* Empty container text */
+.content-box.variant-dark > .empty-container-text {
+    font-size: 16px;
+}
+
+/* Detailed experiment job information container */
+.detailed-job-view {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    min-height: 0;
+    flex: 1;
+}
+
+/* Only detailed information (without actions at the bottom) */
+.detailed-job-view .details {
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px;
+    overflow-y: auto;
+}
+
+/* Only action button container at the bottom from detailed information container
+   (without the detailed information) */
+.detailed-job-view .actions {
+    margin-bottom: 0;
+    margin-top: auto;
+    align-self: flex-end;
+}
+
+/* -------------------------------------------------------- */
+/* Text styles in detailed view  */
+
+.detailed-job-view .label {
+    text-transform: uppercase;
+    font-style: italic;
+    color: var(--color-element-highlight-primary);
+}
+
+.detailed-job-view pre {
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+.detailed-job-view ul {
+    display: flex;
+    flex-direction: column;
+    row-gap: 7px;
+    padding: 0;
+    margin-left: 25px;
+    margin-top: 10px;
+
+    list-style-type: none;
+}
+
+.detailed-job-view li > .label {
+    text-transform: none;
+    color: var(--color-element-highlight-secondary);
+}
+
+
+/*
+--------------------------------------------------------------
+3. Simple experiment job view
+-------------------------------------------------------------- 
+*/
+
+/* Empty container text */
+.experiment-jobs > .content-box.variant-light > .empty-container-text{
+    margin-top: 30px;
+
+    font-size: 16px;
+}
+
+/* Style for currently selected experiment job row in simple view */
+table tr.active {
+    box-shadow: inset 0 0 0 2px var(--color-element-highlight-secondary);
+
+    pointer-events: none;
+}
+
+.experiment-jobs table tr.clickable:hover {
+    box-shadow: inset 0 0 0 2px var(--color-table-rows-border-hover);
+}

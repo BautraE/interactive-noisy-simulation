@@ -1,0 +1,21 @@
+/* 
+=================================================================
+Page specific styles for page showing specific noise data 
+instance information.
+=================================================================
+File contents list:
+1. Miscellaneous content element styling - various specific
+   element styles that only apply in specific pages.
+-----------------------------------------------------------------
+
+--------------------------------------------------------------
+1. Miscellaneous content element styling
+-------------------------------------------------------------- 
+*/
+
+/* Text that appears if there are no noise data sources available
+   to create new noise models from. */
+.noise-data-sources > .empty-container-text {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}

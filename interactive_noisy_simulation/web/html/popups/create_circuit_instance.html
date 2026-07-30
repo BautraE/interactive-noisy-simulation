@@ -1,0 +1,56 @@
+<div class="pop-up">
+     <div class="pop-up-title-bar">
+          <h2 class="pop-up-title">New circuit instance</h2>
+     </div>
+     <form class="pop-up-form">
+          <!-- Reference key input -->
+          <div class="form-input-group">
+               <label for="reference-key">Reference key:</label>
+               <div class="hidden-element input-error-message"
+                    id="reference-key-input-message"></div>
+               <div class="input-with-tracker">
+                    <input type="text" 
+                         id="reference-key" 
+                         name="reference-key"  
+                         placeholder="Enter reference key">
+                    <div class="reference-key-input-length">
+                         <span id="reference-key-input-length">0</span>
+                         /
+                         <span id="reference-key-input-max-length"></span>
+                    </div>
+               </div>
+          </div>
+          <!-- QPY circuit file input -->
+          <div class="form-input-group">
+               <label>Circuit file (.qpy):</label>
+               <div class="hidden-element input-error-message"
+                    id="circuit-file-input-message"></div>
+               <div class="content-box variant-light file-input-box"
+                    id="circuit-file-input">
+                    <div class="file-icon-image"></div>
+                    <a role="button"
+                       id="chose-file-button"
+                       class="clickable action variant-default"
+                       onclick="eel.select_qpy()">Choose file</a>
+                    <p id="selected-file" 
+                       class="selected-file hidden-element"></p>
+                    <div role="button"
+                         id="remove-selected-file-icon"
+                         class="clickable x-icon variant-red hidden-element"
+                         onclick="removeSelectedFile()"></div>
+                    <input type="hidden" 
+                         id="file-path" 
+                         name="file-path">
+               </div>
+          </div>
+     </form>
+     <!-- Create / Cancel buttons -->
+     <div class="form-actions">
+          <div role="button"
+               class="clickable button-regular variant-default"
+               onclick="hidePopUpWindow()">Cancel</div>
+          <div role="button"
+               class="clickable button-regular variant-green"
+               onclick="createInstance()">Create instance</div>
+     </div>
+</div>

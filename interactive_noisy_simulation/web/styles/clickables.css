@@ -1,0 +1,301 @@
+/*
+=================================================================
+Clickable element styles (buttons, actions, icons)
+=================================================================
+File contents list:
+1. Common features - style properties that are expected.
+   across all elements that are clickable (buttons, links and
+   actions in the form of text, icons, etc.).
+2. Actions - text that can be clicked.
+3. Buttons - div elements in the form of buttons.
+4. Icons - clickable icons made purely through of CSS.
+5. Links - text that represents a link for going back to the
+   previous page / pages.
+-----------------------------------------------------------------
+
+-------------------------------------------------------------- 
+1. Common features
+--------------------------------------------------------------
+*/ 
+
+/* Class "clickable" that must be added to all elements that
+   are supposed to be clicked. */
+.clickable,
+.clickable * {
+    cursor: pointer;
+
+    transition: color 0.5s ease,
+    background-color 0.5s ease,
+    text-shadow 0.5s ease,
+    box-shadow 0.5s ease;
+}
+.clickable:hover,
+.clickable:hover * {
+    transition-duration: 0.3s;
+}
+.clickable:active,
+.clickable:active * {
+    transition-duration: 0.1s;
+}
+/* For icons made through CSS */
+.clickable::before,
+.clickable::after {
+    transition: background-color 0.5s ease;
+}
+.clickable:hover::before,
+.clickable:hover::after {
+    transition-duration: 0.3s;
+}
+.clickable:active::before,
+.clickable:active::after {
+    transition-duration: 0.1s;
+}
+
+
+/* 
+-------------------------------------------------------------- 
+2. Actions
+-------------------------------------------------------------- 
+*/
+
+/* Class that must be added to clickable actions */
+.action {
+    width: fit-content;
+
+    text-decoration: underline;
+    text-transform: capitalize;
+    color: var(--text-color);
+}
+
+/* -------------------------------------------------------- */
+/* Different colors for actions: */
+
+/* Action for viewing more details */
+.action.variant-default {
+    --text-color: var(--color-actions-variant-default);
+}
+.action.variant-default:hover {
+    --text-color: var(--color-actions-variant-default-hover);
+}
+.action.variant-default:active {
+    --text-color: var(--color-actions-variant-default-active);
+}
+
+/* Disabled action variant (requires manual removal of 
+   onClick event) */
+.action.variant-disabled {
+    --text-color: var(--color-actions-variant-disabled);
+
+    cursor: default;
+}
+
+/* Action for deleting / removing stuff */
+.action.variant-red {
+    --text-color: var(--color-actions-variant-red);
+}
+.action.variant-red:hover {
+    --text-color: var(--color-actions-variant-red-hover);
+}
+.action.variant-red:active {
+    --text-color: var(--color-actions-variant-red-active);
+}
+
+/* Action for creating / adding stuff */
+.action.variant-green {
+    --text-color: var(--color-actions-variant-green);
+}
+.action.variant-green:hover {
+    --text-color: var(--color-actions-variant-green-hover);
+}
+.action.variant-green:active {
+    --text-color: var(--color-actions-variant-green-active);
+}
+
+
+/* 
+-------------------------------------------------------------- 
+3. Buttons
+-------------------------------------------------------------- 
+*/
+
+/* -------------------------------------------------------- */
+/* Types of buttons */
+
+.button-regular {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    height: fit-content;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-radius: 4px;
+
+    box-shadow: inset 0 0 0 1px var(--border-color);
+    color: var(--text-color);
+    background-color: var(--background-color);
+    filter: var(--container-drop-shadow);
+}
+
+/* -------------------------------------------------------- */
+/* Different colors for buttons: */
+
+/* button color schemes */
+.button-regular.variant-default {
+    --background-color: var(--color-button-variant-default-background);
+    --text-color: var(--color-button-variant-default-text);
+    --border-color: var(--color-button-variant-default-border);
+}
+.button-regular.variant-default:hover {
+    --background-color: var(--color-button-variant-default-background-hover);
+    --text-color: var(--color-button-variant-default-text-hover);
+    --border-color: var(--color-button-variant-default-border-hover);
+}
+.button-regular.variant-default:active {
+    --background-color: var(--color-button-variant-default-background-active);
+    --text-color: var(--color-button-variant-default-text-active);
+    --border-color: var(--color-button-variant-default-border-active);
+}
+
+.button-regular.variant-disabled {
+    --background-color: var(--color-button-variant-disabled-background);
+    --text-color: var(--color-button-variant-disabled-text);
+    --border-color: var(--color-button-variant-disabled-border);
+
+    pointer-events: none;
+}
+
+.button-regular.variant-red {
+    --background-color: var(--color-button-variant-red-background);
+    --text-color: var(--color-button-variant-red-text);
+    --border-color: var(--color-button-variant-red-border);
+}
+.button-regular.variant-red:hover {
+    --background-color: var(--color-button-variant-red-background-hover);
+    --text-color: var(--color-button-variant-red-text-hover);
+    --border-color: var(--color-button-variant-red-border-hover);
+}
+.button-regular.variant-red:active {
+    --text-color: var(--color-button-variant-red-text-active);
+    --border-color: var(--color-button-variant-red-border-active);
+}
+
+.button-regular.variant-green {
+    --background-color: var(--color-button-variant-green-background);
+    --text-color: var(--color-button-variant-green-text);
+    --border-color: var(--color-button-variant-green-border);
+}
+.button-regular.variant-green:hover {
+    --background-color: var(--color-button-variant-green-background-hover);
+    --text-color: var(--color-button-variant-green-text-hover);
+    --border-color: var(--color-button-variant-green-border-hover);
+}
+.button-regular.variant-green:active {
+    --text-color: var(--color-button-variant-green-text-active);
+    --border-color: var(--color-button-variant-green-border-active);
+}
+
+
+/* 
+--------------------------------------------------------------
+4. Icons
+--------------------------------------------------------------
+*/
+
+/* -------------------------------------------------------- */
+/* Types of icons */
+
+/* X icon for closing windows and sidebars */
+.x-icon {
+    position: relative;
+    width: 20px;
+    height: 20px;
+
+    filter: var(--container-drop-shadow);
+}
+.x-icon::before,
+.x-icon::after {
+    content: "";
+
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 20px;
+    height: 3px;
+
+    background-color: var(--background-color);
+    border-radius: 4px;
+    
+    transform-origin: center;
+
+    transition: background-color 0.5s ease;
+}
+.x-icon::before {
+    transform: translateY(-50%) rotate(45deg);
+}
+.x-icon::after {
+    transform: translateY(-50%) rotate(-45deg);
+}
+.x-icon:hover::before,
+.x-icon:hover::after {
+    background-color: var(--background-color);
+}
+.x-icon:active::before,
+.x-icon:active::after {
+    background-color: var(--background-color);
+}
+
+
+/* -------------------------------------------------------- */
+/* Different colors for icons */
+
+/* "icon-red" for a red icon */
+.x-icon.variant-default::before,
+.x-icon.variant-default::after {
+    --background-color: var(--color-icon-variant-default);
+}
+.x-icon.variant-default:hover::before,
+.x-icon.variant-default:hover::after {
+    --background-color: var(--color-icon-variant-default-hover);
+}
+.x-icon.variant-default:active::before,
+.x-icon.variant-default:active::after {
+    --background-color: var(--color-icon-variant-default-active);
+}
+
+.x-icon.variant-red::before,
+.x-icon.variant-red::after {
+    --background-color: var(--color-icon-variant-red);
+}
+.x-icon.variant-red:hover::before,
+.x-icon.variant-red:hover::after {
+    --background-color: var(--color-icon-variant-red-hover);
+}
+.x-icon.variant-red:active::before,
+.x-icon.variant-red:active::after {
+    --background-color: var(--color-icon-variant-red-active);
+}
+
+
+/* 
+-------------------------------------------------------------- 
+5. Links
+-------------------------------------------------------------- 
+*/
+
+.link-previous {
+    width: fit-content;
+    margin-bottom: 10px;
+
+    font-size: 16px;
+    color: var(--color-previous-page-link);
+    text-decoration: underline;
+}
+.link-previous:hover {
+    color: var(--color-previous-page-link-hover);
+}
+.link-previous:active {
+    color: var(--color-previous-page-link-active);
+}

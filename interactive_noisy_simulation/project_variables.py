@@ -1,0 +1,56 @@
+# =================================================================
+# Shared project-level variables and singleton instances.
+# =================================================================
+
+# Functionality-related imports:
+# Standard library imports:
+from importlib import resources
+
+
+# Project directory paths:
+PACKAGE_ROOT = resources.files("interactive_noisy_simulation")
+
+
+# Static project data:
+from .data._data import (
+    # CSV data-related:
+    USED_CSV_COLUMNS,
+    MULTI_DATA_CSV_COLUMNS,
+    UNNECESSARY_CSV_COLUMNS,
+    # Supported qubit gates:
+    SINGLE_QUBIT_GATES,
+    TWO_QUBIT_GATES,
+    # Messages:
+    EMPTY_CONTAINER_MESSAGES,
+    ERROR_MESSAGES,
+    LOG_MESSAGES, 
+    TERMINAL_MESSAGES,
+    TERMINAL_COMMAND_DESCRIPTION
+)
+
+
+# Sharable class objects:
+# - Specific instance managers:
+from .core.instance_managers.noise_data_manager import NoiseDataManager
+noise_data_manager = NoiseDataManager()
+
+from .core.instance_managers.noise_creator import NoiseCreator
+noise_creator = NoiseCreator()
+
+from .core.instance_managers.circuit_manager import CircuitManager
+circuit_manager = CircuitManager()
+
+from .core.instance_managers.experiment_manager import ExperimentManager
+experiment_manager = ExperimentManager()
+
+# - Log manager:
+from .core.logs.log_manager import LogManager
+log_manager = LogManager()
+
+# - Simulation manager:
+from .core.simulation.simulation_manager import SimulationManager
+simulation_manager = SimulationManager()
+
+# - Key blocker:
+from .core.key_blocker import KeyBlocker
+key_blocker = KeyBlocker()

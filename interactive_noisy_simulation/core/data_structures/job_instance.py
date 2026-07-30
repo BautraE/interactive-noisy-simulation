@@ -1,0 +1,126 @@
+# Standard library imports:
+from dataclasses import dataclass, field
+
+# Imports only used for type definition:
+from .circuit_instance import CircuitInstance
+from .noise_model_instance import NoiseModelInstance
+from qiskit.transpiler import Target
+from qiskit import QuantumCircuit
+
+
+@dataclass
+class Job:
+    """Class for storing an experiment job instance.
+    
+    Attributes:
+        reference_key (str): Key by which the specific object is accessed 
+            in other places of the `INS` app.
+        circuit (QuantumCircuit): Selected circuit instance that will be
+            executed by the specific job instance.
+        shot_count (int): Amount of times that the selected circuit 
+            will be executed as part of this job instance.
+        hardware (str): Hardware option that will be used during 
+            simulation (what part of computer hardware will be 
+            responsible for the simulator circuit executions - `CPU` 
+            or `GPU`).
+        simulation_method (str): Simulation method that the simulator
+            will use as part of running the specific job instance.
+        transpilation_target (Target): Job-specific target object that
+            will be used during circuit transpilation (this is used
+            to avoid issues with transpilation when using created
+            simulator as backend argument for `transpile` function).
+        transpiled_circuit (QuantumCircuit): Transpiled version of `circuit`,
+            capable of being executed on a simulator that is based on the
+            specific job instance.
+        noise_model_instance (NoiseModelInstance | None): Selected
+            noise model instance that will be used during simulation. 
+            In case of `None`, it will be a noiseless simulation.
+        optimization_level (int | None): Optimization level for the 
+            transpilation process (for preparing the selected circuit 
+            to be run on a simulator with the selected noise model). 
+            `None` will only be set if the simulation is noiseless.
+        completed_shots (int): Amount of times that the selected circuit
+            has been already executed. This acts as a job proggess metric.
+    """
+    reference_key: str
+    circuit: CircuitInstance
+    shot_count: int
+    hardware: str
+    simulation_method: str
+    transpilation_target: Target
+    transpiled_circuit: QuantumCircuit
+    noise_model: NoiseModelInstance | None = None
+    optimization_level: int | None = None
+    completed_shots: int = 0
+    result_counts: dict[str, int] = field(default_factory=dict)
+
+
+    @property
+    def status(self) -> str:
+        """Returns status of job based on completed shots.
+        
+        Returns:
+            str: Status message.
+        """
+        if self.completed_shots == 0:
+            return "pending"
+        elif self.completed_shots == self.shot_count:
+            return "completed"
+        else:
+            return "partial"
+
+
+    @property
+    def is_complete(self) -> bool:
+        """Returns job completion state for internal INS functionality
+        in the form of a boolean value (`True` or `False`), based on 
+        completed shots.
+        
+        Returns:
+            bool: Whether or not the job is completed (if all shots are 
+            completed).
+        """
+        if self.shot_count == self.completed_shots:
+            return True
+        else:
+            return False
+
+
+    @property
+    def remaining_shots(self) -> int:
+        """Returns the number of remaining shots that the job has left to 
+        complete.
+        
+        Returns:
+            int: Number of remaining shots.
+        """
+        return self.shot_count - self.completed_shots
+    
+
+    @property
+    def completion_percentage(self) -> float:
+        """Returns completion percentage based on completed shots, compared to
+        total number of shots.
+        
+        Returns:
+            float: Job completion percentage.
+        """
+        percentage = (self.completed_shots / self.shot_count) * 100.0
+        return round(percentage, 2)
+    
+
+    def add_results(
+        self, 
+        new_results: dict[str, int]
+    ) -> None:
+        """Adds additional result data to job instance from a completed shot
+        batch.
+
+        Args:
+            new_results (dict[str, int]): Additional result data from completed
+                shots that will be added to the total result data of the job
+                instance.
+        """
+        for key, value in new_results.items():
+            self.result_counts[key] = self.result_counts.get(key, 0) + value
+            self.completed_shots += value

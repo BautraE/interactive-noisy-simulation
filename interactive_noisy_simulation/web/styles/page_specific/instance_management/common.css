@@ -1,0 +1,91 @@
+/* 
+=================================================================
+Common style rules across all instance management pages
+=================================================================
+File contents list:
+1. Side navigation panel - navigation panel for going between
+   pages for different instance types.
+2. Miscellaneous content element styling - various specific
+   element styles that only apply in specific pages.
+-----------------------------------------------------------------
+
+--------------------------------------------------------------
+1. Side navigation panel
+-------------------------------------------------------------- 
+*/
+.side-navbar {
+    background-color: var(--color-side-navbar-background);
+    box-sizing: border-box;
+    width: 20%;
+    min-width: var(--width-min-side-navbar);
+    padding-top: 35px;
+}
+.side-navbar .content-container-heading {
+    margin-left: 35px;
+    margin-right: 35px;
+}
+.side-navbar ul {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    row-gap: 10px;
+    padding: 0;
+    margin-left: 35px;
+}
+.side-navbar ul li {
+    height: fit-content;
+}
+/* Navbar link styles: */
+.side-navbar ul li a {
+    text-decoration: none;
+    color: var(--color-side-navbar-link-text);
+    font-size: 19px;
+
+    display: block;
+    background-color: var(--color-side-navbar-link-background);
+    border-radius: 4px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-right: 35px;
+    filter: var(--container-drop-shadow);
+}
+.side-navbar ul li a:hover {
+    background-color: var(--color-side-navbar-link-background-hover);
+}
+.side-navbar ul li a:active {
+    background-color: var(--color-side-navbar-link-background-active);
+}
+/* For current page link */
+.side-navbar ul li a.active {
+    margin-right: 0px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+
+    background-color: var(--color-side-navbar-link-background-opened);
+
+    pointer-events: none;
+}
+
+
+/* 
+-------------------------------------------------------------- 
+2. Miscellaneous content element styling
+-------------------------------------------------------------- 
+*/
+/* Content box for displayable existing instance data 
+   Makes the content box stretched initially. */
+.instances-content-box {
+    flex: 1;
+    
+    overflow-y: auto;
+}
+
+/* Text that appears if there is no content to currently display
+   within a specific container. */
+.instances-content-box > .empty-container-text {
+    margin-top: 30px;
+
+    font-size: 20px;
+}

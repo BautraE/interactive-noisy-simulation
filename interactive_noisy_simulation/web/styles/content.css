@@ -1,0 +1,355 @@
+/* 
+=================================================================
+General content styles that are used by all pages of INS
+=================================================================
+File contents list:
+1. Specific element styling / default style overwriting.
+2. Table styling.
+3. Main navbar styling.
+4. Main page content container and common element styles
+   (div containers and content boxes, headings, etc.)
+5. Situation-specific styles - hiding / showing elements, 
+   disabling scrolling, etc.
+6. Progress bar styles.
+7. Status text styles.
+-----------------------------------------------------------------
+
+--------------------------------------------------------------
+1. Specific element styling / default style overwriting.
+-------------------------------------------------------------- 
+*/ 
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    
+    font-family: 'Nunito';
+    font-size: 16px;
+    color: var(--color-text-default);
+
+    /* Filler color in case the intended one does not show 
+       (only for development) */
+    background-color: black;
+}
+
+p, h1, h2, h3, h4, ul {
+    margin: 0;
+}
+
+/* Horizontal line separating different content parts */
+hr {
+    border-width: 1.5px;
+    border-color: var(--color-hr-border);
+    color: var(--color-hr-border);
+    border-style: solid;
+}
+
+
+/*
+--------------------------------------------------------------
+2. Table styling
+-------------------------------------------------------------- 
+*/ 
+table {
+    width: 100%;
+    border-spacing: 0;
+}
+
+th {
+    text-align: left;
+    vertical-align: top;
+    text-transform: uppercase;
+    font-style: italic;
+    font-weight: normal;
+    color: var(--color-element-highlight-primary);
+
+    border-radius: 8px;
+}
+
+td {
+    text-wrap: balance;
+    text-align: left;
+    vertical-align: top;
+    word-break: break-word;
+}
+
+td, th {
+    padding: 10px;
+}
+
+tr {
+    border-radius: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: var(--color-table-rows-even);
+}
+
+tr td:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+tr td:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.action-container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 15px;
+}
+
+
+/*
+--------------------------------------------------------------
+3. Main navbar styling.
+-------------------------------------------------------------- 
+*/ 
+.main-navbar {
+    position: sticky;
+    z-index: 1;
+    top: 0;
+    height: 35px;
+    width: 100%;
+    min-width: var(--width-min-page-content);
+    box-sizing: border-box;
+    
+    padding-left: 35px;
+
+    background-color: var(--color-main-navbar-background);
+}
+.main-navbar ul {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+    column-gap: 35px;
+    padding: 0;
+    align-items: center;
+}
+.main-navbar ul li {
+    height: fit-content;
+}
+/* Navbar link styles: */
+.main-navbar ul li a {
+    text-decoration: none;
+    color: var(--color-main-navbar-link-text);
+    font-size: 16px;
+}
+.main-navbar ul li a:hover {
+    text-shadow: var(--color-main-navbar-link-text-shadow) 0px 0 13px;
+    color: var(--color-main-navbar-link-text-hover);
+}
+.main-navbar ul li a:active {
+    text-shadow: var(--color-main-navbar-link-text-shadow) 0px 0 15px;
+    color: var(--color-main-navbar-link-active);
+}
+/* For current page link */
+.main-navbar ul li a.active {
+    color: var(--color-main-navbar-link-opened);
+
+    pointer-events: none;
+}
+
+
+/*
+--------------------------------------------------------------
+4. Main page content container and common element styles
+   (div containers and content boxes, headings, etc.)
+-------------------------------------------------------------- 
+*/ 
+/* Main page content container. It encapsulates all content of the
+   page after the main navigation bar */
+.page-content {
+    display: flex;
+    flex: 1;
+    max-height: var(--height-max-page-content);
+    min-width: var(--width-min-page-content);
+    min-height: var(--height-min-page-content);
+    overflow: auto;
+
+    background: var(--gradient-primary-background);
+}
+
+/* Content container - div element that will contain specific content
+   (headings, content boxes, clickables, text, etc.) */
+.content-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding-top: 35px;
+    padding-bottom: 80px;
+    padding-left: 35px;
+    padding-right: 35px;
+    overflow-y: auto;
+
+    scrollbar-color: var(--scrollbar-color-content-containers);
+}
+
+/* Main heading elements */
+.content-container-heading,
+.medium-heading,
+.small-heading {
+    text-transform: uppercase;
+    font-weight: bold;
+
+    filter: var(--container-drop-shadow);
+}
+
+.content-container-heading {
+    text-align: center;
+    margin-bottom: 30px;
+    
+    font-size: 24px;
+}
+
+.medium-heading {
+    font-size: 18px;
+}
+
+.small-heading {
+    text-align: center;
+    margin-bottom: 15px;
+
+    font-size: 16px;
+}
+
+/* Text that appears if there is no content to currently display
+   within a specific container. */
+.empty-container-text {
+    text-align: center;
+
+    color: var(--color-text-muted);
+}
+
+
+/* -------------------------------------------------------- */
+/* Content box styles: */
+
+/* Header usually containing minimal text and various clickables */
+.content-box-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+/* Element placement in content box headers */
+.content-box-header .left, .content-box-header .right {
+    display: flex;
+    column-gap: 20px;
+}
+.content-box-header .right {
+    margin-left: auto;
+}
+
+/* Darker containers that have readable / visible content
+   (instances or any information about them, data tables, etc.) */
+.content-box {
+    width: auto;
+    margin-left: 20px;
+    padding: 10px;
+    border-radius: 8px;
+
+    scrollbar-color: var(--scrollbar-color-content-box);
+}
+.content-box.variant-light {
+    background-color: var(--color-content-box-light);
+}
+.content-box.variant-dark {
+    background-color: var(--color-content-box-dark);
+}
+
+
+/* 
+--------------------------------------------------------------
+5. Situation-specific styles
+--------------------------------------------------------------
+*/
+/* Something that gets added to elements to hide them */
+.hidden-element {
+    display: none;
+}
+
+/* Style that gets put on body to prevent scrolling whenever
+   either a sidebar or an on-screen pop-up is open. */
+.no-scroll {
+    overflow: hidden;
+}
+
+
+/*
+--------------------------------------------------------------
+6. Progress bar styles.
+-------------------------------------------------------------- 
+*/
+/* Progress line container */
+.progress-bar {
+    position: relative;
+    
+    height: 15px;
+    width: 100%;
+    padding: 5px;
+
+    background-color: var(--color-progress-bar-box);
+    border-radius: 8px;
+}
+/* Progress line with percentage text */
+.current-progress {
+    /* Styles for line */
+    height: 100%;
+    width: 0%;
+
+    background-color: var(--color-progress-bar-line);
+    border-radius: 8px;
+
+    transition: background-color 0.5s ease,
+                width 0.1s ease;
+}
+/* Progress line style for when the specific process with trackable
+   progress is not running. */
+.current-progress.inactive {
+    background-color: var(--color-progress-bar-line-inactive);
+}
+/* Styles for percentage text */
+div.progress-bar p.progress-label {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    margin-bottom: 0; /* Removing inherited style */
+    
+    color: var(--color-progress-bar-text);
+    font-size: 12px;
+    font-weight: bold;
+}
+
+
+/* 
+-------------------------------------------------------------- 
+7. Status text styles
+-------------------------------------------------------------- 
+*/
+td.green-text {
+    color: var(--color-text-green);
+}
+td.red-text {
+    color: var(--color-text-red);
+}
+
+.status-text {
+    text-transform: uppercase;
+}
+.status-text.variant-green {
+    color: var(--color-text-green);
+}
+.status-text.variant-grey {
+    color: var(--color-text-muted);
+}
+.status-text.variant-yellow {
+    color: var(--color-text-yellow);
+}

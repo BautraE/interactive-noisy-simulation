@@ -1,0 +1,157 @@
+/* 
+=================================================================
+Log sidebar-related styles
+=================================================================
+File contents list:
+1. Button element for opening log side panel - located outside
+   of side panel, at the bottom-right corner of the active page.
+2. Main div containers that make the log panel.
+3. Content of the log side panel.
+4. Log entry text fragment highlighting styles.
+-----------------------------------------------------------------
+
+-------------------------------------------------------------- 
+1. Button element for opening log side panel
+-------------------------------------------------------------- 
+*/ 
+.log-sidebar-open-button {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-top-left-radius: 4px;
+    background-color: var(--color-button-variant-default-background);
+    box-shadow: 
+        inset 0 1px 0 0 var(--color-button-variant-default-border), /* Top outline */
+        inset 1px 0 0 0 var(--color-button-variant-default-border); /* Left outline */
+
+    cursor: pointer;
+
+    color: var(--color-button-variant-default-text);
+    font-size: 18px;
+}
+.log-sidebar-open-button:hover {
+    background-color: var(--color-button-variant-default-background-hover);
+    box-shadow: 
+        inset 0 1px 0 0 var(--color-button-variant-default-border-hover), /* Top outline */
+        inset 1px 0 0 0 var(--color-button-variant-default-border-hover); /* Left outline */
+    color: var(--color-button-variant-default-text-hover);
+}
+.log-sidebar-open-button:active {
+    background-color: var(--color-button-variant-default-background-active);
+    box-shadow: 
+        inset 0 1px 0 0 var(--color-button-variant-default-border-active), /* Top outline */
+        inset 1px 0 0 0 var(--color-button-variant-default-border-active); /* Left outline */
+    color: var(--color-button-variant-default-text-active);
+}
+
+/*
+--------------------------------------------------------------
+2. Main div containers that make the log panel
+-------------------------------------------------------------- 
+*/
+/* Container for two main sub-containers */
+.log-container {
+    display: flex;
+    position: fixed;
+    top: 35px;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    height: var(--height-max-page-content);
+
+    background-color: rgba(0, 0, 0, 0.65);
+
+    justify-content: flex-end;
+    overflow-x: auto;
+}
+
+.log-sidebar {
+    max-width: 40%;
+    min-width: var(--width-min-log-sidebar);
+    flex: 1;
+    
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow-y: auto;
+
+    background: var(--gradient-secondary-background);
+    scrollbar-color: var(--scrollbar-color-content-containers);
+}
+
+
+/*
+--------------------------------------------------------------
+3. Content of the log side panel
+-------------------------------------------------------------- 
+*/
+/* "X" icon for closing side panel */
+.log-sidebar-x-icon {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+/* Content box for log messages and errors */
+.log-content-box {
+    flex: 0 0 auto;
+    max-height: 65vh;
+    margin-bottom: 20px;
+    
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+/* Text that appears if there is no content to currently display
+   within a specific container. */
+.log-content-box > .empty-container-text {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* -------------------------------------------------------- */
+/* Message part of log */
+
+/* Each log message instance that is made visible in the content box */
+.log-entry {
+    display: flex;
+}
+
+/* Message log instance container for action (ex. "Clear") */
+.log-entry-action-box {
+    margin-right: 20px;
+}
+
+/* Message log instance container for timestamp and
+   message text */
+.log-entry-content-box {
+    word-break: break-word;
+}
+
+/* Timestamp text */
+.log-timestamp {
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+/* Message text of log instance */
+.log-entry-content-box p:last-child {
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+
+/*
+--------------------------------------------------------------
+4. Log entry text fragment highlighting styles.
+-------------------------------------------------------------- 
+*/
+span.highlight {
+    color: var(--color-element-highlight-primary);
+}

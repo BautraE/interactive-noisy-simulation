@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% set active_main_page = "instance_management" %}
+{% set active_instance_page = "noise_data" %}
+
+{% block css %}
+<link rel="stylesheet" 
+      href="../styles/page_specific/instance_management/common.css">
+<link rel="stylesheet" 
+      href="../styles/page_specific/instance_management/noise_data/single_instance.css">
+{% endblock %}
+
+{% block content %}
+{% include "instance_management/side_navbar.html" %}
+<!-- Current page content -->
+<div class="content-container">
+    <a class="clickable link-previous"
+       onclick="backToInstances()">> Noise Data Instances</a>
+    <h1 class="content-container-heading">
+        Noise data instance "<span id="instance-name"></span>"
+    </h1>
+    <div class="content-box-header">
+        <div class="left">
+            <p>Specific qubit data:</p>
+        </div>
+    </div>
+    <!-- Container where content boxes with qubit noise data will be added -->
+    <div id="qubit-data"
+         class="qubit-data"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="../scripts/instance_management/noise_data/single_instance.js"></script>
+{% endblock %}

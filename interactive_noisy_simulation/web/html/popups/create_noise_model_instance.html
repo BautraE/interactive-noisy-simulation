@@ -1,0 +1,53 @@
+<div class="pop-up">
+     <div class="pop-up-title-bar">
+          <h2 class="pop-up-title">New noise model instance</h2>
+     </div>
+     <form class="pop-up-form"
+           id="pop-up-form">
+          <!-- Reference key input -->
+          <div class="form-input-group">
+               <label for="reference-key">Reference key:</label>
+               <div class="hidden-element input-error-message"
+                    id="reference-key-input-message"></div>
+               <div class="input-with-tracker">
+                    <input type="text"
+                           id="reference-key" 
+                           name="reference-key"  
+                           placeholder="Enter reference key">
+                    <div class="reference-key-input-length">
+                         <span id="reference-key-input-length">0</span>
+                         /
+                         <span id="reference-key-input-max-length"></span>
+                    </div>
+               </div>
+          </div>
+          <!-- Noise data source selection -->
+          <div class="form-input-group">
+               <label>Noise data source:</label>
+               <div class="hidden-element input-error-message"
+                    id="source-data-input-message"></div>
+               <div class="content-box variant-light radio-select-box noise-data-sources"
+                    id="noise-source-container">
+               </div>
+          </div>
+     </form>
+     <!-- Create / Cancel buttons -->
+     <div class="form-actions"
+          id="action-buttons">
+          <div role="button"
+               class="clickable button-regular variant-default"
+               onclick="hidePopUpWindow()">Cancel</div>
+          <div role="button"
+               class="clickable button-regular variant-green"
+               onclick="createNoiseModelInstance()">Create instance</div>
+     </div>
+     <!-- New noise model creation progress bar -->
+     <div class="form-actions hidden-element"
+          id="progress-bar">
+          <div class="progress-bar">
+               <div class="current-progress"
+                    id="current-progress"></div>
+               <p class="progress-label">--</p>
+          </div>
+     </div>
+</div>

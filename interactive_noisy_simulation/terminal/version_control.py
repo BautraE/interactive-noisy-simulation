@@ -6,9 +6,10 @@ import sys
 import requests
 
 # Local project imports:
+from ..utils import format_message_text
 from ._console import console
 from ..VERSION import __version__
-from ..data._data import TERMINAL_MESSAGES
+from ..project_variables import TERMINAL_MESSAGES
 
 
 REPOSITORY_URL = "https://github.com/BautraE/interactive-noisy-simulation"
@@ -20,8 +21,9 @@ LATEST_RELEASE_API = "https://api.github.com/repos/BautraE/interactive-noisy-sim
 
 def check_version() -> None:
     """Prints out the current version of the package."""
-    console.print(TERMINAL_MESSAGES["current_version"].format(
-        version=__version__))
+    printable_text = format_message_text(message=TERMINAL_MESSAGES["current_version"],
+                                         version=__version__)
+    console.print(printable_text)
 
 
 def update_version() -> None:
@@ -39,9 +41,10 @@ def update_version() -> None:
     if latest_version == "error": return
 
     if __is_version_newer(current_version, latest_version):
-        console.print(TERMINAL_MESSAGES["outdated_version"].format(
-            current_version=current_version,
-            latest_version=latest_version))
+        printable_text = format_message_text(TERMINAL_MESSAGES["outdated_version"],
+                                             current_version=current_version,
+                                             latest_version=latest_version)
+        console.print(printable_text)
 
         console.print(TERMINAL_MESSAGES["confirm_update"])
         user_choice = input()
@@ -51,8 +54,9 @@ def update_version() -> None:
         else:
             console.print(TERMINAL_MESSAGES["update_cancelled"])
     else:
-        console.print(TERMINAL_MESSAGES["version_up_to_date"].format(
-            current_version=current_version))
+        printable_text = format_message_text(TERMINAL_MESSAGES["version_up_to_date"],
+                                             current_version=current_version)
+        console.print(printable_text)
 
 
 # Helper functions for main functions in this file
@@ -73,8 +77,9 @@ def __get_latest_version() -> str:
         release_data = response.json()
         version = release_data["tag_name"].strip("v")
     except Exception as e:
-        console.print(TERMINAL_MESSAGES["error"].format(
-            error=e))
+        printable_text = format_message_text(TERMINAL_MESSAGES["error"],
+                                             error=e)
+        console.print(printable_text)
         return "error"
 
     return version
