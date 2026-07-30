@@ -153,7 +153,7 @@ class NoiseDataManager:
         instance = self.__noise_data[reference_key]
         qubit_noise_data = {}
 
-        for qubit in range(instance.get_qubit_count()):
+        for qubit in range(instance.num_qubits):
             qubit_noise_data[qubit] = instance.get_qubit_data(qubit)
 
         return qubit_noise_data

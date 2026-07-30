@@ -26,7 +26,8 @@ class NoiseModelInstance:
     coupling_map: CouplingMap
 
 
-    def get_basis_gates_str(self) -> str:
+    @property
+    def basis_gates_str(self) -> str:
         """Returns noise model basis gates as `str` value.
         
         Returns:
@@ -36,7 +37,8 @@ class NoiseModelInstance:
         return "; ".join(self.noise_model.basis_gates)
     
     
-    def get_qubit_count(self) -> int:
+    @property
+    def num_qubits(self) -> int:
         """Returns noise model qubit count as `int` value.
         
         Returns:
@@ -45,15 +47,16 @@ class NoiseModelInstance:
         return self.coupling_map.size() 
     
 
-    def has_noise(self) -> str:
+    @property
+    def has_noise(self) -> bool:
         """Checks if `NoiseModel` object has noise or is it noiseless.
 
         Returns:
-            str: 
-                - "Yes" if it has noise.
-                - "No" if it is noiseless.
+            bool: 
+                - `True` if it has noise.
+                - `False` if it is noiseless.
         """
         if self.noise_model.is_ideal():
-            return "No"
+            return False
         else:
-            return "Yes"
+            return True

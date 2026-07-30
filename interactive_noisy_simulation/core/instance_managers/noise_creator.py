@@ -87,7 +87,7 @@ class NoiseCreator:
             add_thermal_error(qubit_nr, columns, 
                                 noise_model, noise_dataframe)
             if progress_callback:
-                total_iterations = noise_data.get_qubit_count()
+                total_iterations = noise_data.num_qubits
                 loop_decimal = (qubit_nr + 1) / total_iterations
                 percentage = 5.0 + (loop_decimal * 90)
                 progress_callback(round(percentage, 2))
@@ -124,8 +124,9 @@ class NoiseCreator:
             columns = ["Reference key", "Qubit count", 
                        "Basis gates", "Has noise", 
                        "Noise data source"]
-            rows = [[key, str(instance.get_qubit_count()),
-                     instance.get_basis_gates_str(), instance.has_noise(),
+            rows = [[key, str(instance.num_qubits),
+                     instance.basis_gates_str, 
+                     "Yes" if instance.has_noise else "No",
                      instance.data_source,] 
                     for key, instance in self.__noise_models.items()]
             actions = ["delete"]

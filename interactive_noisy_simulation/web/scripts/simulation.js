@@ -17,7 +17,9 @@
 // tables and rows for displaying existing instance data.
 instanceDataModifications = {
     row: modifyDataRow
-}
+};
+
+let queueExecuting = false;
 
 
 // --------------------------------------------------------------
@@ -52,12 +54,15 @@ function modifyDataRow(rowElement, rowContent) {
 
 
 /**
- * Validates if experiment can be added to queue based on the provided
- * completion status (accomplished through table rows).
+ * Validates if experiment actions should remain active based on
+ * multiple factors.
  * 
- * If an experiment has no jobs or all jobs are completed, its action
- * button to add it to the queue will be disabled and a tooltip will
- * be added that explains as to why it is disabled.
+ * These factors include:
+ * - If the queue is being executed;
+ * - If an experiment has no jobs or all jobs are completed.
+ * 
+ * If actions do get disabled, a tooltip will be added, explaining
+ * the reason for disabling them.
  * 
  * @param {HTMLElement} rowElement - HTML row element that will
  * be modified.
@@ -66,10 +71,16 @@ function modifyDataRow(rowElement, rowContent) {
  * that will be used during element modification.
  */
 function validateQueueEligibility(rowElement, rowContent) {
+    const actionsCell = rowElement.children[3];
+    const actionElement = actionsCell.querySelector("a");
+    if (queueExecuting) {
+        // Disables action element.
+        removeClassesByPrefix(actionElement, "variant-")
+        actionElement.classList.add("variant-disabled");
+        actionElement.title = "No queue modification is allowed during execution.";
+    }
     // Completion status is the 3rd column.
-    if (rowContent[2] === "no jobs" || rowContent[2] === "completed") {
-        const actionsCell = rowElement.children[3];
-        const actionElement = actionsCell.querySelector("a");
+    else if (rowContent[2] === "no jobs" || rowContent[2] === "completed") {
         if (actionElement.innerHTML === "add") {
             // Disables action element.
             removeClassesByPrefix(actionElement, "variant-")
@@ -175,4 +186,16 @@ function updateQueueExecutionButton(state) {
             buttonElement.classList.add("variant-green");
             break;
     }
+}
+
+
+eel.expose(updateQueueExecutionStatus);
+/**
+ * Updates the queue execution status being stored in the variable
+ * `queueExecuting` to whatever is passed to the function as an argument.
+ * 
+ * @param {boolean} isExecuting - new queue execution status that will be set.
+ */
+function updateQueueExecutionStatus(isExecuting) {
+    queueExecuting = isExecuting;
 }

@@ -190,7 +190,7 @@ def execute_queued_experiments() -> None:
     add_log_message(content=LOG_MESSAGES["queue_execution_started"],
                     queued_experiment_count=f"{sm.queue_lenght}")
     
-    sm.is_executing = True
+    update_execution_status(is_executing=True)
     update_queue_execution_button()
     activate_progress_bars()
     try:
@@ -203,9 +203,25 @@ def execute_queued_experiments() -> None:
         add_log_message(content=LOG_MESSAGES["queue_execution_finished"],
                         queued_experiment_count=f"{sm.queue_lenght}")
     finally:
-        sm.is_executing = False
+        update_execution_status(is_executing=False)
         deactivate_progress_bars()
-        update_queue_execution_button()
+        update_simulation_content()
+
+
+def update_execution_status(
+    is_executing: bool
+) -> None:
+    """Updates execution status for functionality in the `Simulation` page.
+    
+    This status is updated: 
+    - inside of the `SimulationManager` class;
+    - in JS code for formatting information.
+
+    Args:
+        is_executing (bool): New status that will be set.
+    """
+    sm.is_executing = is_executing
+    eel.updateQueueExecutionStatus(is_executing)
 
 
 def update_progress_bars(

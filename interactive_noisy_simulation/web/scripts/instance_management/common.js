@@ -5,7 +5,8 @@
 // File contents list:
 // 1. Global page-specific variables
 // 2. Data loading
-// 3. Form input validation
+// 3. File loading / removing
+// 4. Form input validation
 // -----------------------------------------------------------------
 
 // --------------------------------------------------------------
@@ -158,7 +159,61 @@ function viewInstanceData(
 
 
 // --------------------------------------------------------------
-// 3. Form input validation
+// 3. File loading / removing
+// --------------------------------------------------------------
+
+eel.expose(setSelectedFile);
+/**
+ * Changes appearance of custom file input form field and
+ * sets value of hidden input field to the selected file
+ * path on device so that Python can use it after submission.
+ * 
+ * @param {string} fileName - name of selected file that will
+ * be displayed to the user for informative purposes.
+ * @param {string} path - full file path that will be set
+ * as the file input field's value.
+ */
+function setSelectedFile(fileName, path) {
+    // Hides button for selecting file
+    let addFileButton = document.getElementById("chose-file-button");
+    addFileButton.classList.add("hidden-element");
+    // Reveals text with selected file name
+    let pFileName = document.getElementById("selected-file");
+    pFileName.classList.remove("hidden-element");
+    pFileName.innerHTML = fileName;
+    // Reveals X icon for removing selected file
+    let xIcon = document.getElementById("remove-selected-file-icon");
+    xIcon.classList.remove("hidden-element");
+    // Sets selected file path for input field
+    let pathInput = document.getElementById("file-path");
+    pathInput.value = path;
+
+    document.dispatchEvent(new CustomEvent("fileSelected"));
+}
+
+
+/**
+ * Changes appearance of custom file input form field and
+ * unsets value of hidden input field to being empty.
+ */
+function removeSelectedFile() {
+    // Hides text with selected file name
+    let pFileName = document.getElementById("selected-file");
+    pFileName.classList.add("hidden-element");
+    // Hides X icon for removing selected file
+    let xIcon = document.getElementById("remove-selected-file-icon");
+    xIcon.classList.add("hidden-element");
+    // Reveals button for selecting file
+    let addFileButton = document.getElementById("chose-file-button");
+    addFileButton.classList.remove("hidden-element")
+    // Resets selected file path for input field
+    let pathInput = document.getElementById("file-path");
+    pathInput.value = "";
+}
+
+
+// --------------------------------------------------------------
+// 4. Form input validation
 // --------------------------------------------------------------
 
 /**

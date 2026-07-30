@@ -370,7 +370,7 @@ def get_noise_model_references(
         circuit = cm.circuits[args["circuitInstance"]]
         reference_keys = [
             noise_model.reference_key for noise_model in noise_models
-            if circuit.num_qubits <= noise_model.get_qubit_count()
+            if circuit.num_qubits <= noise_model.num_qubits
         ]
         # If none of the available noise model instances can run the selected circuit
         if not reference_keys:

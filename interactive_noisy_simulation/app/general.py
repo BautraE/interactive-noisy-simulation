@@ -3,6 +3,7 @@ import eel
 
 # Project-related imports:
 from .js_common_wrappers import add_empty_container_message
+from ..utils import format_message_text
 from ..project_variables import PACKAGE_ROOT
 
 
@@ -41,7 +42,6 @@ def inform_empty_container(
         **placeholder_replacements (str): Actual words or phrases that will
             replace potential placeholders inside of the message text.
     """
-    if placeholder_replacements:
-        message = message.format(**placeholder_replacements)
+    message = format_message_text(message, **placeholder_replacements)
 
     add_empty_container_message(message, container_id)

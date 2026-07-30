@@ -1,6 +1,9 @@
 # Standard library imports:
 from datetime import datetime
 
+# Project-related imports:
+from ...utils import format_message_text
+
 
 class LogManager:
     def __init__(self) -> None:
@@ -50,7 +53,8 @@ class LogManager:
             tuple[str, list[str]]: Final displayable text and list of 
                 highlightable text fragments.
         """
-        text = text.format(**placeholder_replacements)
+        text = format_message_text(message=text,
+                                   **placeholder_replacements)
         highlightables = [
             hl.format(**placeholder_replacements) for hl in highlightables]
         

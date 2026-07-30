@@ -27,7 +27,8 @@ class NoiseDataInstance:
     dataframe: DataFrame
 
 
-    def get_qubit_count(self) -> int:
+    @property
+    def num_qubits(self) -> int:
         """Retrieves qubit count in current dataframe.
         
         Returns:

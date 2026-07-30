@@ -81,14 +81,11 @@ async function initNoiseDataForm() {
     maxLengthSpan.textContent = MAX_REFERENCE_KEY_LENGTH;
     
     // Adding required event listeners for reference key input field
-    let outlinedElementId = "reference-key";
-    let messageElementId = "reference-key-input-message";
-    
     const referenceKeyInput = document.getElementById("reference-key");
     referenceKeyInput.addEventListener('change', () =>
         removeInputErrorStyles({
-            outlinedElementId: outlinedElementId, 
-            messageElementId: messageElementId
+            outlinedElementId: "reference-key", 
+            messageElementId: "reference-key-input-message"
         })
     );
     referenceKeyInput.addEventListener('input', () =>
@@ -101,64 +98,20 @@ async function initNoiseDataForm() {
             lengthDisplayElementId: "reference-key-input-length",
         })
     );
+
+    // Adding required event listeners for file select input field
+    document.addEventListener("fileSelected", () => {
+        // Removes any previous input error-related style
+        removeInputErrorStyles({
+            outlinedElementId: "csv-file-input", 
+            messageElementId: "csv-file-input-message"
+        });
+    });
 }
 
 
 // --------------------------------------------------------------
 // Regular functionality
-
-eel.expose(setSelectedFile);
-/**
- * Changes appearance of custom file input form field and
- * sets value of hidden input field to the selected file
- * path on device so that Python can use it after submission.
- * 
- * @param {string} fileName - name of selected file that will
- * be displayed to the user for informative purposes.
- * @param {string} path - full file path that will be set
- * as the file input field's value.
- */
-function setSelectedFile(fileName, path) {
-    // Hides button for selecting file
-    let addFileButton = document.getElementById("chose-file-button");
-    addFileButton.classList.add("hidden-element");
-    // Reveals text with selected file name
-    let pFileName = document.getElementById("selected-file");
-    pFileName.classList.remove("hidden-element");
-    pFileName.innerHTML = fileName;
-    // Reveals X icon for removing selected file
-    let xIcon = document.getElementById("remove-selected-file-icon");
-    xIcon.classList.remove("hidden-element");
-    // Sets selected file path for input field
-    let pathInput = document.getElementById("file-path");
-    pathInput.value = path;
-
-    // Removes any previous input error-related style
-    removeInputErrorStyles({
-        outlinedElementId: "csv-file-input", 
-        messageElementId: "csv-file-input-message"
-    });
-}
-
-
-/**
- * Changes appearance of custom file input form field and
- * unsets value of hidden input field to being empty.
- */
-function removeSelectedCSVFile() {
-    // Hides text with selected file name
-    let pFileName = document.getElementById("selected-file");
-    pFileName.classList.add("hidden-element");
-    // Hides X icon for removing selected file
-    let xIcon = document.getElementById("remove-selected-file-icon");
-    xIcon.classList.add("hidden-element");
-    // Reveals button for selecting file
-    let addFileButton = document.getElementById("chose-file-button");
-    addFileButton.classList.remove("hidden-element")
-    // Resets selected file path for input field
-    let pathInput = document.getElementById("file-path");
-    pathInput.value = "";
-}
 
 
 /**

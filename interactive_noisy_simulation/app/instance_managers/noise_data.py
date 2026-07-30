@@ -7,6 +7,7 @@ import eel
 # Project-related imports:
 from ...core.data_structures.file import File
 from ..general import inform_empty_container
+from .js_manager_wrappers import view_instance_data
 from ..js_common_wrappers import (
     add_table, add_table_row,
     add_content_box,
@@ -42,16 +43,11 @@ def view_noise_data_instances() -> None:
     # Retrieves displayable data about created noise data instances
     instance_data = ndm.get_instance_data()
 
-    # If data exists, creates table
+    # If data exists, tells to display the instances
     if instance_data:
-        add_table(container_id="content-box", 
-                  table_id="noise-data-instances",
-                  columns=instance_data.columns,
-                  has_actions=bool(instance_data.actions))
-        for data_row in instance_data.rows:
-            add_table_row(table_id="noise-data-instances",
-                          row_content=data_row,
-                          actions=instance_data.actions)
+        view_instance_data(instance_data=instance_data.to_dict(), 
+                           container_id="content-box",
+                           table_id="noise-data-instances")
     # If not, adds message stating this
     else:
         inform_empty_container(message=EMPTY_CONTAINER_MESSAGES["no_instances"],
